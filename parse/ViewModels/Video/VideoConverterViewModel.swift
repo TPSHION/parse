@@ -39,6 +39,7 @@ class VideoConverterViewModel: ObservableObject {
     }
     
     @Published var videoItems: [VideoItem] = []
+    @Published var exportDocument: ConvertedVideosDocument?
     
     @Published var conversionMode: ConversionMode = .quality
     
@@ -82,6 +83,24 @@ class VideoConverterViewModel: ObservableObject {
         return totalProgress / Double(totalCount)
     }
     
+    var shareableURLs: [URL] {
+        videoItems.compactMap { item in
+            item.status == .success ? item.convertedFileURL : nil
+        }
+    }
+    
+    var hasSuccessItems: Bool {
+        videoItems.contains { $0.status == .success }
+    }
+    
+    var canConvert: Bool {
+        !videoItems.isEmpty
+    }
+    
+    var canSave: Bool {
+        hasSuccessItems && !isConverting
+    }
+    
     // MARK: - 操作
     func addVideo(url: URL, name: String, format: String) async {
         let thumbnail = try? await generateThumbnail(from: url)
@@ -122,6 +141,11 @@ class VideoConverterViewModel: ObservableObject {
         videoItems.remove(atOffsets: offsets)
     }
     
+    func removeItem(id: UUID) {
+        guard let index = videoItems.firstIndex(where: { $0.id == id }) else { return }
+        removeItems(at: IndexSet(integer: index))
+    }
+    
     func clearAll() {
         for item in videoItems {
             if let url = item.convertedFileURL {
@@ -130,6 +154,31 @@ class VideoConverterViewModel: ObservableObject {
             try? FileManager.default.removeItem(at: item.originalURL)
         }
         videoItems.removeAll()
+    }
+    
+    func prepareExportDocument() {
+        let successItems = videoItems.filter { $0.status == .success }
+        exportDocument = successItems.isEmpty ? nil : ConvertedVideosDocument(items: successItems)
+    }
+    
+    func handlePrimaryAction() async {
+        if isConverting {
+            stopConversions()
+        } else {
+            await convertAll()
+        }
+    }
+    
+    func handleFileImportResult(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            Task { [weak self] in
+                guard let self else { return }
+                await self.importVideos(from: urls)
+            }
+        case .failure(let error):
+            print("Import failed: \(error.localizedDescription)")
+        }
     }
     
     func processVideoSelections(_ selections: [PhotosPickerItem]) {
@@ -157,6 +206,29 @@ class VideoConverterViewModel: ObservableObject {
                 }
             }
             self.isImporting = false
+        }
+    }
+    
+    private func importVideos(from urls: [URL]) async {
+        guard !urls.isEmpty else { return }
+        isImporting = true
+        defer { isImporting = false }
+        
+        for url in urls {
+            guard url.startAccessingSecurityScopedResource() else { continue }
+            defer { url.stopAccessingSecurityScopedResource() }
+            
+            let tempDirectory = FileManager.default.temporaryDirectory
+            let tempURL = tempDirectory.appendingPathComponent(UUID().uuidString + "_" + url.lastPathComponent)
+            
+            do {
+                try FileManager.default.copyItem(at: url, to: tempURL)
+                let name = url.deletingPathExtension().lastPathComponent
+                let format = url.pathExtension.uppercased()
+                await addVideo(url: tempURL, name: name, format: format.isEmpty ? "未知" : format)
+            } catch {
+                print("Import failed: \(error.localizedDescription)")
+            }
         }
     }
     

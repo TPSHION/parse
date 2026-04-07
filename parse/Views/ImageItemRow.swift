@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ImageItemRow: View {
     let item: ImageItem
-    @Binding var batchTargetFormat: ImageFormat
     let onFormatChange: (ImageFormat) -> Void
     let onDelete: () -> Void
     

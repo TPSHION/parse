@@ -114,7 +114,7 @@ struct VideoItemRow: View {
             HStack(spacing: 4) {
                 Image(systemName: "play.fill")
                     .font(.system(size: 8, weight: .bold))
-                Text(durationText(item.duration))
+                Text(item.duration.videoDurationText)
                     .font(.system(size: 9, weight: .bold))
             }
             .foregroundColor(.white)
@@ -150,15 +150,4 @@ struct VideoItemRow: View {
         }
     }
 
-    private func durationText(_ value: Double) -> String {
-        guard value.isFinite, value > 0 else { return "--:--" }
-        let totalSeconds = Int(value.rounded())
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        }
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
 }

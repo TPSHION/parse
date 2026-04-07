@@ -8,6 +8,7 @@ import Photos
 @MainActor
 class ConverterViewModel: ObservableObject {
     @Published var imageItems: [ImageItem] = []
+    @Published var exportDocument: ConvertedImagesDocument?
     
     @Published var batchTargetFormat: ImageFormat = .jpeg {
         didSet {
@@ -39,6 +40,24 @@ class ConverterViewModel: ObservableObject {
     
     var convertingCount: Int {
         imageItems.filter { $0.status == .converting }.count
+    }
+    
+    var shareableURLs: [URL] {
+        imageItems.compactMap { item in
+            item.status == .success ? item.convertedFileURL : nil
+        }
+    }
+    
+    var hasSuccessItems: Bool {
+        imageItems.contains { $0.status == .success }
+    }
+    
+    var canConvert: Bool {
+        !isConverting && !imageItems.isEmpty
+    }
+    
+    var canSave: Bool {
+        hasSuccessItems && !isConverting
     }
     
     // 整体转换进度 (0.0 - 1.0)
@@ -81,6 +100,11 @@ class ConverterViewModel: ObservableObject {
         imageItems.remove(atOffsets: offsets)
     }
     
+    func removeItem(id: UUID) {
+        guard let index = imageItems.firstIndex(where: { $0.id == id }) else { return }
+        removeItems(at: IndexSet(integer: index))
+    }
+    
     func clearAll() {
         // 清理所有临时文件
         for item in imageItems {
@@ -89,6 +113,24 @@ class ConverterViewModel: ObservableObject {
             }
         }
         imageItems.removeAll()
+    }
+    
+    func prepareExportDocument() {
+        let successItems = imageItems.filter { $0.status == .success }
+        exportDocument = successItems.isEmpty ? nil : ConvertedImagesDocument(items: successItems)
+    }
+    
+    func handlePrimaryAction() async {
+        await convertAll()
+    }
+    
+    func handleFileImportResult(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            importImages(from: urls)
+        case .failure(let error):
+            print("Import failed: \(error.localizedDescription)")
+        }
     }
     
     func convertAll() async {
@@ -220,6 +262,20 @@ class ConverterViewModel: ObservableObject {
             }
         }
     }
+    
+    private func importImages(from urls: [URL]) {
+        for url in urls {
+            guard url.startAccessingSecurityScopedResource() else { continue }
+            defer { url.stopAccessingSecurityScopedResource() }
+            
+            if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                let name = url.deletingPathExtension().lastPathComponent
+                let format = url.pathExtension.uppercased()
+                addImage(image: image, name: name, format: format.isEmpty ? "未知" : format)
+            }
+        }
+    }
+    
     func saveToPhotoLibrary() async -> Result<Int, Error> {
         // 请求“仅添加”权限（如果还没有）
         let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)

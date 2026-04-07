@@ -14,19 +14,9 @@ struct ImageConverterView: View {
     @State private var selectedPhotos: [PhotosPickerItem] = []
     @State private var isFileImporterPresented = false
     @State private var isFileExporterPresented = false
-    @State private var exportDocument: ConvertedImagesDocument?
     @State private var isSaveActionSheetPresented = false
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
-    
-    private var shareableURLs: [URL] {
-        viewModel.imageItems.compactMap { item in
-            if item.status == .success {
-                return item.convertedFileURL
-            }
-            return nil
-        }
-    }
     
     var body: some View {
         ZStack {
@@ -103,14 +93,11 @@ struct ImageConverterView: View {
                                     ForEach(viewModel.imageItems) { item in
                                         ImageItemRow(
                                             item: item,
-                                            batchTargetFormat: $viewModel.batchTargetFormat,
                                             onFormatChange: { newFormat in
                                                 viewModel.updateTargetFormat(for: item.id, to: newFormat)
                                             },
                                             onDelete: {
-                                                if let index = viewModel.imageItems.firstIndex(where: { $0.id == item.id }) {
-                                                    viewModel.removeItems(at: IndexSet(integer: index))
-                                                }
+                                                viewModel.removeItem(id: item.id)
                                             }
                                         )
                                     }
@@ -154,11 +141,11 @@ struct ImageConverterView: View {
                 allowedContentTypes: [.image],
                 allowsMultipleSelection: true
             ) { result in
-                handleFileImporterResult(result)
+                viewModel.handleFileImportResult(result)
             }
             .fileExporter(
                 isPresented: $isFileExporterPresented,
-                document: exportDocument,
+                document: viewModel.exportDocument,
                 contentType: .folder,
                 defaultFilename: "ConvertedImages"
             ) { result in
@@ -173,7 +160,7 @@ struct ImageConverterView: View {
             }
             .sheet(isPresented: $isSaveActionSheetPresented) {
                 SaveActionSheetView(
-                    shareableURLs: shareableURLs,
+                    shareableURLs: viewModel.shareableURLs,
                     onSaveToAlbum: {
                         isSaveActionSheetPresented = false
                         Task {
@@ -190,7 +177,8 @@ struct ImageConverterView: View {
                     },
                     onSaveToFile: {
                         isSaveActionSheetPresented = false
-                        exportConvertedImages()
+                        viewModel.prepareExportDocument()
+                        isFileExporterPresented = viewModel.exportDocument != nil
                     }
                 )
                 .presentationDetents([.height(280)])
@@ -208,10 +196,6 @@ struct ImageConverterView: View {
     
     @ViewBuilder
     private var bottomActionPanel: some View {
-        let hasSuccessItems = viewModel.imageItems.contains { $0.status == .success }
-        let canConvert = !viewModel.isConverting && !viewModel.imageItems.isEmpty
-        let canSave = hasSuccessItems && !viewModel.isConverting
-        
         HStack(spacing: 12) {
             Button(action: {
                 isFileImporterPresented = true
@@ -239,7 +223,7 @@ struct ImageConverterView: View {
             
             Button(action: {
                 Task {
-                    await viewModel.convertAll()
+                    await viewModel.handlePrimaryAction()
                 }
             }) {
                 HStack(spacing: 6) {
@@ -255,15 +239,15 @@ struct ImageConverterView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
-                .foregroundColor(canConvert ? .white : AppColors.textSecondary.opacity(0.5))
+                .foregroundColor(viewModel.canConvert ? .white : AppColors.textSecondary.opacity(0.5))
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
-                .background(canConvert ? AppColors.accentBlue : AppColors.secondaryBackground.opacity(0.5))
+                .background(viewModel.canConvert ? AppColors.accentBlue : AppColors.secondaryBackground.opacity(0.5))
                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(color: canConvert ? AppColors.accentBlue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
+                .shadow(color: viewModel.canConvert ? AppColors.accentBlue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
             }
             .buttonStyle(.plain)
-            .disabled(!canConvert)
+            .disabled(!viewModel.canConvert)
             
             Button(action: {
                 isSaveActionSheetPresented = true
@@ -275,15 +259,15 @@ struct ImageConverterView: View {
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
                 }
-                .foregroundColor(canSave ? .white : AppColors.textSecondary.opacity(0.5))
+                .foregroundColor(viewModel.canSave ? .white : AppColors.textSecondary.opacity(0.5))
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
-                .background(canSave ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5))
+                .background(viewModel.canSave ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5))
                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(color: canSave ? AppColors.accentGreen.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
+                .shadow(color: viewModel.canSave ? AppColors.accentGreen.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
             }
             .buttonStyle(.plain)
-            .disabled(!canSave)
+            .disabled(!viewModel.canSave)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
@@ -302,121 +286,6 @@ struct ImageConverterView: View {
         .padding(.bottom, 0)
     }
     
-    private func handleFileImporterResult(_ result: Result<[URL], Error>) {
-        switch result {
-        case .success(let urls):
-            for url in urls {
-                guard url.startAccessingSecurityScopedResource() else { continue }
-                defer { url.stopAccessingSecurityScopedResource() }
-                
-                if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                    let name = url.deletingPathExtension().lastPathComponent
-                    let format = url.pathExtension.uppercased()
-                    viewModel.addImage(image: image, name: name, format: format.isEmpty ? "未知" : format)
-                }
-            }
-        case .failure(let error):
-            print("Import failed: \(error.localizedDescription)")
-        }
-    }
-    
-    private func exportConvertedImages() {
-        // Zip document logic to be implemented, or save to Photo Library
-        let successItems = viewModel.imageItems.filter { $0.status == .success }
-        exportDocument = ConvertedImagesDocument(items: successItems)
-        isFileExporterPresented = true
-    }
-}
-
-struct StatItemView: View {
-    let title: String
-    let count: Int
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 4) {
-            Text(title)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(AppColors.textSecondary)
-            
-            Text("\(count)")
-                .font(.system(size: 20, weight: .bold))
-                .foregroundColor(color)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct SaveActionSheetView: View {
-    let shareableURLs: [URL]
-    let onSaveToAlbum: () -> Void
-    let onSaveToFile: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("选择操作方式")
-                .font(.headline)
-                .fontWeight(.bold)
-                .foregroundColor(AppColors.textPrimary)
-                .padding(.top, 10)
-            
-            VStack(spacing: 12) {
-                // 分享按钮（利用 SwiftUI 的原生 ShareLink）
-                if !shareableURLs.isEmpty {
-                    ShareLink(items: shareableURLs) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.system(size: 20))
-                            Text("分享图片")
-                                .font(.system(size: 16, weight: .semibold))
-                            Spacer()
-                        }
-                        .foregroundColor(AppColors.textPrimary)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(AppColors.cardBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    }
-                    .buttonStyle(.plain)
-                }
-                
-                Button(action: onSaveToAlbum) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "photo.on.rectangle.angled")
-                            .font(.system(size: 20))
-                        Text("保存到相册")
-                            .font(.system(size: 16, weight: .semibold))
-                        Spacer()
-                    }
-                    .foregroundColor(AppColors.textPrimary)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(AppColors.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .buttonStyle(.plain)
-                
-                Button(action: onSaveToFile) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "folder")
-                            .font(.system(size: 20))
-                        Text("保存为文件")
-                            .font(.system(size: 16, weight: .semibold))
-                        Spacer()
-                    }
-                    .foregroundColor(AppColors.textPrimary)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(AppColors.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, 20)
-            
-            Spacer()
-        }
-    }
 }
 
 #Preview {

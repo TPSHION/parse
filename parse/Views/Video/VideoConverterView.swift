@@ -6,19 +6,9 @@ struct VideoConverterView: View {
     @State private var selectedVideos: [PhotosPickerItem] = []
     @State private var isFileImporterPresented = false
     @State private var isFileExporterPresented = false
-    @State private var exportDocument: ConvertedVideosDocument?
     @State private var isSaveActionSheetPresented = false
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
-    
-    private var shareableURLs: [URL] {
-        viewModel.videoItems.compactMap { item in
-            if item.status == .success {
-                return item.convertedFileURL
-            }
-            return nil
-        }
-    }
     
     var body: some View {
         ZStack {
@@ -102,11 +92,11 @@ struct VideoConverterView: View {
             allowedContentTypes: [.movie, .video],
             allowsMultipleSelection: true
         ) { result in
-            handleFileImporterResult(result)
+            viewModel.handleFileImportResult(result)
         }
         .fileExporter(
             isPresented: $isFileExporterPresented,
-            document: exportDocument,
+            document: viewModel.exportDocument,
             contentType: .folder,
             defaultFilename: "ConvertedVideos"
         ) { result in
@@ -121,7 +111,7 @@ struct VideoConverterView: View {
         }
         .sheet(isPresented: $isSaveActionSheetPresented) {
             SaveActionSheetView(
-                shareableURLs: shareableURLs,
+                shareableURLs: viewModel.shareableURLs,
                 onSaveToAlbum: {
                     isSaveActionSheetPresented = false
                     Task {
@@ -138,7 +128,8 @@ struct VideoConverterView: View {
                 },
                 onSaveToFile: {
                     isSaveActionSheetPresented = false
-                    exportConvertedVideos()
+                    viewModel.prepareExportDocument()
+                    isFileExporterPresented = viewModel.exportDocument != nil
                 }
             )
             .presentationDetents([.height(280)])
@@ -266,33 +257,6 @@ struct VideoConverterView: View {
         .padding(.horizontal)
     }
     
-    private var batchFormatPanel: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("批量目标格式")
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(AppColors.textPrimary)
-                    Text("统一设置待处理视频的默认导出格式")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(AppColors.textSecondary)
-                }
-                Spacer()
-            }
-            
-            Picker("统一转换为", selection: $viewModel.batchTargetFormat) {
-                ForEach(VideoFormat.allCases) { format in
-                    Text(format.rawValue).tag(format)
-                }
-            }
-            .pickerStyle(.segmented)
-            .allowsHitTesting(!viewModel.isConverting)
-        }
-        .padding(18)
-        .background(AppColors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-    }
-    
     private var listSection: some View {
         VStack(spacing: 12) {
             ForEach(viewModel.videoItems) { item in
@@ -302,9 +266,7 @@ struct VideoConverterView: View {
                         viewModel.updateTargetFormat(for: item.id, to: newFormat)
                     },
                     onDelete: {
-                        if let index = viewModel.videoItems.firstIndex(where: { $0.id == item.id }) {
-                            viewModel.removeItems(at: IndexSet(integer: index))
-                        }
+                        viewModel.removeItem(id: item.id)
                     }
                 )
             }
@@ -316,62 +278,53 @@ struct VideoConverterView: View {
     
     @ViewBuilder
     private var bottomActionPanel: some View {
-        let hasSuccessItems = viewModel.videoItems.contains { $0.status == .success }
-        let canConvert = !viewModel.videoItems.isEmpty
-        let canSave = hasSuccessItems && !viewModel.isConverting
-        let isConverting = viewModel.isConverting
-        
         HStack(spacing: 12) {
             Button(action: {
                 isFileImporterPresented = true
             }) {
                 Image(systemName: "folder.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(viewModel.isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(viewModel.isConverting ? 0.3 : 0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(isConverting)
+            .disabled(viewModel.isConverting)
             
             PhotosPicker(selection: $selectedVideos, matching: .videos, photoLibrary: .shared()) {
                 Image(systemName: "photo.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(viewModel.isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(viewModel.isConverting ? 0.3 : 0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(isConverting)
+            .disabled(viewModel.isConverting)
             
             Button(action: {
-                if isConverting {
-                    viewModel.stopConversions()
-                } else {
-                    Task {
-                        await viewModel.convertAll()
-                    }
+                Task {
+                    await viewModel.handlePrimaryAction()
                 }
             }) {
                 HStack(spacing: 6) {
-                    Image(systemName: isConverting ? "stop.fill" : "arrow.triangle.2.circlepath")
+                    Image(systemName: viewModel.isConverting ? "stop.fill" : "arrow.triangle.2.circlepath")
                         .font(.system(size: 16, weight: .semibold))
-                    Text(isConverting ? "停止" : "转换")
+                    Text(viewModel.isConverting ? "停止" : "转换")
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
-                .foregroundColor(canConvert ? .white : AppColors.textSecondary.opacity(0.5))
+                .foregroundColor(viewModel.canConvert ? .white : AppColors.textSecondary.opacity(0.5))
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
-                .background(canConvert ? AppColors.accentBlue : AppColors.secondaryBackground.opacity(0.5))
+                .background(viewModel.canConvert ? AppColors.accentBlue : AppColors.secondaryBackground.opacity(0.5))
                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(color: canConvert ? AppColors.accentBlue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
+                .shadow(color: viewModel.canConvert ? AppColors.accentBlue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
             }
             .buttonStyle(.plain)
-            .disabled(!canConvert)
+            .disabled(!viewModel.canConvert)
             
             Button(action: {
                 isSaveActionSheetPresented = true
@@ -383,15 +336,15 @@ struct VideoConverterView: View {
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
                 }
-                .foregroundColor(canSave ? .white : AppColors.textSecondary.opacity(0.5))
+                .foregroundColor(viewModel.canSave ? .white : AppColors.textSecondary.opacity(0.5))
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
-                .background(canSave ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5))
+                .background(viewModel.canSave ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5))
                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(color: canSave ? AppColors.accentGreen.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
+                .shadow(color: viewModel.canSave ? AppColors.accentGreen.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
             }
             .buttonStyle(.plain)
-            .disabled(!canSave)
+            .disabled(!viewModel.canSave)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
@@ -410,89 +363,4 @@ struct VideoConverterView: View {
         .padding(.bottom, 0)
     }
     
-    private func metricCard(title: String, value: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(AppColors.textSecondary)
-            Text(value)
-                .font(.system(size: 20, weight: .bold))
-                .foregroundColor(color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(AppColors.secondaryBackground.opacity(0.3))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-    
-    private func summaryBadge(icon: String, text: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.system(size: 11, weight: .semibold))
-            Text(text)
-                .font(.system(size: 12, weight: .semibold))
-        }
-        .foregroundColor(AppColors.textSecondary)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
-        .background(AppColors.secondaryBackground.opacity(0.35))
-        .clipShape(Capsule())
-    }
-    
-    private func handleFileImporterResult(_ result: Result<[URL], Error>) {
-        switch result {
-        case .success(let urls):
-            guard !urls.isEmpty else { return }
-            viewModel.isImporting = true
-            
-            Task {
-                for url in urls {
-                    guard url.startAccessingSecurityScopedResource() else { continue }
-                    
-                    let tempDirectory = FileManager.default.temporaryDirectory
-                    let tempURL = tempDirectory.appendingPathComponent(UUID().uuidString + "_" + url.lastPathComponent)
-                    
-                    do {
-                        try FileManager.default.copyItem(at: url, to: tempURL)
-                        let name = url.deletingPathExtension().lastPathComponent
-                        let format = url.pathExtension.uppercased()
-                        await viewModel.addVideo(url: tempURL, name: name, format: format.isEmpty ? "未知" : format)
-                    } catch {
-                        print("Import failed: \(error.localizedDescription)")
-                    }
-                    
-                    url.stopAccessingSecurityScopedResource()
-                }
-                viewModel.isImporting = false
-            }
-        case .failure(let error):
-            print("Import failed: \(error.localizedDescription)")
-        }
-    }
-    
-    private func exportConvertedVideos() {
-        let successItems = viewModel.videoItems.filter { $0.status == .success }
-        exportDocument = ConvertedVideosDocument(items: successItems)
-        isFileExporterPresented = true
-    }
-}
-
-private extension Double {
-    var progressText: String {
-        "\(Int(self * 100))%"
-    }
-    
-    var videoDurationText: String {
-        guard isFinite, self > 0 else { return "--:--" }
-        let totalSeconds = Int(self.rounded())
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        }
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
 }
