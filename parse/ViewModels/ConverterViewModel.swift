@@ -151,6 +151,23 @@ class ConverterViewModel: ObservableObject {
                 guard CGImageDestinationFinalize(destination) else {
                     throw ConversionError.failedToGenerateData
                 }
+                
+            case .tiff:
+                guard let cgImage = image.cgImage,
+                      let destination = CGImageDestinationCreateWithURL(fileURL as CFURL, UTType.tiff.identifier as CFString, 1, nil) else {
+                    throw ConversionError.failedToGenerateData
+                }
+                
+                // TIFF 通常作为无损/未压缩格式使用，保留最原始的像素数据
+                // 这里的 LZW 是 TIFF 标准的一种无损压缩算法，可以略微减小极大的文件体积而不丢失任何质量
+                let options: [CFString: Any] = [
+                    kCGImagePropertyTIFFCompression: 5 // 5 means LZW compression
+                ]
+                
+                CGImageDestinationAddImage(destination, cgImage, options as CFDictionary)
+                guard CGImageDestinationFinalize(destination) else {
+                    throw ConversionError.failedToGenerateData
+                }
             }
             
             return fileURL

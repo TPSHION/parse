@@ -26,7 +26,7 @@ struct EmptyStateView: View {
                     .fontWeight(.bold)
                     .foregroundColor(AppColors.textPrimary)
                 
-                Text("支持多张图片同时转换为 JPEG、PNG 或 HEIC 格式")
+                Text("支持多张图片同时转换为 JPEG、PNG、HEIC 或 TIFF 格式")
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
                     .multilineTextAlignment(.center)

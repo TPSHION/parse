@@ -5,6 +5,7 @@ enum ImageFormat: String, CaseIterable, Identifiable {
     case jpeg = "JPEG"
     case png = "PNG"
     case heic = "HEIC"
+    case tiff = "TIFF"
     
     var id: String { rawValue }
     
@@ -13,6 +14,7 @@ enum ImageFormat: String, CaseIterable, Identifiable {
         case .jpeg: return "jpg"
         case .png: return "png"
         case .heic: return "heic"
+        case .tiff: return "tiff"
         }
     }
     
@@ -21,6 +23,7 @@ enum ImageFormat: String, CaseIterable, Identifiable {
         case .jpeg: return .jpeg
         case .png: return .png
         case .heic: return .heic
+        case .tiff: return .tiff
         }
     }
 }
