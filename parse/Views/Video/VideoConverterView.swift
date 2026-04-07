@@ -82,9 +82,9 @@ struct VideoConverterView: View {
                     Button(action: { viewModel.clearAll() }) {
                         Text("清空")
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(AppColors.textSecondary)
+                            .foregroundColor(.white)
                     }
-                    .disabled(viewModel.isConverting)
+                    .allowsHitTesting(!viewModel.isConverting)
                 }
             }
         }
@@ -171,43 +171,97 @@ struct VideoConverterView: View {
                 
                 // 仅在有任务进行过或进行中时显示进度条
                 if viewModel.totalCount > 0 && (viewModel.isConverting || viewModel.successCount > 0 || viewModel.failedCount > 0) {
-                    GeometryReader { geometry in
-                        ZStack(alignment: .leading) {
-                            Rectangle()
-                                .fill(AppColors.secondaryBackground.opacity(0.5))
-                                .frame(height: 4)
-                            
-                            Rectangle()
-                                .fill(viewModel.isConverting ? AppColors.accentBlue : AppColors.accentGreen)
-                                .frame(width: geometry.size.width * CGFloat(viewModel.conversionProgress), height: 4)
-                                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: viewModel.conversionProgress)
-                                .animation(.easeInOut(duration: 0.3), value: viewModel.isConverting)
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text(viewModel.isConverting ? "处理中" : "处理完成")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(viewModel.isConverting ? AppColors.accentBlue : AppColors.accentGreen)
+                            Spacer()
+                            Text(viewModel.conversionProgress.progressText)
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(AppColors.textPrimary)
                         }
+                        
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                Rectangle()
+                                    .fill(AppColors.secondaryBackground.opacity(0.5))
+                                    .frame(height: 4)
+                                
+                                Rectangle()
+                                    .fill(viewModel.isConverting ? AppColors.accentBlue : AppColors.accentGreen)
+                                    .frame(width: geometry.size.width * CGFloat(viewModel.conversionProgress), height: 4)
+                                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: viewModel.conversionProgress)
+                                    .animation(.easeInOut(duration: 0.3), value: viewModel.isConverting)
+                            }
+                        }
+                        .frame(height: 4)
                     }
-                    .frame(height: 4)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 12)
                 }
             }
             .background(AppColors.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             
-            // 统一转换选项
-            VStack(alignment: .leading, spacing: 12) {
-                Text("统一转换为")
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.textSecondary)
-                    .fontWeight(.medium)
+                // 模式选择和统一转换选项
+                VStack(spacing: 12) {
+                    HStack {
+                        Text("转换模式")
+                            .font(.subheadline)
+                            .foregroundColor(AppColors.textSecondary)
+                            .fontWeight(.medium)
+                        Spacer()
+                        Picker("转换模式", selection: $viewModel.conversionMode) {
+                            ForEach(VideoConverterViewModel.ConversionMode.allCases) { mode in
+                                Text(mode.rawValue).tag(mode)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .frame(width: 160)
+                        .allowsHitTesting(!viewModel.isConverting)
+                    }
                     
-                Picker("统一转换为", selection: $viewModel.batchTargetFormat) {
-                    ForEach(VideoFormat.allCases) { format in
-                        Text(format.rawValue).tag(format)
+                    Divider().background(AppColors.secondaryBackground)
+                    
+                    HStack {
+                        Text("统一转换为")
+                            .font(.subheadline)
+                            .foregroundColor(AppColors.textSecondary)
+                            .fontWeight(.medium)
+                        Spacer()
+                        Picker("统一转换为", selection: $viewModel.batchTargetFormat) {
+                            ForEach(VideoFormat.allCases) { format in
+                                Text(format.rawValue).tag(format)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .frame(width: 240)
+                        .allowsHitTesting(!viewModel.isConverting)
+                    }
+                    
+                    Divider().background(AppColors.secondaryBackground)
+                    
+                    HStack {
+                        Text("并发处理数量")
+                            .font(.subheadline)
+                            .foregroundColor(AppColors.textSecondary)
+                            .fontWeight(.medium)
+                        Spacer()
+                        Stepper(value: $viewModel.maxConcurrentTasks, in: 1...10) {
+                            Text("\(viewModel.maxConcurrentTasks)")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(AppColors.textPrimary)
+                                .frame(minWidth: 30, alignment: .trailing)
+                        }
+                        .frame(width: 140)
+                        .environment(\.colorScheme, .dark)
+                        .allowsHitTesting(!viewModel.isConverting)
                     }
                 }
-                .pickerStyle(.segmented)
-                .disabled(viewModel.isConverting)
-            }
-            .padding()
-            .background(AppColors.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .padding(16)
+                .background(AppColors.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
         .padding(.horizontal)
     }
@@ -232,7 +286,7 @@ struct VideoConverterView: View {
                 }
             }
             .pickerStyle(.segmented)
-            .disabled(viewModel.isConverting)
+            .allowsHitTesting(!viewModel.isConverting)
         }
         .padding(18)
         .background(AppColors.cardBackground)
@@ -255,6 +309,7 @@ struct VideoConverterView: View {
                 )
             }
         }
+        .allowsHitTesting(!viewModel.isConverting)
         .padding(.horizontal)
         .padding(.bottom, 100)
     }
@@ -262,8 +317,9 @@ struct VideoConverterView: View {
     @ViewBuilder
     private var bottomActionPanel: some View {
         let hasSuccessItems = viewModel.videoItems.contains { $0.status == .success }
-        let canConvert = !viewModel.isConverting && !viewModel.videoItems.isEmpty
+        let canConvert = !viewModel.videoItems.isEmpty
         let canSave = hasSuccessItems && !viewModel.isConverting
+        let isConverting = viewModel.isConverting
         
         HStack(spacing: 12) {
             Button(action: {
@@ -271,39 +327,38 @@ struct VideoConverterView: View {
             }) {
                 Image(systemName: "folder.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(viewModel.isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(viewModel.isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(viewModel.isConverting)
+            .disabled(isConverting)
             
             PhotosPicker(selection: $selectedVideos, matching: .videos, photoLibrary: .shared()) {
                 Image(systemName: "photo.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(viewModel.isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(viewModel.isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(viewModel.isConverting)
+            .disabled(isConverting)
             
             Button(action: {
-                Task {
-                    await viewModel.convertAll()
+                if isConverting {
+                    viewModel.stopConversions()
+                } else {
+                    Task {
+                        await viewModel.convertAll()
+                    }
                 }
             }) {
                 HStack(spacing: 6) {
-                    if viewModel.isConverting {
-                        ProgressView()
-                            .tint(AppColors.textSecondary)
-                    } else {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                            .font(.system(size: 16, weight: .semibold))
-                    }
-                    Text(viewModel.isConverting ? "转换中" : "转换")
+                    Image(systemName: isConverting ? "stop.fill" : "arrow.triangle.2.circlepath")
+                        .font(.system(size: 16, weight: .semibold))
+                    Text(isConverting ? "停止" : "转换")
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)

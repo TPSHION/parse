@@ -134,7 +134,7 @@ struct ImageConverterView: View {
                         Button(action: { viewModel.clearAll() }) {
                             Text("清空")
                                 .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(AppColors.textSecondary)
+                                .foregroundColor(.white)
                         }
                         .disabled(viewModel.isConverting)
                     }

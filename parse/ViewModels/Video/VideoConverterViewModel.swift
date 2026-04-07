@@ -19,7 +19,30 @@ struct MovieTransferable: Transferable {
 
 @MainActor
 class VideoConverterViewModel: ObservableObject {
+    private static let stoppedMessage = "已停止转换"
+    
+    private enum ConversionAttemptResult {
+        case success
+        case failure(String)
+    }
+    
+    private enum FFmpegProfile {
+        case quality
+        case speed
+    }
+    
+    enum ConversionMode: String, CaseIterable, Identifiable {
+        case quality = "质量优先"
+        case speed = "速度优先"
+        
+        var id: String { self.rawValue }
+    }
+    
     @Published var videoItems: [VideoItem] = []
+    
+    @Published var conversionMode: ConversionMode = .quality
+    
+    @Published var maxConcurrentTasks: Int = 2
     
     @Published var batchTargetFormat: VideoFormat = .mp4 {
         didSet {
@@ -33,6 +56,9 @@ class VideoConverterViewModel: ObservableObject {
     
     @Published var isConverting: Bool = false
     @Published var isImporting: Bool = false
+    
+    private var shouldStopConversion = false
+    private var activeNativeExportSessions: [UUID: AVAssetExportSession] = [:]
     
     // MARK: - 统计属性
     var totalCount: Int { videoItems.count }
@@ -50,8 +76,10 @@ class VideoConverterViewModel: ObservableObject {
     
     var conversionProgress: Double {
         guard totalCount > 0 else { return 0.0 }
-        let completed = successCount + failedCount
-        return Double(completed) / Double(totalCount)
+        let totalProgress = videoItems.reduce(0.0) { partialResult, item in
+            partialResult + overallProgress(for: item)
+        }
+        return totalProgress / Double(totalCount)
     }
     
     // MARK: - 操作
@@ -134,18 +162,61 @@ class VideoConverterViewModel: ObservableObject {
     
     // MARK: - 转换逻辑 (FFmpeg)
     func convertAll() async {
-        isConverting = true
-        defer { isConverting = false }
+        let pendingIndexes = videoItems.indices.filter { index in
+            let item = videoItems[index]
+            return item.status == .pending || isFailed(status: item.status)
+        }
         
-        for i in videoItems.indices {
-            let item = videoItems[i]
-            if item.status == .pending || isFailed(status: item.status) {
-                await convertItem(at: i)
+        guard !pendingIndexes.isEmpty else { return }
+        
+        shouldStopConversion = false
+        isConverting = true
+        defer {
+            isConverting = false
+            shouldStopConversion = false
+            activeNativeExportSessions.removeAll()
+        }
+        
+        let concurrencyLimit = min(max(maxConcurrentTasks, 1), pendingIndexes.count)
+        
+        await withTaskGroup(of: Void.self) { group in
+            var nextOffset = 0
+            
+            func enqueueNextTaskIfNeeded() async {
+                let shouldStop = await MainActor.run { self.shouldStopConversion }
+                guard !shouldStop, nextOffset < pendingIndexes.count else { return }
+                let index = pendingIndexes[nextOffset]
+                nextOffset += 1
+                group.addTask { [weak self] in
+                    guard let self else { return }
+                    await self.convertItem(at: index)
+                }
+            }
+            
+            for _ in 0..<concurrencyLimit {
+                await enqueueNextTaskIfNeeded()
+            }
+            
+            while await group.next() != nil {
+                await enqueueNextTaskIfNeeded()
             }
         }
     }
     
+    func stopConversions() {
+        guard isConverting else { return }
+        shouldStopConversion = true
+        
+        for session in activeNativeExportSessions.values {
+            session.cancelExport()
+        }
+        
+        FFmpegKit.cancel()
+    }
+    
     private func convertItem(at index: Int) async {
+        guard videoItems.indices.contains(index), !shouldStopConversion else { return }
+        
         let item = videoItems[index]
         videoItems[index].status = .converting
         videoItems[index].conversionProgress = 0.0
@@ -155,103 +226,374 @@ class VideoConverterViewModel: ObservableObject {
         let fileName = "\(item.originalName)_\(UUID().uuidString.prefix(6)).\(ext)"
         let outputURL = tempDirectory.appendingPathComponent(fileName)
         
-        // 构建 FFmpeg 命令
+        let result: ConversionAttemptResult
+        if conversionMode == .quality {
+            result = await convertWithQualityPriority(item: item, outputURL: outputURL, index: index)
+        } else {
+            result = await convertWithSpeedPriority(item: item, outputURL: outputURL, index: index)
+        }
+        
+        switch result {
+        case .success:
+            guard !shouldStopConversion else {
+                try? FileManager.default.removeItem(at: outputURL)
+                videoItems[index].status = .failed(Self.stoppedMessage)
+                videoItems[index].conversionProgress = 0.0
+                return
+            }
+            videoItems[index].convertedFileURL = outputURL
+            videoItems[index].status = .success
+            videoItems[index].conversionProgress = 1.0
+        case .failure(let message):
+            videoItems[index].status = .failed(message)
+            try? FileManager.default.removeItem(at: outputURL)
+        }
+    }
+    
+    private func convertWithQualityPriority(item: VideoItem, outputURL: URL, index: Int) async -> ConversionAttemptResult {
+        if shouldTryLosslessRemux(for: item) {
+            let remuxResult = await remuxWithoutReencode(item: item, outputURL: outputURL)
+            if case .success = remuxResult {
+                return remuxResult
+            }
+        }
+        
+        if shouldTryNativeExport(for: item),
+           let nativeResult = await exportUsingNativeSession(item: item, outputURL: outputURL, index: index) {
+            if case .success = nativeResult {
+                return nativeResult
+            }
+        }
+        
+        return await convertWithFFmpeg(
+            item: item,
+            outputURL: outputURL,
+            index: index,
+            profile: .quality,
+            stageLabel: "质量优先兜底转码"
+        )
+    }
+    
+    private func convertWithSpeedPriority(item: VideoItem, outputURL: URL, index: Int) async -> ConversionAttemptResult {
+        if shouldTryFastRemux(for: item) {
+            let remuxResult = await remuxWithoutReencode(item: item, outputURL: outputURL)
+            if case .success = remuxResult {
+                return remuxResult
+            }
+        }
+        
+        return await convertWithFFmpeg(
+            item: item,
+            outputURL: outputURL,
+            index: index,
+            profile: .speed,
+            stageLabel: "速度优先快速转码"
+        )
+    }
+    
+    private func shouldTryLosslessRemux(for item: VideoItem) -> Bool {
+        switch (item.originalFormat.lowercased(), item.targetFormat) {
+        case ("mov", .mp4), ("mp4", .mov), ("mov", .mov), ("mp4", .mp4):
+            return true
+        default:
+            return false
+        }
+    }
+    
+    private func shouldTryNativeExport(for item: VideoItem) -> Bool {
+        switch item.targetFormat {
+        case .mp4, .mov:
+            return true
+        case .gif, .avi, .mkv:
+            return false
+        }
+    }
+    
+    private func shouldTryFastRemux(for item: VideoItem) -> Bool {
+        switch (item.originalFormat.lowercased(), item.targetFormat) {
+        case ("mov", .mp4), ("mp4", .mp4), ("mov", .mov), ("mp4", .mov), ("mov", .mkv), ("mp4", .mkv):
+            return true
+        default:
+            return false
+        }
+    }
+    
+    private func remuxWithoutReencode(item: VideoItem, outputURL: URL) async -> ConversionAttemptResult {
+        let inputPath = item.originalURL.path
+        let outputPath = outputURL.path
+        let command = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? -c copy -movflags +faststart -y \"\(outputPath)\""
+        return await executeFFmpegCommand(command, outputURL: outputURL, stageLabel: "无损封装")
+    }
+    
+    private func exportUsingNativeSession(item: VideoItem, outputURL: URL, index: Int) async -> ConversionAttemptResult? {
+        let asset = AVURLAsset(url: item.originalURL)
+        guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality) else {
+            return nil
+        }
+        
+        let outputFileType: AVFileType
+        switch item.targetFormat {
+        case .mp4:
+            outputFileType = .mp4
+        case .mov:
+            outputFileType = .mov
+        case .gif, .avi, .mkv:
+            return nil
+        }
+        
+        guard exportSession.supportedFileTypes.contains(outputFileType) else {
+            print("==== 系统原生导出跳过 ====")
+            print("原因: 不支持输出类型 \(outputFileType.rawValue)")
+            print("========================")
+            return nil
+        }
+        
+        try? FileManager.default.removeItem(at: outputURL)
+        
+        exportSession.outputURL = outputURL
+        exportSession.outputFileType = outputFileType
+        exportSession.shouldOptimizeForNetworkUse = true
+        
+        let sessionID = UUID()
+        activeNativeExportSessions[sessionID] = exportSession
+        
+        let progressTask = Task { [weak self] in
+            guard let self else { return }
+            while !Task.isCancelled {
+                let progress = Double(exportSession.progress)
+                await MainActor.run {
+                    let current = self.videoItems[index].conversionProgress
+                    self.videoItems[index].conversionProgress = min(max(progress, current), 0.95)
+                }
+                try? await Task.sleep(nanoseconds: 150_000_000)
+            }
+        }
+        
+        defer {
+            progressTask.cancel()
+            activeNativeExportSessions.removeValue(forKey: sessionID)
+        }
+        
+        do {
+            try await exportSession.export(to: outputURL, as: outputFileType)
+            if shouldStopConversion || exportSession.status == .cancelled {
+                try? FileManager.default.removeItem(at: outputURL)
+                return .failure(Self.stoppedMessage)
+            }
+            return .success
+        } catch {
+            if shouldStopConversion || exportSession.status == .cancelled {
+                try? FileManager.default.removeItem(at: outputURL)
+                return .failure(Self.stoppedMessage)
+            }
+            let message = error.localizedDescription
+            print("==== 系统原生导出失败 ====")
+            print("Error: \(message)")
+            print("========================")
+            try? FileManager.default.removeItem(at: outputURL)
+            return .failure("系统原生导出失败：\(message)")
+        }
+    }
+    
+    private func convertWithFFmpeg(
+        item: VideoItem,
+        outputURL: URL,
+        index: Int,
+        profile: FFmpegProfile,
+        stageLabel: String
+    ) async -> ConversionAttemptResult {
+        let command = buildFFmpegCommand(for: item, outputURL: outputURL, profile: profile)
+        let duration = await getVideoDuration(url: item.originalURL)
+        return await executeFFmpegCommand(command, outputURL: outputURL, stageLabel: stageLabel, duration: duration) { [weak self] progress in
+            guard let self else { return }
+            let safeProgress = min(max(progress, self.videoItems[index].conversionProgress), 0.99)
+            self.videoItems[index].conversionProgress = safeProgress
+        }
+    }
+    
+    private func buildFFmpegCommand(for item: VideoItem, outputURL: URL, profile: FFmpegProfile) -> String {
         let inputPath = item.originalURL.path
         let outputPath = outputURL.path
         
-        var ffmpegCommand = "-i \"\(inputPath)\" "
-        // 只保留主视频流和可选音频流，避免 MOV 内的 metadata/data 轨道影响 MP4 封装
-        ffmpegCommand += "-map 0:v:0 -map 0:a? "
-        
-        // 针对特定格式优化命令
         switch item.targetFormat {
         case .mp4:
-            // ffmpeg-kit iOS 预编译包通常不包含 libx264，改用系统硬件编码器 videotoolbox
-            ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart "
+            var ffmpegCommand = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? "
+            switch profile {
+            case .quality:
+                ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 15M -maxrate 20M -c:a aac -b:a 192k -movflags +faststart "
+            case .speed:
+                ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 4M -maxrate 5M -c:a aac -b:a 96k -movflags +faststart "
+            }
+            ffmpegCommand += "-y \"\(outputPath)\""
+            return ffmpegCommand
         case .mov:
-            ffmpegCommand += "-c copy "
+            var ffmpegCommand = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? "
+            switch profile {
+            case .quality:
+                ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 15M -maxrate 20M -c:a aac -b:a 192k "
+            case .speed:
+                ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 4M -maxrate 5M -c:a aac -b:a 96k "
+            }
+            ffmpegCommand += "-y \"\(outputPath)\""
+            return ffmpegCommand
         case .gif:
-            // 生成高质量 GIF 的调色板方法
-            ffmpegCommand += "-vf \"fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 "
+            var ffmpegCommand = "-i \"\(inputPath)\" -map 0:v:0 -an "
+            switch profile {
+            case .quality:
+                ffmpegCommand += "-vf \"fps=15,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 "
+            case .speed:
+                ffmpegCommand += "-vf \"fps=8,scale=240:-1:flags=fast_bilinear,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 "
+            }
+            ffmpegCommand += "-y \"\(outputPath)\""
+            return ffmpegCommand
         case .avi, .mkv:
-            // 默认转换同样避免依赖未编入的 libx264
-            ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -c:a aac "
+            var ffmpegCommand = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? "
+            switch profile {
+            case .quality:
+                ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 15M -maxrate 20M -c:a aac -b:a 192k "
+            case .speed:
+                ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 4M -maxrate 5M -c:a aac -b:a 96k "
+            }
+            ffmpegCommand += "-y \"\(outputPath)\""
+            return ffmpegCommand
         }
-        
-        ffmpegCommand += "-y \"\(outputPath)\""
-        
-        // 获取视频总时长以计算进度
-        let duration = await getVideoDuration(url: item.originalURL)
-        
+    }
+    
+    private func executeFFmpegCommand(
+        _ command: String,
+        outputURL: URL,
+        stageLabel: String,
+        duration: Double? = nil,
+        progressHandler: ((Double) -> Void)? = nil
+    ) async -> ConversionAttemptResult {
         return await withCheckedContinuation { continuation in
-            FFmpegKit.executeAsync(ffmpegCommand, withCompleteCallback: { [weak self] session in
-                guard let self = self, let session = session else {
-                    continuation.resume()
+            FFmpegKit.executeAsync(command, withCompleteCallback: { session in
+                guard let session else {
+                    continuation.resume(returning: .failure("转换会话未创建"))
                     return
                 }
                 
                 let returnCode = session.getReturnCode()
-                DispatchQueue.main.async {
-                    if ReturnCode.isSuccess(returnCode) {
-                        self.videoItems[index].convertedFileURL = outputURL
-                        self.videoItems[index].status = .success
-                        self.videoItems[index].conversionProgress = 1.0
-                    } else {
-                        // 提取并打印 FFmpeg 错误日志
-                        let logs = session.getAllLogsAsString() ?? "无日志"
-                        let errorLog = session.getFailStackTrace() ?? "未知转换错误"
-                        print("==== FFmpeg 转换失败 ====")
-                        print("Return Code: \(String(describing: returnCode))")
-                        print("Fail StackTrace: \(errorLog)")
-                        print("All Logs:\n\(logs)")
-                        print("===========================")
-                        
-                        // 提取一条对用户相对友好的错误信息
-                        let friendlyError = self.extractFriendlyErrorMessage(from: logs)
-                        
-                        self.videoItems[index].status = .failed(friendlyError)
-                        try? FileManager.default.removeItem(at: outputURL)
-                    }
-                    continuation.resume()
+                if ReturnCode.isSuccess(returnCode) {
+                    continuation.resume(returning: .success)
+                } else if ReturnCode.isCancel(returnCode) || self.shouldStopConversion {
+                    try? FileManager.default.removeItem(at: outputURL)
+                    continuation.resume(returning: .failure(Self.stoppedMessage))
+                } else {
+                    let logs = session.getAllLogsAsString() ?? "无日志"
+                    let errorLog = session.getFailStackTrace() ?? "未知转换错误"
+                    print("==== \(stageLabel) 失败 ====")
+                    print("Command: \(command)")
+                    print("Return Code: \(String(describing: returnCode))")
+                    print("Fail StackTrace: \(errorLog)")
+                    print("All Logs:\n\(logs)")
+                    print("=========================")
+                    try? FileManager.default.removeItem(at: outputURL)
+                    let friendlyError = self.extractFriendlyErrorMessage(from: logs, stackTrace: errorLog)
+                    continuation.resume(returning: .failure(friendlyError))
                 }
-            }, withLogCallback: nil, withStatisticsCallback: { [weak self] stats in
-                guard let self = self, let stats = stats, duration > 0 else { return }
-                
+            }, withLogCallback: nil, withStatisticsCallback: { stats in
+                guard let stats, let duration, duration > 0 else { return }
                 let timeInMilliseconds = Double(stats.getTime())
-                if timeInMilliseconds > 0 {
-                    let progress = timeInMilliseconds / (duration * 1000.0)
-                    DispatchQueue.main.async {
-                        // 确保进度不倒退且不超过 0.99 (留给完成回调)
-                        let safeProgress = min(max(progress, self.videoItems[index].conversionProgress), 0.99)
-                        self.videoItems[index].conversionProgress = safeProgress
-                    }
+                guard timeInMilliseconds > 0 else { return }
+                let progress = timeInMilliseconds / (duration * 1000.0)
+                DispatchQueue.main.async {
+                    progressHandler?(progress)
                 }
             })
         }
     }
     
     // MARK: - 辅助方法
+    private func overallProgress(for item: VideoItem) -> Double {
+        switch item.status {
+        case .pending:
+            return 0.0
+        case .converting:
+            return item.conversionProgress
+        case .success, .failed:
+            return 1.0
+        }
+    }
+    
     private func isFailed(status: VideoItem.ConversionStatus) -> Bool {
         if case .failed = status { return true }
         return false
     }
     
-    private func extractFriendlyErrorMessage(from logs: String) -> String {
+    private func extractFriendlyErrorMessage(from logs: String, stackTrace: String) -> String {
         let lowercasedLogs = logs.lowercased()
         if lowercasedLogs.contains("unknown encoder 'libx264'") {
             return "当前应用内置的转码器不支持 libx264，已切换为系统硬件编码器"
+        } else if lowercasedLogs.contains("unknown encoder") {
+            return "当前设备上的视频编码器不可用"
         } else if lowercasedLogs.contains("no space left on device") {
             return "设备存储空间不足"
         } else if lowercasedLogs.contains("permission denied") {
             return "文件权限被拒绝，无法读取原视频"
         } else if lowercasedLogs.contains("unsupported codec") || lowercasedLogs.contains("unknown decoder") {
             return "不支持的原视频编码格式"
+        } else if lowercasedLogs.contains("error while opening encoder") {
+            return "视频编码器初始化失败"
+        } else if lowercasedLogs.contains("could not write header") || lowercasedLogs.contains("error initializing output stream") {
+            return "输出文件封装失败，请尝试更换目标格式"
+        } else if lowercasedLogs.contains("tag") && lowercasedLogs.contains("is not supported") {
+            return "当前音视频编码与目标格式不兼容"
+        } else if lowercasedLogs.contains("incorrect codec parameters") {
+            return "源视频参数异常，暂时无法转换"
+        } else if lowercasedLogs.contains("audio") && lowercasedLogs.contains("error") {
+            return "音频轨处理失败"
+        } else if lowercasedLogs.contains("format gif") && lowercasedLogs.contains("encoder manually") {
+            return "GIF 不支持音频轨，已改为仅导出视频画面"
         } else if lowercasedLogs.contains("invalid data found") || lowercasedLogs.contains("moov atom not found") {
             return "视频文件已损坏或不完整"
         } else if lowercasedLogs.contains("conversion failed") {
             return "转码引擎内部错误"
         }
+        
+        if let detail = extractUsefulLogLine(from: logs, stackTrace: stackTrace) {
+            return "转换失败：\(detail)"
+        }
+        
         return "转换失败，可能是不支持的特殊视频格式"
+    }
+    
+    private func extractUsefulLogLine(from logs: String, stackTrace: String) -> String? {
+        let candidates = (logs + "\n" + stackTrace)
+            .components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        
+        let ignoredPrefixes = [
+            "ffmpeg version",
+            "built with",
+            "configuration:",
+            "libav",
+            "input #",
+            "metadata:",
+            "duration:",
+            "stream #",
+            "side data:"
+        ]
+        
+        for line in candidates.reversed() {
+            let lowercasedLine = line.lowercased()
+            let shouldIgnore = ignoredPrefixes.contains { lowercasedLine.hasPrefix($0) }
+            if shouldIgnore {
+                continue
+            }
+            
+            if lowercasedLine.contains("error")
+                || lowercasedLine.contains("failed")
+                || lowercasedLine.contains("unsupported")
+                || lowercasedLine.contains("unknown")
+                || lowercasedLine.contains("invalid")
+                || lowercasedLine.contains("denied") {
+                return line
+            }
+        }
+        
+        return nil
     }
     
     private func generateThumbnail(from url: URL) async throws -> UIImage? {
@@ -288,30 +630,61 @@ class VideoConverterViewModel: ObservableObject {
         }
         
         let successItems = videoItems.filter { $0.status == .success && $0.convertedFileURL != nil }
+        let savableItems = successItems.filter { item in
+            switch item.targetFormat {
+            case .mp4, .mov, .gif:
+                return true
+            case .avi, .mkv:
+                return false
+            }
+        }
+        
+        guard !savableItems.isEmpty else {
+            return .failure(VideoConversionError.unsupportedPhotoLibraryFormat)
+        }
+        
         var savedCount = 0
         
         do {
             try await PHPhotoLibrary.shared().performChanges {
-                for item in successItems {
+                for item in savableItems {
                     guard let fileURL = item.convertedFileURL else { continue }
                     let creationRequest = PHAssetCreationRequest.forAsset()
-                    creationRequest.addResource(with: .video, fileURL: fileURL, options: nil)
+                    let resourceType: PHAssetResourceType = item.targetFormat == .gif ? .photo : .video
+                    creationRequest.addResource(with: resourceType, fileURL: fileURL, options: nil)
                     savedCount += 1
                 }
             }
             return .success(savedCount)
         } catch {
-            return .failure(error)
+            return .failure(mapPhotoLibraryError(error, containsGIF: savableItems.contains { $0.targetFormat == .gif }))
         }
+    }
+    
+    private func mapPhotoLibraryError(_ error: Error, containsGIF: Bool) -> Error {
+        let nsError = error as NSError
+        if nsError.domain == "PHPhotosErrorDomain" && nsError.code == 3302 {
+            if containsGIF {
+                return VideoConversionError.gifPhotoLibrarySaveFailed
+            }
+            return VideoConversionError.photoLibrarySaveFailed
+        }
+        return error
     }
 }
 
 enum VideoConversionError: Error, LocalizedError {
     case photoLibraryAccessDenied
+    case unsupportedPhotoLibraryFormat
+    case photoLibrarySaveFailed
+    case gifPhotoLibrarySaveFailed
     
     var errorDescription: String? {
         switch self {
         case .photoLibraryAccessDenied: return "需要相册的“添加照片”权限才能保存视频"
+        case .unsupportedPhotoLibraryFormat: return "相册仅支持保存 MP4、MOV 和 GIF，请使用“保存到文件”导出其他格式"
+        case .photoLibrarySaveFailed: return "保存到相册失败，请稍后重试"
+        case .gifPhotoLibrarySaveFailed: return "GIF 保存到相册失败，请确认系统照片支持动画图片导入，或改用“保存到文件”"
         }
     }
 }
