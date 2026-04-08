@@ -448,13 +448,13 @@ class VideoConverterViewModel: ObservableObject {
         
         do {
             try await exportSession.export(to: outputURL, as: outputFileType)
-            if shouldStopConversion || exportSession.status == .cancelled {
+            if shouldStopConversion {
                 try? FileManager.default.removeItem(at: outputURL)
                 return .failure(Self.stoppedMessage)
             }
             return .success
         } catch {
-            if shouldStopConversion || exportSession.status == .cancelled {
+            if shouldStopConversion {
                 try? FileManager.default.removeItem(at: outputURL)
                 return .failure(Self.stoppedMessage)
             }

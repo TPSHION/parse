@@ -196,30 +196,32 @@ struct ImageConverterView: View {
     
     @ViewBuilder
     private var bottomActionPanel: some View {
+        let isConverting = viewModel.isConverting
+        
         HStack(spacing: 12) {
             Button(action: {
                 isFileImporterPresented = true
             }) {
                 Image(systemName: "folder.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(viewModel.isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(viewModel.isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(viewModel.isConverting)
+            .disabled(isConverting)
             
             PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
                 Image(systemName: "photo.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(viewModel.isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(viewModel.isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(viewModel.isConverting)
+            .disabled(isConverting)
             
             Button(action: {
                 Task {
@@ -227,14 +229,14 @@ struct ImageConverterView: View {
                 }
             }) {
                 HStack(spacing: 6) {
-                    if viewModel.isConverting {
+                    if isConverting {
                         ProgressView()
                             .tint(AppColors.textSecondary)
                     } else {
                         Image(systemName: "arrow.triangle.2.circlepath")
                             .font(.system(size: 16, weight: .semibold))
                     }
-                    Text(viewModel.isConverting ? "转换中" : "转换")
+                    Text(isConverting ? "转换中" : "转换")
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)

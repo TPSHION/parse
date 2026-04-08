@@ -160,9 +160,10 @@ class ConverterViewModel: ObservableObject {
     
     /// 将图片转换为目标格式，并直接写入到磁盘上的临时目录中，返回该文件的 URL
     private func performConversionAndSave(image: UIImage, to format: ImageFormat, originalName: String) async throws -> URL {
+        let ext = format.fileExtension
+        
         return try await Task.detached(priority: .userInitiated) {
             let tempDirectory = FileManager.default.temporaryDirectory
-            let ext = format.fileExtension
             let fileName = "\(originalName)_\(UUID().uuidString.prefix(6)).\(ext)"
             let fileURL = tempDirectory.appendingPathComponent(fileName)
             

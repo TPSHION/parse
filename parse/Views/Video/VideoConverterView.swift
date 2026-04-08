@@ -278,30 +278,32 @@ struct VideoConverterView: View {
     
     @ViewBuilder
     private var bottomActionPanel: some View {
+        let isConverting = viewModel.isConverting
+        
         HStack(spacing: 12) {
             Button(action: {
                 isFileImporterPresented = true
             }) {
                 Image(systemName: "folder.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(viewModel.isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(viewModel.isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(viewModel.isConverting)
+            .disabled(isConverting)
             
             PhotosPicker(selection: $selectedVideos, matching: .videos, photoLibrary: .shared()) {
                 Image(systemName: "photo.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(viewModel.isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(viewModel.isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(viewModel.isConverting)
+            .disabled(isConverting)
             
             Button(action: {
                 Task {
@@ -309,9 +311,9 @@ struct VideoConverterView: View {
                 }
             }) {
                 HStack(spacing: 6) {
-                    Image(systemName: viewModel.isConverting ? "stop.fill" : "arrow.triangle.2.circlepath")
+                    Image(systemName: isConverting ? "stop.fill" : "arrow.triangle.2.circlepath")
                         .font(.system(size: 16, weight: .semibold))
-                    Text(viewModel.isConverting ? "停止" : "转换")
+                    Text(isConverting ? "停止" : "转换")
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
