@@ -11,7 +11,7 @@ struct ConvertedAudioDocument: FileDocument {
     }
     
     init(configuration: ReadConfiguration) throws {
-        self.items = []
+        self.items = try Self.loadItems(from: configuration.file)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
@@ -38,5 +38,49 @@ struct ConvertedAudioDocument: FileDocument {
         }
         
         return FileWrapper(directoryWithFileWrappers: fileWrappers)
+    }
+    
+    private static func loadItems(from wrapper: FileWrapper) throws -> [AudioItem] {
+        guard wrapper.isDirectory, let childWrappers = wrapper.fileWrappers else {
+            return []
+        }
+        
+        let importDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ImportedAudioDocument_\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: importDirectory, withIntermediateDirectories: true)
+        
+        var items: [AudioItem] = []
+        
+        for (filename, childWrapper) in childWrappers.sorted(by: { $0.key.localizedStandardCompare($1.key) == .orderedAscending }) {
+            guard !childWrapper.isDirectory else { continue }
+            
+            let destinationURL = uniqueDestinationURL(for: filename, in: importDirectory)
+            try childWrapper.write(to: destinationURL, options: .atomic, originalContentsURL: nil)
+            
+            let targetFormat = AudioFormat(fileExtension: destinationURL.pathExtension) ?? .mp3
+            items.append(AudioItem(url: destinationURL, originalFilename: filename, targetFormat: targetFormat))
+        }
+        
+        return items
+    }
+    
+    private static func uniqueDestinationURL(for filename: String, in directory: URL) -> URL {
+        let initialURL = directory.appendingPathComponent(filename)
+        guard FileManager.default.fileExists(atPath: initialURL.path) else {
+            return initialURL
+        }
+        
+        let baseName = initialURL.deletingPathExtension().lastPathComponent
+        let ext = initialURL.pathExtension
+        var counter = 1
+        
+        while true {
+            let candidateName = ext.isEmpty ? "\(baseName)_\(counter)" : "\(baseName)_\(counter).\(ext)"
+            let candidateURL = directory.appendingPathComponent(candidateName)
+            if !FileManager.default.fileExists(atPath: candidateURL.path) {
+                return candidateURL
+            }
+            counter += 1
+        }
     }
 }

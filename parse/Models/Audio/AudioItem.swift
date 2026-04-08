@@ -13,11 +13,13 @@ struct AudioItem: Identifiable, Equatable {
     var convertedURL: URL?
     var conversionProgress: Double = 0.0
     
-    init(url: URL, targetFormat: AudioFormat = .mp3) {
+    init(url: URL, originalFilename: String? = nil, targetFormat: AudioFormat = .mp3) {
+        let resolvedFilename = originalFilename ?? url.lastPathComponent
+        
         self.url = url
-        self.filename = url.lastPathComponent
-        self.baseName = url.deletingPathExtension().lastPathComponent
-        self.originalFormat = url.pathExtension.uppercased()
+        self.filename = resolvedFilename
+        self.baseName = URL(fileURLWithPath: resolvedFilename).deletingPathExtension().lastPathComponent
+        self.originalFormat = URL(fileURLWithPath: resolvedFilename).pathExtension.uppercased()
         self.targetFormat = targetFormat
         
         do {

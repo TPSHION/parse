@@ -9,6 +9,23 @@ enum AudioFormat: String, CaseIterable, Identifiable {
     
     var id: String { self.rawValue }
     
+    init?(fileExtension: String) {
+        switch fileExtension.lowercased() {
+        case "mp3":
+            self = .mp3
+        case "wav":
+            self = .wav
+        case "aac":
+            self = .aac
+        case "m4a":
+            self = .m4a
+        case "flac":
+            self = .flac
+        default:
+            return nil
+        }
+    }
+    
     var fileExtension: String {
         switch self {
         case .mp3: return "mp3"

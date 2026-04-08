@@ -25,6 +25,8 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		74D3609E2F84D89E000AB26F /* parse */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = parse;
 			sourceTree = "<group>";
 		};

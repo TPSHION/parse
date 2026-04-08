@@ -26,7 +26,7 @@ struct AudioConverterView: View {
             
             Group {
                 if viewModel.audioItems.isEmpty {
-                    emptyStateView
+                    AudioEmptyStateView(isFileImporterPresented: $isFileImporterPresented)
                 } else {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 20) {
@@ -107,38 +107,6 @@ struct AudioConverterView: View {
             if let message = saveMessage {
                 Text(message)
             }
-        }
-    }
-    
-    private var emptyStateView: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            
-            Image(systemName: "waveform.circle.fill")
-                .font(.system(size: 64))
-                .foregroundColor(AppColors.accentOrange)
-                .padding()
-                .background(Circle().fill(AppColors.accentOrange.opacity(0.1)))
-            
-            Text("支持音频格式高效互转")
-                .font(.headline)
-                .foregroundColor(AppColors.textSecondary)
-                .multilineTextAlignment(.center)
-            
-            Button(action: {
-                isFileImporterPresented = true
-            }) {
-                Text("导入音频文件")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 32)
-                    .padding(.vertical, 16)
-                    .background(AppColors.accentOrange)
-                    .clipShape(Capsule())
-            }
-            .padding(.top, 16)
-            
-            Spacer()
         }
     }
     

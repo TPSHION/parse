@@ -77,10 +77,12 @@ class AudioConverterViewModel: ObservableObject {
             
             let targetFormat = batchTargetFormat
             Task.detached(priority: .userInitiated) { [urls, targetFormat] in
-                let importedURLs = Self.importAudioURLs(from: urls)
+                let importedFiles = Self.importAudioFiles(from: urls)
                 
                 await MainActor.run {
-                    self.audioItems.append(contentsOf: importedURLs.map { AudioItem(url: $0, targetFormat: targetFormat) })
+                    self.audioItems.append(contentsOf: importedFiles.map {
+                        AudioItem(url: $0.url, originalFilename: $0.originalFilename, targetFormat: targetFormat)
+                    })
                     self.endImport()
                 }
             }
@@ -248,11 +250,16 @@ class AudioConverterViewModel: ObservableObject {
         isImporting = importActivityCount > 0
     }
     
-    private nonisolated static func importAudioURLs(from urls: [URL]) -> [URL] {
-        urls.compactMap { importAudioURL(from: $0) }
+    private struct ImportedAudioFile {
+        let url: URL
+        let originalFilename: String
     }
     
-    private nonisolated static func importAudioURL(from url: URL) -> URL? {
+    private nonisolated static func importAudioFiles(from urls: [URL]) -> [ImportedAudioFile] {
+        urls.compactMap { importAudioFile(from: $0) }
+    }
+    
+    private nonisolated static func importAudioFile(from url: URL) -> ImportedAudioFile? {
         guard url.startAccessingSecurityScopedResource() else { return nil }
         defer { url.stopAccessingSecurityScopedResource() }
         
@@ -264,7 +271,7 @@ class AudioConverterViewModel: ObservableObject {
                 try FileManager.default.removeItem(at: tempURL)
             }
             try FileManager.default.copyItem(at: url, to: tempURL)
-            return tempURL
+            return ImportedAudioFile(url: tempURL, originalFilename: url.lastPathComponent)
         } catch {
             print("Failed to copy imported audio file: \(error.localizedDescription)")
             return nil
