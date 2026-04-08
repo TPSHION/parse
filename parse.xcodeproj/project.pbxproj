@@ -13,7 +13,12 @@
 /* Begin PBXFileReference section */
 		6EC5DF57CCFBA7470D885AC5 /* Pods-parse.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-parse.release.xcconfig"; path = "Target Support Files/Pods-parse/Pods-parse.release.xcconfig"; sourceTree = "<group>"; };
 		74D3609C2F84D89E000AB26F /* parse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = parse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		862C30B1BB83FBC8D2575676 /* PDFItem.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PDFItem.swift; path = parse/Models/Document/PDFItem.swift; sourceTree = "<group>"; };
 		902E3CBED005C7BBA0270D8A /* Pods_parse.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_parse.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A218634EBF16FF018C86A758 /* PDFConverterViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PDFConverterViewModel.swift; path = parse/ViewModels/Document/PDFConverterViewModel.swift; sourceTree = "<group>"; };
+		C773128D7062454A288AA199 /* PDFConverterView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PDFConverterView.swift; path = parse/Views/Document/PDFConverterView.swift; sourceTree = "<group>"; };
+		E90FADBD30F1BE72EC20B3AA /* PDFTargetFormat.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PDFTargetFormat.swift; path = parse/Models/Document/PDFTargetFormat.swift; sourceTree = "<group>"; };
+		E9145E52A764210ED18176DC /* PDFItemRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PDFItemRow.swift; path = parse/Views/Document/PDFItemRow.swift; sourceTree = "<group>"; };
 		E9AB115FED0E399B9011A694 /* Pods-parse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-parse.debug.xcconfig"; path = "Target Support Files/Pods-parse/Pods-parse.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -37,6 +42,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		04B927888CECD93E1833895D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				744CE0BFEC81058967D5904A /* Document */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		136289719A21B5EAB598D5CE /* Document */ = {
+			isa = PBXGroup;
+			children = (
+				E9145E52A764210ED18176DC /* PDFItemRow.swift */,
+				C773128D7062454A288AA199 /* PDFConverterView.swift */,
+			);
+			name = Document;
+			sourceTree = "<group>";
+		};
 		1ED03FEC2E8C782D4C661265 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -54,6 +76,25 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		73B8E367A7D2C9E59FB53A91 /* parse */ = {
+			isa = PBXGroup;
+			children = (
+				04B927888CECD93E1833895D /* Models */,
+				81D368E87F34F31679372FEC /* ViewModels */,
+				751D429F159D0980D0A508FA /* Views */,
+			);
+			name = parse;
+			sourceTree = "<group>";
+		};
+		744CE0BFEC81058967D5904A /* Document */ = {
+			isa = PBXGroup;
+			children = (
+				E90FADBD30F1BE72EC20B3AA /* PDFTargetFormat.swift */,
+				862C30B1BB83FBC8D2575676 /* PDFItem.swift */,
+			);
+			name = Document;
+			sourceTree = "<group>";
+		};
 		74D360932F84D89E000AB26F = {
 			isa = PBXGroup;
 			children = (
@@ -61,6 +102,7 @@
 				74D3609D2F84D89E000AB26F /* Products */,
 				40D6FC83089317E8358226BD /* Pods */,
 				1ED03FEC2E8C782D4C661265 /* Frameworks */,
+				73B8E367A7D2C9E59FB53A91 /* parse */,
 			);
 			sourceTree = "<group>";
 		};
@@ -70,6 +112,30 @@
 				74D3609C2F84D89E000AB26F /* parse.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		751D429F159D0980D0A508FA /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				136289719A21B5EAB598D5CE /* Document */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		81D368E87F34F31679372FEC /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				87143B7018CD1DA3C381331E /* Document */,
+			);
+			name = ViewModels;
+			sourceTree = "<group>";
+		};
+		87143B7018CD1DA3C381331E /* Document */ = {
+			isa = PBXGroup;
+			children = (
+				A218634EBF16FF018C86A758 /* PDFConverterViewModel.swift */,
+			);
+			name = Document;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

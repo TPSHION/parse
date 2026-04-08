@@ -19,6 +19,8 @@ enum AppColors {
     static let accentBlue = Color(hex: "#3B82F6")
     /// 失败/警告状态色 (Red)
     static let accentRed = Color(hex: "#EF4444")
+    /// 文档相关强调色 (Purple)
+    static let accentPurple = Color(hex: "#A855F7")
 }
 
 extension Color {

@@ -1,72 +1,12 @@
 import SwiftUI
 
-struct FeatureCard: View {
-    let icon: String
-    let title: String
-    let description: String
-    let color: Color
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            ZStack {
-                // 图标背景的微发光效果
-                Circle()
-                    .fill(LinearGradient(
-                        colors: [color.opacity(0.4), color.opacity(0.1)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ))
-                    .frame(width: 56, height: 56)
-                    .shadow(color: color.opacity(0.3), radius: 10, x: 0, y: 5)
-                
-                Image(systemName: icon)
-                    .font(.system(size: 24, weight: .medium))
-                    .foregroundColor(color)
-            }
-            
-            VStack(alignment: .leading, spacing: 6) {
-                Text(title)
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                
-                Text(description)
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.textSecondary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            
-            Spacer(minLength: 8)
-            
-            Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .bold))
-                .foregroundColor(AppColors.textSecondary.opacity(0.5))
-        }
-        .padding(20)
-        .background(
-            ZStack {
-                AppColors.cardBackground
-                // 微弱的渐变覆盖增加质感
-                LinearGradient(
-                    colors: [Color.white.opacity(0.03), Color.clear],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            }
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Color.white.opacity(0.05), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 8)
-        .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-    }
-}
-
 struct ContentView: View {
     @State private var appearAnimation = false
+    
+    let columns = [
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
+    ]
     
     var body: some View {
         NavigationStack {
@@ -79,15 +19,21 @@ struct ContentView: View {
                 )
                 .ignoresSafeArea()
                 
-                // 顶部氛围光晕
+                // 顶部氛围光晕 (混合蓝色和紫色)
                 Circle()
-                    .fill(AppColors.accentBlue.opacity(0.15))
+                    .fill(AppColors.accentBlue.opacity(0.12))
                     .frame(width: 300, height: 300)
                     .blur(radius: 100)
-                    .offset(x: -100, y: -250)
+                    .offset(x: -150, y: -250)
+                    
+                Circle()
+                    .fill(AppColors.accentPurple.opacity(0.12))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 100)
+                    .offset(x: 150, y: -100)
                 
-                ScrollView {
-                    VStack(spacing: 24) {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 32) {
                         // 欢迎文案区
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Welcome to Parse")
@@ -106,59 +52,59 @@ struct ContentView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 10)
-                        .padding(.bottom, 10)
-                        .padding(.horizontal, 4)
                         .opacity(appearAnimation ? 1 : 0)
                         .offset(y: appearAnimation ? 0 : 20)
                         
-                        // 图片格式转换入口
-                        NavigationLink(destination: ImageConverterView()) {
-                            FeatureCard(
-                                icon: "photo.badge.arrow.down.fill",
-                                title: "图片格式转换",
-                                description: "支持极速批量转换 JPEG, PNG, HEIC, TIFF",
-                                color: AppColors.accentBlue
-                            )
+                        // 媒体处理分类
+                        VStack(alignment: .leading, spacing: 16) {
+                            sectionHeader(title: "媒体处理", icon: "photo.on.rectangle.angled", color: AppColors.accentBlue)
+                            
+                            LazyVGrid(columns: columns, spacing: 16) {
+                                NavigationLink(destination: ImageConverterView()) {
+                                    ToolGridCard(icon: "photo.badge.arrow.down.fill", title: "图片转换", description: "极速批量转换主流图片格式", color: AppColors.accentBlue)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                NavigationLink(destination: VideoConverterView()) {
+                                    ToolGridCard(icon: "video.fill.badge.ellipsis", title: "视频转换", description: "高效互转 MP4, MOV, GIF, AVI, MKV 等格式", color: AppColors.accentGreen)
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
-                        .buttonStyle(.plain)
                         .opacity(appearAnimation ? 1 : 0)
                         .offset(y: appearAnimation ? 0 : 30)
                         
-                        // 视频格式转换入口
-                        NavigationLink(destination: VideoConverterView()) {
-                            FeatureCard(
-                                icon: "video.fill.badge.ellipsis",
-                                title: "视频格式转换",
-                                description: "支持 MP4, MOV, GIF, AVI, MKV 等格式互转",
-                                color: AppColors.accentGreen
-                            )
+                        // 文档处理分类
+                        VStack(alignment: .leading, spacing: 16) {
+                            sectionHeader(title: "文档处理", icon: "doc.on.doc.fill", color: AppColors.accentPurple)
+                            
+                            LazyVGrid(columns: columns, spacing: 16) {
+                                NavigationLink(destination: PDFConverterView()) {
+                                    ToolGridCard(icon: "doc.text.viewfinder", title: "PDF 转换", description: "支持转为 DOCX, TXT, MD, PNG 等", color: AppColors.accentPurple)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                NavigationLink(destination: DocumentToolDetailView(toolType: .imageToText)) {
+                                    ToolGridCard(icon: "text.viewfinder", title: "图片转文字", description: "精准提取图片中的文字内容", color: AppColors.accentPurple)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                NavigationLink(destination: DocumentToolDetailView(toolType: .ebookConvert)) {
+                                    ToolGridCard(icon: "book.closed.fill", title: "电子书转换", description: "EPUB, MOBI 等格式完美互转", color: AppColors.accentPurple)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                NavigationLink(destination: DocumentToolDetailView(toolType: .textWebConvert)) {
+                                    ToolGridCard(icon: "network", title: "网页转文档", description: "输入链接一键生成 PDF", color: AppColors.accentPurple)
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
-                        .buttonStyle(.plain)
                         .opacity(appearAnimation ? 1 : 0)
                         .offset(y: appearAnimation ? 0 : 40)
-                        
-                        // 媒体压缩入口 (敬请期待)
-                        FeatureCard(
-                            icon: "arrow.down.right.and.arrow.up.left.circle.fill",
-                            title: "媒体智能压缩",
-                            description: "即将支持自定义分辨率和码率，智能缩减文件体积",
-                            color: .orange
-                        )
-                        .opacity(appearAnimation ? 0.6 : 0)
-                        .offset(y: appearAnimation ? 0 : 50)
-                        .overlay(alignment: .topTrailing) {
-                            Text("COMING SOON")
-                                .font(.system(size: 9, weight: .black))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 5)
-                                .background(LinearGradient(colors: [.orange, .orange.opacity(0.7)], startPoint: .leading, endPoint: .trailing))
-                                .foregroundColor(.white)
-                                .clipShape(Capsule())
-                                .shadow(color: Color.orange.opacity(0.3), radius: 5, x: 0, y: 2)
-                                .offset(x: -16, y: 16)
-                        }
                     }
                     .padding(24)
+                    .padding(.bottom, 40)
                 }
             }
             .navigationBarHidden(true)
@@ -168,6 +114,18 @@ struct ContentView: View {
                 }
             }
         }
+    }
+    
+    private func sectionHeader(title: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(color)
+            Text(title)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.white)
+        }
+        .padding(.horizontal, 4)
     }
 }
 
