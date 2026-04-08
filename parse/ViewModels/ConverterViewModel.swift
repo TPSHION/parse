@@ -1,9 +1,22 @@
 import SwiftUI
 import CoreGraphics
+import ImageIO
 import UniformTypeIdentifiers
 import PhotosUI
 import Combine
 import Photos
+
+struct ImageFileTransferable: Transferable {
+    let url: URL
+    
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(importedContentType: .image) { received in
+            let copy = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + "_" + received.file.lastPathComponent)
+            try FileManager.default.copyItem(at: received.file, to: copy)
+            return ImageFileTransferable(url: copy)
+        }
+    }
+}
 
 @MainActor
 class ConverterViewModel: ObservableObject {
@@ -22,6 +35,7 @@ class ConverterViewModel: ObservableObject {
     }
     
     @Published var isConverting: Bool = false
+    @Published var isImporting: Bool = false
     
     // MARK: - 统计属性
     var totalCount: Int { imageItems.count }
@@ -67,9 +81,11 @@ class ConverterViewModel: ObservableObject {
         return Double(completed) / Double(totalCount)
     }
     
-    func addImage(image: UIImage, name: String, format: String) {
+    func addImage(fileURL: URL, name: String, format: String) async {
+        let previewImage = await generatePreviewImage(from: fileURL)
         let newItem = ImageItem(
-            originalImage: image,
+            originalFileURL: fileURL,
+            previewImage: previewImage,
             originalName: name,
             originalFormat: format,
             targetFormat: batchTargetFormat
@@ -96,6 +112,7 @@ class ConverterViewModel: ObservableObject {
             if let url = imageItems[index].convertedFileURL {
                 try? FileManager.default.removeItem(at: url)
             }
+            try? FileManager.default.removeItem(at: imageItems[index].originalFileURL)
         }
         imageItems.remove(atOffsets: offsets)
     }
@@ -111,6 +128,7 @@ class ConverterViewModel: ObservableObject {
             if let url = item.convertedFileURL {
                 try? FileManager.default.removeItem(at: url)
             }
+            try? FileManager.default.removeItem(at: item.originalFileURL)
         }
         imageItems.removeAll()
     }
@@ -127,7 +145,10 @@ class ConverterViewModel: ObservableObject {
     func handleFileImportResult(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
-            importImages(from: urls)
+            Task { [weak self] in
+                guard let self else { return }
+                await self.importImages(from: urls)
+            }
         case .failure(let error):
             print("Import failed: \(error.localizedDescription)")
         }
@@ -150,7 +171,7 @@ class ConverterViewModel: ObservableObject {
         imageItems[index].status = .converting
         
         do {
-            let fileURL = try await performConversionAndSave(image: item.originalImage, to: item.targetFormat, originalName: item.originalName)
+            let fileURL = try await performConversionAndSave(sourceURL: item.originalFileURL, to: item.targetFormat, originalName: item.originalName)
             imageItems[index].convertedFileURL = fileURL
             imageItems[index].status = .success
         } catch {
@@ -159,13 +180,16 @@ class ConverterViewModel: ObservableObject {
     }
     
     /// 将图片转换为目标格式，并直接写入到磁盘上的临时目录中，返回该文件的 URL
-    private func performConversionAndSave(image: UIImage, to format: ImageFormat, originalName: String) async throws -> URL {
+    private func performConversionAndSave(sourceURL: URL, to format: ImageFormat, originalName: String) async throws -> URL {
         let ext = format.fileExtension
         
         return try await Task.detached(priority: .userInitiated) {
             let tempDirectory = FileManager.default.temporaryDirectory
             let fileName = "\(originalName)_\(UUID().uuidString.prefix(6)).\(ext)"
             let fileURL = tempDirectory.appendingPathComponent(fileName)
+            guard let image = UIImage(contentsOfFile: sourceURL.path) else {
+                throw ConversionError.failedToLoadSourceImage
+            }
             
             switch format {
             case .jpeg:
@@ -224,57 +248,86 @@ class ConverterViewModel: ObservableObject {
     
     // Process selected photos from PhotosPicker
     func processPhotoSelections(_ selections: [PhotosPickerItem]) {
-        for selection in selections {
-            // 在 iOS 16+ 中，PhotosPickerItem 提取原文件名比较特殊，
-            // 它没有直接的 filename 属性，也不能直接调用 loadFileRepresentation(for:)。
-            // 我们可以通过 loadTransferable 获取数据，并通过其它方式尽可能推断文件名。
-            // 实际的 PHAsset 文件名需要访问权限，这里为了兼容性和不需要额外权限，
-            // 我们可以尝试解析 Transferable 中的文件名，或者生成更具辨识度的名字。
+        guard !selections.isEmpty else { return }
+        isImporting = true
+        
+        Task {
+            defer { self.isImporting = false }
             
-            selection.loadTransferable(type: Data.self) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let data?):
-                        if let image = UIImage(data: data) {
-                            var formatString = "未知"
-                            if let contentType = selection.supportedContentTypes.first {
-                                formatString = contentType.preferredFilenameExtension?.uppercased() ?? contentType.localizedDescription ?? "未知"
-                            }
-                            
-                            // 由于 PhotosPickerItem 不提供文件名，为了让名称更有意义，
-                            // 这里我们利用当前时间戳来生成一个格式化的名称，而不是随机的 UUID，
-                            // 这样对于用户来说名称（如 "IMG_20260407_1455.PNG"）会更加直观合理。
-                            let formatter = DateFormatter()
-                            formatter.dateFormat = "yyyyMMdd_HHmmss"
-                            let timeString = formatter.string(from: Date())
-                            
-                            // 加上一个短随机数防止同一秒内多张图片重名
-                            let randomSuffix = String(Int.random(in: 100...999))
-                            let name = "IMG_\(timeString)_\(randomSuffix)"
-                            
-                            self?.addImage(image: image, name: name, format: formatString)
+            for selection in selections {
+                do {
+                    if let imageFile = try await selection.loadTransferable(type: ImageFileTransferable.self) {
+                        let url = imageFile.url
+                        var formatString = "未知"
+                        if let contentType = selection.supportedContentTypes.first {
+                            formatString = contentType.preferredFilenameExtension?.uppercased() ?? contentType.localizedDescription ?? "未知"
                         }
-                    case .success(nil):
-                        print("Failed to load image data.")
-                    case .failure(let error):
-                        print("Error loading image: \(error.localizedDescription)")
+                        
+                        let formatter = DateFormatter()
+                        formatter.dateFormat = "yyyyMMdd_HHmmss"
+                        let timeString = formatter.string(from: Date())
+                        let randomSuffix = String(Int.random(in: 100...999))
+                        let name = "IMG_\(timeString)_\(randomSuffix)"
+                        
+                        await self.addImage(fileURL: url, name: name, format: formatString)
+                    } else {
+                        print("Failed to load image file.")
                     }
+                } catch {
+                    print("Error loading image: \(error.localizedDescription)")
                 }
             }
         }
     }
     
-    private func importImages(from urls: [URL]) {
+    private func importImages(from urls: [URL]) async {
+        guard !urls.isEmpty else { return }
+        isImporting = true
+        defer { isImporting = false }
+        
         for url in urls {
-            guard url.startAccessingSecurityScopedResource() else { continue }
-            defer { url.stopAccessingSecurityScopedResource() }
+            let importedImage: (tempURL: URL, name: String, format: String)? = {
+                guard url.startAccessingSecurityScopedResource() else { return nil }
+                defer { url.stopAccessingSecurityScopedResource() }
+                
+                let tempDirectory = FileManager.default.temporaryDirectory
+                let tempURL = tempDirectory.appendingPathComponent(UUID().uuidString + "_" + url.lastPathComponent)
+                
+                do {
+                    try FileManager.default.copyItem(at: url, to: tempURL)
+                    let name = url.deletingPathExtension().lastPathComponent
+                    let format = url.pathExtension.uppercased()
+                    return (tempURL, name, format.isEmpty ? "未知" : format)
+                } catch {
+                    print("Import failed: \(error.localizedDescription)")
+                    return nil
+                }
+            }()
             
-            if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                let name = url.deletingPathExtension().lastPathComponent
-                let format = url.pathExtension.uppercased()
-                addImage(image: image, name: name, format: format.isEmpty ? "未知" : format)
+            if let importedImage {
+                await addImage(fileURL: importedImage.tempURL, name: importedImage.name, format: importedImage.format)
             }
         }
+    }
+    
+    private func generatePreviewImage(from fileURL: URL) async -> UIImage? {
+        await Task.detached(priority: .utility) {
+            guard let source = CGImageSourceCreateWithURL(fileURL as CFURL, nil) else {
+                return nil
+            }
+            
+            let options: [CFString: Any] = [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 256
+            ]
+            
+            guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+                return nil
+            }
+            
+            return UIImage(cgImage: cgImage)
+        }.value
     }
     
     func saveToPhotoLibrary() async -> Result<Int, Error> {
@@ -308,11 +361,13 @@ class ConverterViewModel: ObservableObject {
 
 enum ConversionError: Error, LocalizedError {
     case failedToGenerateData
+    case failedToLoadSourceImage
     case photoLibraryAccessDenied
     
     var errorDescription: String? {
         switch self {
         case .failedToGenerateData: return "无法生成目标格式的图片数据"
+        case .failedToLoadSourceImage: return "无法读取原始图片文件"
         case .photoLibraryAccessDenied: return "需要相册的“添加照片”权限才能保存图片"
         }
     }

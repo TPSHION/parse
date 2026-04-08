@@ -19,7 +19,7 @@ struct SaveActionSheetView: View {
                         HStack(spacing: 12) {
                             Image(systemName: "square.and.arrow.up")
                                 .font(.system(size: 20))
-                            Text("分享图片")
+                            Text("分享文件")
                                 .font(.system(size: 16, weight: .semibold))
                             Spacer()
                         }

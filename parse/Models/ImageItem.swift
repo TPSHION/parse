@@ -3,7 +3,8 @@ import UIKit
 
 struct ImageItem: Identifiable, Equatable {
     let id = UUID()
-    let originalImage: UIImage
+    let originalFileURL: URL
+    let previewImage: UIImage?
     let originalName: String
     let originalFormat: String
     

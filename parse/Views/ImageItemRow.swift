@@ -7,12 +7,24 @@ struct ImageItemRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            Image(uiImage: item.originalImage)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 64, height: 64)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+            Group {
+                if let previewImage = item.previewImage {
+                    Image(uiImage: previewImage)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Rectangle()
+                        .fill(AppColors.secondaryBackground)
+                        .overlay {
+                            Image(systemName: "photo")
+                                .font(.system(size: 22))
+                                .foregroundColor(AppColors.textSecondary)
+                        }
+                }
+            }
+            .frame(width: 64, height: 64)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
             
             VStack(alignment: .leading, spacing: 6) {
                 Text(item.originalName)

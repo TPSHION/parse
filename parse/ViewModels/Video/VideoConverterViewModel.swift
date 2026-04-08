@@ -215,19 +215,26 @@ class VideoConverterViewModel: ObservableObject {
         defer { isImporting = false }
         
         for url in urls {
-            guard url.startAccessingSecurityScopedResource() else { continue }
-            defer { url.stopAccessingSecurityScopedResource() }
+            let importedVideo: (tempURL: URL, name: String, format: String)? = {
+                guard url.startAccessingSecurityScopedResource() else { return nil }
+                defer { url.stopAccessingSecurityScopedResource() }
+                
+                let tempDirectory = FileManager.default.temporaryDirectory
+                let tempURL = tempDirectory.appendingPathComponent(UUID().uuidString + "_" + url.lastPathComponent)
+                
+                do {
+                    try FileManager.default.copyItem(at: url, to: tempURL)
+                    let name = url.deletingPathExtension().lastPathComponent
+                    let format = url.pathExtension.uppercased()
+                    return (tempURL, name, format.isEmpty ? "未知" : format)
+                } catch {
+                    print("Import failed: \(error.localizedDescription)")
+                    return nil
+                }
+            }()
             
-            let tempDirectory = FileManager.default.temporaryDirectory
-            let tempURL = tempDirectory.appendingPathComponent(UUID().uuidString + "_" + url.lastPathComponent)
-            
-            do {
-                try FileManager.default.copyItem(at: url, to: tempURL)
-                let name = url.deletingPathExtension().lastPathComponent
-                let format = url.pathExtension.uppercased()
-                await addVideo(url: tempURL, name: name, format: format.isEmpty ? "未知" : format)
-            } catch {
-                print("Import failed: \(error.localizedDescription)")
+            if let importedVideo {
+                await addVideo(url: importedVideo.tempURL, name: importedVideo.name, format: importedVideo.format)
             }
         }
     }

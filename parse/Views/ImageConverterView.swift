@@ -46,8 +46,28 @@ struct ImageConverterView: View {
                 }
             }
             
-            // 导入时的加载动画 (如果有)
-            // if viewModel.isImporting { ... } 
+            // 导入时的加载动画
+            if viewModel.isImporting {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                    
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(.white)
+                        
+                        Text("正在导入图片...")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.white)
+                    }
+                    .padding(32)
+                    .background(AppColors.cardBackground.opacity(0.9))
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 10)
+                }
+                .zIndex(100)
+            }
         }
         .navigationTitle("图片格式转换")
         .navigationBarTitleDisplayMode(.inline)
