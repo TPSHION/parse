@@ -1,4 +1,4 @@
-platform :ios, '16.0'
+platform :ios, '18.6'
 
 target 'parse' do
   use_frameworks!
