@@ -20,8 +20,8 @@ struct ConvertedVideosDocument: FileDocument {
         for item in items {
             guard let fileURL = item.convertedFileURL else { continue }
             
-            let data = try Data(contentsOf: fileURL)
-            let wrapper = FileWrapper(regularFileWithContents: data)
+            // 转换产物已经位于应用自己的临时目录中，直接使用磁盘文件可避免导出时的内存峰值。
+            let wrapper = try FileWrapper(url: fileURL, options: .immediate)
             
             let ext = item.targetFormat.fileExtension
             let filename = "\(item.originalName).\(ext)"

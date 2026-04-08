@@ -393,7 +393,13 @@ class VideoConverterViewModel: ObservableObject {
     private func remuxWithoutReencode(item: VideoItem, outputURL: URL) async -> ConversionAttemptResult {
         let inputPath = item.originalURL.path
         let outputPath = outputURL.path
-        let command = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? -c copy -movflags +faststart -y \"\(outputPath)\""
+        let movFlags = switch item.targetFormat {
+        case .mp4, .mov:
+            " -movflags +faststart"
+        case .gif, .avi, .mkv:
+            ""
+        }
+        let command = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? -c copy\(movFlags) -y \"\(outputPath)\""
         return await executeFFmpegCommand(command, outputURL: outputURL, stageLabel: "无损封装")
     }
     
@@ -518,7 +524,17 @@ class VideoConverterViewModel: ObservableObject {
             }
             ffmpegCommand += "-y \"\(outputPath)\""
             return ffmpegCommand
-        case .avi, .mkv:
+        case .avi:
+            var ffmpegCommand = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? "
+            switch profile {
+            case .quality:
+                ffmpegCommand += "-c:v mpeg4 -q:v 4 -c:a mp3 -b:a 192k "
+            case .speed:
+                ffmpegCommand += "-c:v mpeg4 -q:v 7 -c:a mp3 -b:a 128k "
+            }
+            ffmpegCommand += "-y \"\(outputPath)\""
+            return ffmpegCommand
+        case .mkv:
             var ffmpegCommand = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? "
             switch profile {
             case .quality:

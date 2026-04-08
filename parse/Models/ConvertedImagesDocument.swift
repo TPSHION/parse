@@ -20,10 +20,8 @@ struct ConvertedImagesDocument: FileDocument {
         for item in items {
             guard let fileURL = item.convertedFileURL else { continue }
             
-            // 为了安全起见，从临时文件读取数据包装进 FileWrapper
-            // 因为 iOS 系统的 FileWrapper(url:) 处理外部依赖文件时可能会在导出时出现权限或状态问题
-            let data = try Data(contentsOf: fileURL)
-            let wrapper = FileWrapper(regularFileWithContents: data)
+            // 转换产物已经位于应用自己的临时目录中，直接使用磁盘文件可避免导出时的内存峰值。
+            let wrapper = try FileWrapper(url: fileURL, options: .immediate)
             
             let ext = item.targetFormat.fileExtension
             let filename = "\(item.originalName).\(ext)"
