@@ -21,6 +21,8 @@ enum AppColors {
     static let accentRed = Color(hex: "#EF4444")
     /// 文档相关强调色 (Purple)
     static let accentPurple = Color(hex: "#A855F7")
+    /// 音频相关强调色 (Orange/Yellow)
+    static let accentOrange = Color(hex: "#F59E0B")
 }
 
 extension Color {

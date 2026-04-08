@@ -69,6 +69,11 @@ struct ContentView: View {
                                     ToolGridCard(icon: "video.fill.badge.ellipsis", title: "视频转换", description: "高效互转 MP4, MOV, GIF, AVI, MKV 等格式", color: AppColors.accentGreen)
                                 }
                                 .buttonStyle(.plain)
+                                
+                                NavigationLink(destination: AudioConverterView()) {
+                                    ToolGridCard(icon: "waveform.circle.fill", title: "音频转换", description: "提取音频，或互转 MP3, WAV, M4A 等", color: AppColors.accentOrange)
+                                }
+                                .buttonStyle(.plain)
                             }
                         }
                         .opacity(appearAnimation ? 1 : 0)
