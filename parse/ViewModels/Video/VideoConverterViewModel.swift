@@ -6,13 +6,15 @@ import AVFoundation
 
 struct MovieTransferable: Transferable {
     let url: URL
+    let originalFilename: String
     
     static var transferRepresentation: some TransferRepresentation {
         FileRepresentation(importedContentType: .movie) { received in
             // 为了安全起见，我们将收到的文件拷贝到临时目录
-            let copy = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + "_" + received.file.lastPathComponent)
+            let originalFilename = received.file.lastPathComponent
+            let copy = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + "_" + originalFilename)
             try FileManager.default.copyItem(at: received.file, to: copy)
-            return MovieTransferable(url: copy)
+            return MovieTransferable(url: copy, originalFilename: originalFilename)
         }
     }
 }
@@ -195,11 +197,9 @@ class VideoConverterViewModel: ObservableObject {
                 do {
                     if let movie = try await selection.loadTransferable(type: MovieTransferable.self) {
                         let url = movie.url
-                        let formatter = DateFormatter()
-                        formatter.dateFormat = "yyyyMMdd_HHmmss"
-                        let timeString = formatter.string(from: Date())
-                        let randomSuffix = String(Int.random(in: 100...999))
-                        let name = "VID_\(timeString)_\(randomSuffix)"
+                        let name = URL(fileURLWithPath: movie.originalFilename)
+                            .deletingPathExtension()
+                            .lastPathComponent
                         let format = url.pathExtension.uppercased()
                         
                         await self.addVideo(url: url, name: name, format: format.isEmpty ? "未知" : format)

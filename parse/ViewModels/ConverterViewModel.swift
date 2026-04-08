@@ -8,12 +8,14 @@ import Photos
 
 struct ImageFileTransferable: Transferable {
     let url: URL
+    let originalFilename: String
     
     static var transferRepresentation: some TransferRepresentation {
         FileRepresentation(importedContentType: .image) { received in
-            let copy = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + "_" + received.file.lastPathComponent)
+            let originalFilename = received.file.lastPathComponent
+            let copy = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + "_" + originalFilename)
             try FileManager.default.copyItem(at: received.file, to: copy)
-            return ImageFileTransferable(url: copy)
+            return ImageFileTransferable(url: copy, originalFilename: originalFilename)
         }
     }
 }
@@ -315,13 +317,11 @@ class ConverterViewModel: ObservableObject {
                         if let contentType = selection.supportedContentTypes.first {
                             formatString = contentType.preferredFilenameExtension?.uppercased() ?? contentType.localizedDescription ?? "未知"
                         }
-                        
-                        let formatter = DateFormatter()
-                        formatter.dateFormat = "yyyyMMdd_HHmmss"
-                        let timeString = formatter.string(from: Date())
-                        let randomSuffix = String(Int.random(in: 100...999))
-                        let name = "IMG_\(timeString)_\(randomSuffix)"
-                        
+
+                        let name = URL(fileURLWithPath: imageFile.originalFilename)
+                            .deletingPathExtension()
+                            .lastPathComponent
+
                         await self.addImage(fileURL: url, name: name, format: formatString)
                     } else {
                         print("Failed to load image file.")

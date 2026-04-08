@@ -69,6 +69,13 @@ class AudioConverterViewModel: ObservableObject {
         exportDocument = successItems.isEmpty ? nil : ConvertedAudioDocument(items: successItems)
     }
     
+    func addImportedAudioFiles(_ files: [ImportedAudioFile]) {
+        guard !files.isEmpty else { return }
+        audioItems.append(contentsOf: files.map {
+            AudioItem(url: $0.url, originalFilename: $0.originalFilename, targetFormat: batchTargetFormat)
+        })
+    }
+    
     func handleFileImportResult(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
@@ -249,12 +256,7 @@ class AudioConverterViewModel: ObservableObject {
         importActivityCount = max(0, importActivityCount - 1)
         isImporting = importActivityCount > 0
     }
-    
-    private struct ImportedAudioFile {
-        let url: URL
-        let originalFilename: String
-    }
-    
+
     private nonisolated static func importAudioFiles(from urls: [URL]) -> [ImportedAudioFile] {
         urls.compactMap { importAudioFile(from: $0) }
     }

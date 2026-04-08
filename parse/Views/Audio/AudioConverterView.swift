@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 struct AudioConverterView: View {
     @StateObject private var viewModel = AudioConverterViewModel()
     @State private var isFileImporterPresented = false
+    @State private var isSMBImportPresented = false
     @State private var isFileExporterPresented = false
     @State private var isSaveActionSheetPresented = false
     @State private var saveMessage: String?
@@ -26,7 +27,12 @@ struct AudioConverterView: View {
             
             Group {
                 if viewModel.audioItems.isEmpty {
-                    AudioEmptyStateView(isFileImporterPresented: $isFileImporterPresented)
+                    AudioEmptyStateView(
+                        isFileImporterPresented: $isFileImporterPresented,
+                        onImportFromSMB: {
+                            isSMBImportPresented = true
+                        }
+                    )
                 } else {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 20) {
@@ -71,6 +77,14 @@ struct AudioConverterView: View {
             allowsMultipleSelection: true
         ) { result in
             viewModel.handleFileImportResult(result)
+        }
+        .sheet(isPresented: $isSMBImportPresented) {
+            AudioSMBImportSheet { importedFiles in
+                viewModel.addImportedAudioFiles(importedFiles)
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(AppColors.background)
         }
         .fileExporter(
             isPresented: $isFileExporterPresented,
@@ -229,6 +243,19 @@ struct AudioConverterView: View {
                 isFileImporterPresented = true
             }) {
                 Image(systemName: "folder.badge.plus")
+                    .font(.system(size: 20))
+                    .foregroundColor(AppColors.textPrimary)
+                    .frame(width: 48, height: 48)
+                    .background(AppColors.secondaryBackground.opacity(0.8))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .disabled(isBusy)
+
+            Button(action: {
+                isSMBImportPresented = true
+            }) {
+                Image(systemName: "externaldrive.connected.to.line.below")
                     .font(.system(size: 20))
                     .foregroundColor(AppColors.textPrimary)
                     .frame(width: 48, height: 48)

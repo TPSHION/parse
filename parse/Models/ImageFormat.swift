@@ -8,6 +8,21 @@ enum ImageFormat: String, CaseIterable, Identifiable {
     case tiff = "TIFF"
     
     var id: String { rawValue }
+
+    init?(fileExtension: String) {
+        switch fileExtension.lowercased() {
+        case "jpg", "jpeg":
+            self = .jpeg
+        case "png":
+            self = .png
+        case "heic", "heif":
+            self = .heic
+        case "tif", "tiff":
+            self = .tiff
+        default:
+            return nil
+        }
+    }
     
     var fileExtension: String {
         switch self {
