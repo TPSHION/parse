@@ -7,7 +7,7 @@ struct FeatureCard: View {
     let color: Color
     
     var body: some View {
-        HStack(spacing: 20) {
+        HStack(spacing: 16) {
             ZStack {
                 // 图标背景的微发光效果
                 Circle()
@@ -16,15 +16,15 @@ struct FeatureCard: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ))
-                    .frame(width: 64, height: 64)
+                    .frame(width: 56, height: 56)
                     .shadow(color: color.opacity(0.3), radius: 10, x: 0, y: 5)
                 
                 Image(systemName: icon)
-                    .font(.system(size: 28, weight: .medium))
+                    .font(.system(size: 24, weight: .medium))
                     .foregroundColor(color)
             }
             
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(title)
                     .font(.title3)
                     .fontWeight(.bold)
@@ -37,7 +37,7 @@ struct FeatureCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             
-            Spacer()
+            Spacer(minLength: 8)
             
             Image(systemName: "chevron.right")
                 .font(.system(size: 14, weight: .bold))
@@ -107,6 +107,7 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 10)
                         .padding(.bottom, 10)
+                        .padding(.horizontal, 4)
                         .opacity(appearAnimation ? 1 : 0)
                         .offset(y: appearAnimation ? 0 : 20)
                         
@@ -115,7 +116,7 @@ struct ContentView: View {
                             FeatureCard(
                                 icon: "photo.badge.arrow.down.fill",
                                 title: "图片格式转换",
-                                description: "支持批量极速转换 JPEG, PNG, HEIC, TIFF 等多种格式",
+                                description: "支持极速批量转换 JPEG, PNG, HEIC, TIFF",
                                 color: AppColors.accentBlue
                             )
                         }
@@ -128,7 +129,7 @@ struct ContentView: View {
                             FeatureCard(
                                 icon: "video.fill.badge.ellipsis",
                                 title: "视频格式转换",
-                                description: "支持 MP4, MOV, GIF, AVI 等主流视频格式的高清互相转换",
+                                description: "支持 MP4, MOV, GIF, AVI, MKV 等格式互转",
                                 color: AppColors.accentGreen
                             )
                         }

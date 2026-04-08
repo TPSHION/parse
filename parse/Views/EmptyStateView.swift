@@ -6,77 +6,143 @@ struct EmptyStateView: View {
     @Binding var selectedPhotos: [PhotosPickerItem]
     
     var body: some View {
-        VStack(spacing: 32) {
-            Spacer()
-            
-            ZStack {
-                Circle()
-                    .fill(AppColors.cardBackground)
-                    .frame(width: 120, height: 120)
-                
-                Image(systemName: "photo.on.rectangle.angled")
-                    .font(.system(size: 48, weight: .light))
-                    .foregroundColor(AppColors.accentBlue)
-            }
-            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-            
-            VStack(spacing: 8) {
-                Text("开始转换图片")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(AppColors.textPrimary)
-                
-                Text("支持多张图片同时转换为 JPEG、PNG、HEIC 或 TIFF 格式")
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-            }
-            
-            VStack(spacing: 16) {
-                PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "photo")
-                            .font(.title3)
-                        Text("从相册选择")
-                            .fontWeight(.semibold)
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 16) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [AppColors.cardBackground, Color.black.opacity(0.9)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(height: 220)
+                        
+                        Circle()
+                            .fill(AppColors.accentBlue.opacity(0.18))
+                            .frame(width: 180, height: 180)
+                            .blur(radius: 10)
+                            .offset(x: 90, y: -40)
+                        
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Label("Image Lab", systemImage: "photo.on.rectangle.angled")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(AppColors.accentBlue)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(AppColors.accentBlue.opacity(0.12))
+                                    .clipShape(Capsule())
+                                Spacer()
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("开始图片格式转换")
+                                    .font(.system(size: 28, weight: .heavy))
+                                    .foregroundColor(AppColors.textPrimary)
+                                
+                                Text("支持从相册或文件导入图片，统一转换为 JPEG、PNG、HEIC 或 TIFF。")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(AppColors.textSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .padding(22)
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(AppColors.accentBlue)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .buttonStyle(.plain)
-                
-                Button(action: {
-                    isFileImporterPresented = true
-                }) {
+                    
                     HStack(spacing: 12) {
-                        Image(systemName: "folder")
-                            .font(.title3)
-                        Text("从文件夹选择")
-                            .fontWeight(.semibold)
+                        featureChip(icon: "bolt.fill", text: "本地处理")
+                        featureChip(icon: "square.stack.3d.up.fill", text: "批量导入")
+                        featureChip(icon: "sparkles", text: "原画质导出")
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(AppColors.cardBackground)
-                    .foregroundColor(AppColors.textPrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(AppColors.secondaryBackground, lineWidth: 1)
-                    )
                 }
-                .buttonStyle(.plain)
+                
+                VStack(spacing: 14) {
+                    PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
+                        actionCard(
+                            icon: "photo.stack.fill",
+                            title: "从相册导入",
+                            detail: "适合批量挑选近期拍摄或已保存的图片",
+                            accent: AppColors.accentBlue,
+                            filled: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: {
+                        isFileImporterPresented = true
+                    }) {
+                        actionCard(
+                            icon: "folder.fill.badge.plus",
+                            title: "从文件导入",
+                            detail: "支持从 iCloud Drive 或本地目录选择图片文件",
+                            accent: AppColors.accentGreen,
+                            filled: false
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
             }
-            .padding(.horizontal, 40)
-            .padding(.top, 24)
-            
-            Spacer()
-            Spacer()
+            .padding(20)
         }
-        .padding()
         .background(AppColors.background.ignoresSafeArea())
+    }
+    
+    private func featureChip(icon: String, text: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+            Text(text)
+                .font(.system(size: 11, weight: .bold))
+        }
+        .foregroundColor(AppColors.textSecondary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(AppColors.cardBackground)
+        .clipShape(Capsule())
+    }
+    
+    private func actionCard(icon: String, title: String, detail: String, accent: Color, filled: Bool) -> some View {
+        HStack(spacing: 16) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(filled ? accent.opacity(0.18) : AppColors.secondaryBackground.opacity(0.35))
+                    .frame(width: 56, height: 56)
+                Image(systemName: icon)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundColor(filled ? .white : accent)
+            }
+            
+            VStack(alignment: .leading, spacing: 6) {
+                Text(title)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(filled ? .white : AppColors.textPrimary)
+                Text(detail)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(filled ? Color.white.opacity(0.86) : AppColors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(filled ? Color.white.opacity(0.78) : AppColors.textSecondary.opacity(0.6))
+        }
+        .padding(18)
+        .background(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(filled ? accent.opacity(0.92) : AppColors.cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(filled ? Color.clear : Color.white.opacity(0.06), lineWidth: 1)
+        )
+        .foregroundColor(filled ? .white : AppColors.textPrimary)
+        .shadow(color: filled ? accent.opacity(0.18) : Color.black.opacity(0.12), radius: 16, x: 0, y: 8)
     }
 }

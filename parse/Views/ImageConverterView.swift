@@ -22,96 +22,35 @@ struct ImageConverterView: View {
         ZStack {
             AppColors.background.ignoresSafeArea()
             
+            LinearGradient(
+                colors: [AppColors.accentBlue.opacity(0.15), Color.clear],
+                startPoint: .topLeading,
+                endPoint: .center
+            )
+            .ignoresSafeArea()
+            
             Group {
-                    if viewModel.imageItems.isEmpty {
-                        EmptyStateView(
-                            isFileImporterPresented: $isFileImporterPresented,
-                            selectedPhotos: $selectedPhotos
-                        )
-                    } else {
-                        ScrollView {
-                            VStack(spacing: 20) {
-                                // 统一转换头部面板和统计栏
-                                VStack(spacing: 16) {
-                                    // 状态统计和进度
-                                    VStack(spacing: 0) {
-                                        HStack(spacing: 0) {
-                                            StatItemView(title: "总数", count: viewModel.totalCount, color: AppColors.textPrimary)
-                                            Divider().background(AppColors.secondaryBackground)
-                                            StatItemView(title: "待处理", count: viewModel.pendingCount + viewModel.convertingCount, color: AppColors.accentBlue)
-                                            Divider().background(AppColors.secondaryBackground)
-                                            StatItemView(title: "成功", count: viewModel.successCount, color: AppColors.accentGreen)
-                                            Divider().background(AppColors.secondaryBackground)
-                                            StatItemView(title: "失败", count: viewModel.failedCount, color: AppColors.accentRed)
-                                        }
-                                        .padding(.vertical, 12)
-                                        
-                                        // 仅在有任务进行过或进行中时显示进度条
-                                        if viewModel.totalCount > 0 && (viewModel.isConverting || viewModel.successCount > 0 || viewModel.failedCount > 0) {
-                                            GeometryReader { geometry in
-                                                ZStack(alignment: .leading) {
-                                                    Rectangle()
-                                                        .fill(AppColors.secondaryBackground.opacity(0.5))
-                                                        .frame(height: 4)
-                                                    
-                                                    Rectangle()
-                                                        .fill(viewModel.isConverting ? AppColors.accentBlue : AppColors.accentGreen)
-                                                        .frame(width: geometry.size.width * CGFloat(viewModel.conversionProgress), height: 4)
-                                                        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: viewModel.conversionProgress)
-                                                        .animation(.easeInOut(duration: 0.3), value: viewModel.isConverting)
-                                                }
-                                            }
-                                            .frame(height: 4)
-                                        }
-                                    }
-                                    .background(AppColors.cardBackground)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                    
-                                    // 统一转换选项
-                                    VStack(alignment: .leading, spacing: 12) {
-                                        Text("统一转换为")
-                                            .font(.subheadline)
-                                            .foregroundColor(AppColors.textSecondary)
-                                            .fontWeight(.medium)
-                                            
-                                        Picker("统一转换为", selection: $viewModel.batchTargetFormat) {
-                                            ForEach(ImageFormat.allCases) { format in
-                                                Text(format.rawValue).tag(format)
-                                            }
-                                        }
-                                        .pickerStyle(.segmented)
-                                        .disabled(viewModel.isConverting)
-                                    }
-                                    .padding()
-                                    .background(AppColors.cardBackground)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                }
-                                .padding(.horizontal)
-                                
-                                // 图片列表
-                                VStack(spacing: 12) {
-                                    ForEach(viewModel.imageItems) { item in
-                                        ImageItemRow(
-                                            item: item,
-                                            onFormatChange: { newFormat in
-                                                viewModel.updateTargetFormat(for: item.id, to: newFormat)
-                                            },
-                                            onDelete: {
-                                                viewModel.removeItem(id: item.id)
-                                            }
-                                        )
-                                    }
-                                }
-                                .padding(.horizontal)
-                                .padding(.bottom, 100) // 为底部悬浮按钮留出空间
-                            }
-                            .padding(.top, 20)
+                if viewModel.imageItems.isEmpty {
+                    EmptyStateView(
+                        isFileImporterPresented: $isFileImporterPresented,
+                        selectedPhotos: $selectedPhotos
+                    )
+                } else {
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 20) {
+                            summaryPanel
+                            listSection
                         }
+                        .padding(.top, 20)
                     }
                 }
             }
-            .navigationTitle("图片格式转换")
-            .navigationBarTitleDisplayMode(.inline)
+            
+            // 导入时的加载动画 (如果有)
+            // if viewModel.isImporting { ... } 
+        }
+        .navigationTitle("图片格式转换")
+        .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(AppColors.background, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -123,7 +62,7 @@ struct ImageConverterView: View {
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(.white)
                         }
-                        .disabled(viewModel.isConverting)
+                        .allowsHitTesting(!viewModel.isConverting)
                     }
                 }
             }
@@ -192,6 +131,100 @@ struct ImageConverterView: View {
                 Text(message)
             }
         }
+    }
+    
+    private var summaryPanel: some View {
+        VStack(spacing: 16) {
+            // 状态统计和进度
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    StatItemView(title: "总数", count: viewModel.totalCount, color: AppColors.textPrimary)
+                    Divider().background(AppColors.secondaryBackground)
+                    StatItemView(title: "待处理", count: viewModel.pendingCount + viewModel.convertingCount, color: AppColors.accentBlue)
+                    Divider().background(AppColors.secondaryBackground)
+                    StatItemView(title: "成功", count: viewModel.successCount, color: AppColors.accentGreen)
+                    Divider().background(AppColors.secondaryBackground)
+                    StatItemView(title: "失败", count: viewModel.failedCount, color: AppColors.accentRed)
+                }
+                .padding(.vertical, 12)
+                
+                // 仅在有任务进行过或进行中时显示进度条
+                if viewModel.totalCount > 0 && (viewModel.isConverting || viewModel.successCount > 0 || viewModel.failedCount > 0) {
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text(viewModel.isConverting ? "处理中" : "处理完成")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(viewModel.isConverting ? AppColors.accentBlue : AppColors.accentGreen)
+                            Spacer()
+                            Text(viewModel.conversionProgress.progressText)
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(AppColors.textPrimary)
+                        }
+                        
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                Rectangle()
+                                    .fill(AppColors.secondaryBackground.opacity(0.5))
+                                    .frame(height: 4)
+                                
+                                Rectangle()
+                                    .fill(viewModel.isConverting ? AppColors.accentBlue : AppColors.accentGreen)
+                                    .frame(width: geometry.size.width * CGFloat(viewModel.conversionProgress), height: 4)
+                                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: viewModel.conversionProgress)
+                                    .animation(.easeInOut(duration: 0.3), value: viewModel.isConverting)
+                            }
+                        }
+                        .frame(height: 4)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 12)
+                }
+            }
+            .background(AppColors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            
+            // 统一转换选项
+            VStack(spacing: 12) {
+                HStack {
+                    Text("统一转换为")
+                        .font(.subheadline)
+                        .foregroundColor(AppColors.textSecondary)
+                        .fontWeight(.medium)
+                    Spacer()
+                    Picker("统一转换为", selection: $viewModel.batchTargetFormat) {
+                        ForEach(ImageFormat.allCases) { format in
+                            Text(format.rawValue).tag(format)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 240)
+                    .allowsHitTesting(!viewModel.isConverting)
+                }
+            }
+            .padding(16)
+            .background(AppColors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+        .padding(.horizontal)
+    }
+    
+    private var listSection: some View {
+        VStack(spacing: 12) {
+            ForEach(viewModel.imageItems) { item in
+                ImageItemRow(
+                    item: item,
+                    onFormatChange: { newFormat in
+                        viewModel.updateTargetFormat(for: item.id, to: newFormat)
+                    },
+                    onDelete: {
+                        viewModel.removeItem(id: item.id)
+                    }
+                )
+            }
+        }
+        .allowsHitTesting(!viewModel.isConverting)
+        .padding(.horizontal)
+        .padding(.bottom, 100)
     }
     
     @ViewBuilder
