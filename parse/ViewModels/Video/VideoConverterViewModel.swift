@@ -60,6 +60,7 @@ class VideoConverterViewModel: ObservableObject {
     
     private var shouldStopConversion = false
     private var activeNativeExportSessions: [UUID: AVAssetExportSession] = [:]
+    private var importActivityCount: Int = 0
     
     // MARK: - 统计属性
     var totalCount: Int { videoItems.count }
@@ -94,11 +95,11 @@ class VideoConverterViewModel: ObservableObject {
     }
     
     var canConvert: Bool {
-        !videoItems.isEmpty
+        isConverting || (!isImporting && !videoItems.isEmpty)
     }
     
     var canSave: Bool {
-        hasSuccessItems && !isConverting
+        hasSuccessItems && !isConverting && !isImporting
     }
     
     // MARK: - 操作
@@ -172,9 +173,11 @@ class VideoConverterViewModel: ObservableObject {
     func handleFileImportResult(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
-            Task { [weak self] in
-                guard let self else { return }
-                await self.importVideos(from: urls)
+            guard !urls.isEmpty else { return }
+            beginImport()
+            Task { [self] in
+                defer { endImport() }
+                await importVideos(from: urls)
             }
         case .failure(let error):
             print("Import failed: \(error.localizedDescription)")
@@ -183,9 +186,11 @@ class VideoConverterViewModel: ObservableObject {
     
     func processVideoSelections(_ selections: [PhotosPickerItem]) {
         guard !selections.isEmpty else { return }
-        isImporting = true
+        beginImport()
         
-        Task {
+        Task { [self] in
+            defer { endImport() }
+            
             for selection in selections {
                 do {
                     if let movie = try await selection.loadTransferable(type: MovieTransferable.self) {
@@ -205,15 +210,10 @@ class VideoConverterViewModel: ObservableObject {
                     print("Error loading video: \(error.localizedDescription)")
                 }
             }
-            self.isImporting = false
         }
     }
     
     private func importVideos(from urls: [URL]) async {
-        guard !urls.isEmpty else { return }
-        isImporting = true
-        defer { isImporting = false }
-        
         for url in urls {
             let importedVideo: (tempURL: URL, name: String, format: String)? = {
                 guard url.startAccessingSecurityScopedResource() else { return nil }
@@ -237,6 +237,16 @@ class VideoConverterViewModel: ObservableObject {
                 await addVideo(url: importedVideo.tempURL, name: importedVideo.name, format: importedVideo.format)
             }
         }
+    }
+    
+    private func beginImport() {
+        importActivityCount += 1
+        isImporting = importActivityCount > 0
+    }
+    
+    private func endImport() {
+        importActivityCount = max(0, importActivityCount - 1)
+        isImporting = importActivityCount > 0
     }
     
     // MARK: - 转换逻辑 (FFmpeg)

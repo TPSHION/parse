@@ -19,6 +19,8 @@ struct ImageConverterView: View {
     @State private var showSaveAlert = false
     
     var body: some View {
+        let isBusy = viewModel.isConverting || viewModel.isImporting
+        
         ZStack {
             AppColors.background.ignoresSafeArea()
             
@@ -35,6 +37,7 @@ struct ImageConverterView: View {
                         isFileImporterPresented: $isFileImporterPresented,
                         selectedPhotos: $selectedPhotos
                     )
+                    .allowsHitTesting(!viewModel.isImporting)
                 } else {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 20) {
@@ -43,6 +46,7 @@ struct ImageConverterView: View {
                         }
                         .padding(.top, 20)
                     }
+                    .allowsHitTesting(!isBusy)
                 }
             }
             
@@ -82,7 +86,7 @@ struct ImageConverterView: View {
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(.white)
                         }
-                        .allowsHitTesting(!viewModel.isConverting)
+                        .allowsHitTesting(!isBusy)
                     }
                 }
             }
@@ -250,6 +254,9 @@ struct ImageConverterView: View {
     @ViewBuilder
     private var bottomActionPanel: some View {
         let isConverting = viewModel.isConverting
+        let isBusy = viewModel.isConverting || viewModel.isImporting
+        let hasItems = !viewModel.imageItems.isEmpty
+        let hasSuccessItems = viewModel.hasSuccessItems
         
         HStack(spacing: 12) {
             Button(action: {
@@ -257,24 +264,24 @@ struct ImageConverterView: View {
             }) {
                 Image(systemName: "folder.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(isConverting)
+            .disabled(isBusy)
             
             PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
                 Image(systemName: "photo.badge.plus")
                     .font(.system(size: 20))
-                    .foregroundColor(isConverting ? AppColors.textSecondary.opacity(0.5) : AppColors.textPrimary)
+                    .foregroundColor(AppColors.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(isConverting ? 0.3 : 0.8))
+                    .background(AppColors.secondaryBackground.opacity(0.8))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(isConverting)
+            .disabled(isBusy)
             
             Button(action: {
                 Task {
@@ -294,12 +301,12 @@ struct ImageConverterView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
-                .foregroundColor(viewModel.canConvert ? .white : AppColors.textSecondary.opacity(0.5))
+                .foregroundColor(hasItems ? .white : AppColors.textSecondary.opacity(0.5))
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
-                .background(viewModel.canConvert ? AppColors.accentBlue : AppColors.secondaryBackground.opacity(0.5))
+                .background(hasItems ? AppColors.accentBlue : AppColors.secondaryBackground.opacity(0.5))
                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(color: viewModel.canConvert ? AppColors.accentBlue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
+                .shadow(color: hasItems ? AppColors.accentBlue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
             }
             .buttonStyle(.plain)
             .disabled(!viewModel.canConvert)
@@ -314,12 +321,12 @@ struct ImageConverterView: View {
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
                 }
-                .foregroundColor(viewModel.canSave ? .white : AppColors.textSecondary.opacity(0.5))
+                .foregroundColor(hasSuccessItems ? .white : AppColors.textSecondary.opacity(0.5))
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
-                .background(viewModel.canSave ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5))
+                .background(hasSuccessItems ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5))
                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(color: viewModel.canSave ? AppColors.accentGreen.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
+                .shadow(color: hasSuccessItems ? AppColors.accentGreen.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
             }
             .buttonStyle(.plain)
             .disabled(!viewModel.canSave)
@@ -339,6 +346,7 @@ struct ImageConverterView: View {
         .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
         .padding(.horizontal, 16)
         .padding(.bottom, 0)
+        .allowsHitTesting(!viewModel.isImporting)
     }
     
 }

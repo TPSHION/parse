@@ -37,6 +37,8 @@ class ConverterViewModel: ObservableObject {
     @Published var isConverting: Bool = false
     @Published var isImporting: Bool = false
     
+    private var importActivityCount: Int = 0
+    
     // MARK: - 统计属性
     var totalCount: Int { imageItems.count }
     
@@ -67,11 +69,11 @@ class ConverterViewModel: ObservableObject {
     }
     
     var canConvert: Bool {
-        !isConverting && !imageItems.isEmpty
+        !isConverting && !isImporting && !imageItems.isEmpty
     }
     
     var canSave: Bool {
-        hasSuccessItems && !isConverting
+        hasSuccessItems && !isConverting && !isImporting
     }
     
     // 整体转换进度 (0.0 - 1.0)
@@ -145,9 +147,11 @@ class ConverterViewModel: ObservableObject {
     func handleFileImportResult(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
-            Task { [weak self] in
-                guard let self else { return }
-                await self.importImages(from: urls)
+            guard !urls.isEmpty else { return }
+            beginImport()
+            Task { [self] in
+                defer { endImport() }
+                await importImages(from: urls)
             }
         case .failure(let error):
             print("Import failed: \(error.localizedDescription)")
@@ -249,10 +253,10 @@ class ConverterViewModel: ObservableObject {
     // Process selected photos from PhotosPicker
     func processPhotoSelections(_ selections: [PhotosPickerItem]) {
         guard !selections.isEmpty else { return }
-        isImporting = true
+        beginImport()
         
-        Task {
-            defer { self.isImporting = false }
+        Task { [self] in
+            defer { endImport() }
             
             for selection in selections {
                 do {
@@ -281,10 +285,6 @@ class ConverterViewModel: ObservableObject {
     }
     
     private func importImages(from urls: [URL]) async {
-        guard !urls.isEmpty else { return }
-        isImporting = true
-        defer { isImporting = false }
-        
         for url in urls {
             let importedImage: (tempURL: URL, name: String, format: String)? = {
                 guard url.startAccessingSecurityScopedResource() else { return nil }
@@ -328,6 +328,16 @@ class ConverterViewModel: ObservableObject {
             
             return UIImage(cgImage: cgImage)
         }.value
+    }
+    
+    private func beginImport() {
+        importActivityCount += 1
+        isImporting = importActivityCount > 0
+    }
+    
+    private func endImport() {
+        importActivityCount = max(0, importActivityCount - 1)
+        isImporting = importActivityCount > 0
     }
     
     func saveToPhotoLibrary() async -> Result<Int, Error> {
