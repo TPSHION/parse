@@ -13,10 +13,12 @@ struct ImageConverterView: View {
     @StateObject private var viewModel = ConverterViewModel()
     @State private var selectedPhotos: [PhotosPickerItem] = []
     @State private var isFileImporterPresented = false
+    @State private var isLinkImportPresented = false
     @State private var isFileExporterPresented = false
     @State private var isSaveActionSheetPresented = false
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
+    @State private var remoteImportPreview: RemoteImageImportPreview?
     
     var body: some View {
         let isBusy = viewModel.isConverting || viewModel.isImporting
@@ -35,7 +37,10 @@ struct ImageConverterView: View {
                 if viewModel.imageItems.isEmpty {
                     EmptyStateView(
                         isFileImporterPresented: $isFileImporterPresented,
-                        selectedPhotos: $selectedPhotos
+                        selectedPhotos: $selectedPhotos,
+                        onImportFromLink: {
+                            isLinkImportPresented = true
+                        }
                     )
                     .allowsHitTesting(!viewModel.isImporting)
                 } else {
@@ -106,6 +111,19 @@ struct ImageConverterView: View {
             ) { result in
                 viewModel.handleFileImportResult(result)
             }
+            .sheet(isPresented: $isLinkImportPresented) {
+                ImageLinkImportSheet(
+                    resolver: { urlText in
+                        try await viewModel.prepareRemoteImageImport(from: urlText)
+                    },
+                    onResolved: { preview in
+                        remoteImportPreview = preview
+                    }
+                )
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(AppColors.background)
+            }
             .fileExporter(
                 isPresented: $isFileExporterPresented,
                 document: viewModel.exportDocument,
@@ -146,6 +164,22 @@ struct ImageConverterView: View {
                 )
                 .presentationDetents([.height(280)])
                 .presentationDragIndicator(.visible)
+                .presentationBackground(AppColors.background)
+            }
+            .sheet(item: $remoteImportPreview) { preview in
+                RemoteImageImportPreviewSheet(
+                    preview: preview,
+                    onImport: {
+                        viewModel.confirmRemoteImageImport(preview)
+                        remoteImportPreview = nil
+                    },
+                    onCancel: {
+                        viewModel.discardRemoteImageImport(preview)
+                        remoteImportPreview = nil
+                    }
+                )
+                .presentationDetents([.height(340)]) // 稍微调高以适应多行显示
+                .presentationDragIndicator(.hidden)
                 .presentationBackground(AppColors.background)
             }
         .alert("保存结果", isPresented: $showSaveAlert) {
@@ -258,89 +292,111 @@ struct ImageConverterView: View {
         let hasItems = !viewModel.imageItems.isEmpty
         let hasSuccessItems = viewModel.hasSuccessItems
         
-        HStack(spacing: 12) {
-            Button(action: {
-                isFileImporterPresented = true
-            }) {
-                Image(systemName: "folder.badge.plus")
-                    .font(.system(size: 20))
-                    .foregroundColor(AppColors.textPrimary)
-                    .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(0.8))
-                    .clipShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .disabled(isBusy)
-            
-            PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
-                Image(systemName: "photo.badge.plus")
-                    .font(.system(size: 20))
-                    .foregroundColor(AppColors.textPrimary)
-                    .frame(width: 48, height: 48)
-                    .background(AppColors.secondaryBackground.opacity(0.8))
-                    .clipShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .disabled(isBusy)
-            
-            Button(action: {
-                Task {
-                    await viewModel.handlePrimaryAction()
+        HStack(spacing: 8) {
+            // 左侧操作按钮组 (使用更紧凑的间距和圆角)
+            HStack(spacing: 6) {
+                Button(action: {
+                    isFileImporterPresented = true
+                }) {
+                    Image(systemName: "folder.badge.plus")
+                        .font(.system(size: 18))
+                        .foregroundColor(AppColors.textPrimary)
+                        .frame(width: 44, height: 44)
+                        .background(AppColors.secondaryBackground.opacity(0.8))
+                        .clipShape(Circle())
                 }
-            }) {
-                HStack(spacing: 6) {
-                    if isConverting {
-                        ProgressView()
-                            .tint(AppColors.textSecondary)
-                    } else {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                            .font(.system(size: 16, weight: .semibold))
+                .buttonStyle(.plain)
+                .disabled(isBusy)
+                
+                PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
+                    Image(systemName: "photo.badge.plus")
+                        .font(.system(size: 18))
+                        .foregroundColor(AppColors.textPrimary)
+                        .frame(width: 44, height: 44)
+                        .background(AppColors.secondaryBackground.opacity(0.8))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isBusy)
+                
+                Button(action: {
+                    isLinkImportPresented = true
+                }) {
+                    Image(systemName: "link")
+                        .font(.system(size: 18))
+                        .foregroundColor(AppColors.textPrimary)
+                        .frame(width: 44, height: 44)
+                        .background(AppColors.secondaryBackground.opacity(0.8))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isBusy)
+            }
+            
+            Spacer(minLength: 4)
+            
+            // 右侧核心操作按钮组
+            HStack(spacing: 8) {
+                Button(action: {
+                    Task {
+                        await viewModel.handlePrimaryAction()
                     }
-                    Text(isConverting ? "转换中" : "转换")
-                        .font(.system(size: 16, weight: .bold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                }) {
+                    HStack(spacing: 4) {
+                        if isConverting {
+                            ProgressView()
+                                .tint(AppColors.textSecondary)
+                                .scaleEffect(0.8)
+                        } else {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .font(.system(size: 14, weight: .semibold))
+                        }
+                        Text(isConverting ? "转换中" : "转换")
+                            .font(.system(size: 15, weight: .bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .foregroundColor(hasItems ? .white : AppColors.textSecondary.opacity(0.5))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(hasItems ? AppColors.accentBlue : AppColors.secondaryBackground.opacity(0.5))
+                    .clipShape(Capsule())
+                    .shadow(color: hasItems ? AppColors.accentBlue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
                 }
-                .foregroundColor(hasItems ? .white : AppColors.textSecondary.opacity(0.5))
-                .frame(maxWidth: .infinity)
-                .frame(height: 48)
-                .background(hasItems ? AppColors.accentBlue : AppColors.secondaryBackground.opacity(0.5))
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(color: hasItems ? AppColors.accentBlue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
-            }
-            .buttonStyle(.plain)
-            .disabled(!viewModel.canConvert)
-            
-            Button(action: {
-                isSaveActionSheetPresented = true
-            }) {
-                HStack(spacing: 6) {
-                    Image(systemName: "square.and.arrow.down")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text("保存")
-                        .font(.system(size: 16, weight: .bold))
-                        .lineLimit(1)
+                .buttonStyle(.plain)
+                .disabled(!viewModel.canConvert)
+                
+                Button(action: {
+                    isSaveActionSheetPresented = true
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "square.and.arrow.down")
+                            .font(.system(size: 14, weight: .semibold))
+                        Text("保存")
+                            .font(.system(size: 15, weight: .bold))
+                            .lineLimit(1)
+                    }
+                    .foregroundColor(hasSuccessItems ? .white : AppColors.textSecondary.opacity(0.5))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(hasSuccessItems ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5))
+                    .clipShape(Capsule())
+                    .shadow(color: hasSuccessItems ? AppColors.accentGreen.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
                 }
-                .foregroundColor(hasSuccessItems ? .white : AppColors.textSecondary.opacity(0.5))
-                .frame(maxWidth: .infinity)
-                .frame(height: 48)
-                .background(hasSuccessItems ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5))
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(color: hasSuccessItems ? AppColors.accentGreen.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
+                .buttonStyle(.plain)
+                .disabled(!viewModel.canSave)
             }
-            .buttonStyle(.plain)
-            .disabled(!viewModel.canSave)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
                 .fill(AppColors.cardBackground.opacity(0.85))
                 .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)

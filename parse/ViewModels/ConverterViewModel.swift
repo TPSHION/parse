@@ -140,6 +140,55 @@ class ConverterViewModel: ObservableObject {
         exportDocument = successItems.isEmpty ? nil : ConvertedImagesDocument(items: successItems)
     }
     
+    func prepareRemoteImageImport(from urlString: String) async throws -> RemoteImageImportPreview {
+        let remoteURL = try normalizeRemoteImageURL(from: urlString)
+        let (downloadedURL, response) = try await URLSession.shared.download(from: remoteURL)
+        let storedURL = try persistDownloadedImage(from: downloadedURL, response: response, sourceURL: remoteURL)
+        let previewImage = await generatePreviewImage(from: storedURL)
+        
+        guard let source = CGImageSourceCreateWithURL(storedURL as CFURL, nil) else {
+            try? FileManager.default.removeItem(at: storedURL)
+            throw RemoteImageImportError.notAnImage
+        }
+        
+        let detectedUTType = (CGImageSourceGetType(source) as String?).flatMap(UTType.init)
+        let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+        let pixelWidth = properties?[kCGImagePropertyPixelWidth] as? Int ?? 0
+        let pixelHeight = properties?[kCGImagePropertyPixelHeight] as? Int ?? 0
+        let fileSize = Int64((try storedURL.resourceValues(forKeys: [.fileSizeKey])).fileSize ?? 0)
+        
+        let displayFilename = resolvedFilename(for: response, sourceURL: remoteURL, detectedUTType: detectedUTType)
+        let displayName = URL(fileURLWithPath: displayFilename).deletingPathExtension().lastPathComponent
+        
+        return RemoteImageImportPreview(
+            sourceURL: remoteURL,
+            localFileURL: storedURL,
+            previewImage: previewImage,
+            displayFilename: displayFilename,
+            displayName: displayName,
+            detectedFormat: displayFormat(for: detectedUTType, fallbackURL: storedURL, mimeType: response.mimeType),
+            mimeType: response.mimeType,
+            pixelWidth: pixelWidth,
+            pixelHeight: pixelHeight,
+            fileSizeInBytes: fileSize
+        )
+    }
+    
+    func confirmRemoteImageImport(_ preview: RemoteImageImportPreview) {
+        let newItem = ImageItem(
+            originalFileURL: preview.localFileURL,
+            previewImage: preview.previewImage,
+            originalName: preview.displayName,
+            originalFormat: preview.detectedFormat,
+            targetFormat: batchTargetFormat
+        )
+        imageItems.append(newItem)
+    }
+    
+    func discardRemoteImageImport(_ preview: RemoteImageImportPreview) {
+        try? FileManager.default.removeItem(at: preview.localFileURL)
+    }
+    
     func handlePrimaryAction() async {
         await convertAll()
     }
@@ -340,6 +389,61 @@ class ConverterViewModel: ObservableObject {
         isImporting = importActivityCount > 0
     }
     
+    private func normalizeRemoteImageURL(from input: String) throws -> URL {
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let url = URL(string: trimmed),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https" else {
+            throw RemoteImageImportError.invalidURL
+        }
+        return url
+    }
+    
+    private func persistDownloadedImage(from downloadedURL: URL, response: URLResponse, sourceURL: URL) throws -> URL {
+        let suggestedFilename = response.suggestedFilename ?? sourceURL.lastPathComponent
+        let fallbackName = suggestedFilename.isEmpty ? "remote-image" : suggestedFilename
+        let destinationURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString + "_" + fallbackName)
+        
+        if FileManager.default.fileExists(atPath: destinationURL.path) {
+            try FileManager.default.removeItem(at: destinationURL)
+        }
+        
+        try FileManager.default.moveItem(at: downloadedURL, to: destinationURL)
+        return destinationURL
+    }
+    
+    private func resolvedFilename(for response: URLResponse, sourceURL: URL, detectedUTType: UTType?) -> String {
+        let suggestedFilename = response.suggestedFilename ?? sourceURL.lastPathComponent
+        let fallbackName = suggestedFilename.isEmpty ? "remote-image" : suggestedFilename
+        let baseName = URL(fileURLWithPath: fallbackName).deletingPathExtension().lastPathComponent
+        let ext = detectedUTType?.preferredFilenameExtension
+            ?? URL(fileURLWithPath: fallbackName).pathExtension
+        
+        guard !ext.isEmpty else { return baseName }
+        return "\(baseName).\(ext)"
+    }
+    
+    private func displayFormat(for utType: UTType?, fallbackURL: URL, mimeType: String?) -> String {
+        if let utType, let ext = utType.preferredFilenameExtension {
+            switch ext.lowercased() {
+            case "jpg", "jpeg":
+                return "JPEG"
+            case "tif", "tiff":
+                return "TIFF"
+            default:
+                return ext.uppercased()
+            }
+        }
+        
+        if let mimeType, let utType = UTType(mimeType: mimeType), let ext = utType.preferredFilenameExtension {
+            return ext.uppercased()
+        }
+        
+        let ext = fallbackURL.pathExtension
+        return ext.isEmpty ? "未知" : ext.uppercased()
+    }
+    
     func saveToPhotoLibrary() async -> Result<Int, Error> {
         // 请求“仅添加”权限（如果还没有）
         let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
@@ -379,6 +483,20 @@ enum ConversionError: Error, LocalizedError {
         case .failedToGenerateData: return "无法生成目标格式的图片数据"
         case .failedToLoadSourceImage: return "无法读取原始图片文件"
         case .photoLibraryAccessDenied: return "需要相册的“添加照片”权限才能保存图片"
+        }
+    }
+}
+
+enum RemoteImageImportError: LocalizedError {
+    case invalidURL
+    case notAnImage
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "请输入完整且可访问的图片链接"
+        case .notAnImage:
+            return "下载结果不是可识别的图片文件"
         }
     }
 }

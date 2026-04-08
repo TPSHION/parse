@@ -4,6 +4,7 @@ import PhotosUI
 struct EmptyStateView: View {
     @Binding var isFileImporterPresented: Bool
     @Binding var selectedPhotos: [PhotosPickerItem]
+    let onImportFromLink: () -> Void
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -45,7 +46,7 @@ struct EmptyStateView: View {
                                     .font(.system(size: 28, weight: .heavy))
                                     .foregroundColor(AppColors.textPrimary)
                                 
-                                Text("支持从相册或文件导入图片，统一转换为 JPEG、PNG、HEIC 或 TIFF。")
+                                Text("支持从相册、文件或链接导入图片，统一转换为 JPEG、PNG、HEIC 或 TIFF。")
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -81,6 +82,17 @@ struct EmptyStateView: View {
                             title: "从文件导入",
                             detail: "支持从 iCloud Drive 或本地目录选择图片文件",
                             accent: AppColors.accentGreen,
+                            filled: false
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: onImportFromLink) {
+                        actionCard(
+                            icon: "link",
+                            title: "从链接导入",
+                            detail: "粘贴公开图片链接，先识别真实格式和尺寸，再确认导入",
+                            accent: AppColors.accentOrange,
                             filled: false
                         )
                     }
