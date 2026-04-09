@@ -17,7 +17,7 @@ struct RemoteImageImportPreview: Identifiable, Equatable {
     let fileSizeInBytes: Int64
     
     var dimensionsText: String {
-        guard pixelWidth > 0, pixelHeight > 0 else { return "未知" }
+        guard pixelWidth > 0, pixelHeight > 0 else { return AppLocalizer.localized("未知") }
         return "\(pixelWidth) × \(pixelHeight)"
     }
     

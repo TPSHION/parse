@@ -10,6 +10,11 @@ import SwiftUI
 @main
 struct parseApp: App {
     @State private var router = RouterManager.shared
+    @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.simplifiedChinese.rawValue
+
+    private var appLanguage: AppLanguage {
+        AppLanguage.resolve(from: appLanguageRawValue)
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -35,6 +40,7 @@ struct parseApp: App {
                         }
                     }
             }
+            .environment(\.locale, appLanguage.locale)
             .environment(router)
         }
     }

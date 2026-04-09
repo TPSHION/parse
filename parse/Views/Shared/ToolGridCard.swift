@@ -32,9 +32,7 @@ struct ToolGridCard: View {
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(AppColors.textSecondary.opacity(0.3))
             }
-            
-            Spacer(minLength: 4)
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 16, weight: .bold))
@@ -56,10 +54,12 @@ struct ToolGridCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
+
+            Spacer(minLength: 0)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(height: 136) // 稍微增加高度以容纳两行说明文字
+        .frame(height: 130)
         .background(
             ZStack {
                 AppColors.cardBackground

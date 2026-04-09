@@ -53,7 +53,7 @@ struct DocumentToolDetailView: View {
                                 Spacer()
                                 
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text(toolType.rawValue)
+                                    Text(toolType.localizedTitle)
                                         .font(.system(size: 28, weight: .heavy))
                                         .foregroundColor(AppColors.textPrimary)
                                     
@@ -67,9 +67,9 @@ struct DocumentToolDetailView: View {
                         }
                         
                         HStack(spacing: 12) {
-                            featureChip(icon: "bolt.fill", text: "本地处理")
-                            featureChip(icon: "lock.fill", text: "隐私安全")
-                            featureChip(icon: "sparkles", text: "高保真")
+                            featureChip(icon: "bolt.fill", text: AppLocalizer.localized("本地处理"))
+                            featureChip(icon: "lock.fill", text: AppLocalizer.localized("隐私安全"))
+                            featureChip(icon: "sparkles", text: AppLocalizer.localized("高保真"))
                         }
                     }
                     
@@ -78,8 +78,8 @@ struct DocumentToolDetailView: View {
                             NavigationLink(destination: PDFConverterView()) {
                                 actionCard(
                                     icon: "doc.text.viewfinder",
-                                    title: "进入 PDF 转换工具",
-                                    detail: "支持转为 DOCX, TXT, MD, PNG, JPEG",
+                                    title: AppLocalizer.localized("进入 PDF 转换工具"),
+                                    detail: AppLocalizer.localized("支持转为 DOCX, TXT, MD, PNG, JPEG"),
                                     accent: AppColors.accentPurple,
                                     filled: true
                                 )
@@ -91,8 +91,8 @@ struct DocumentToolDetailView: View {
                                 PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
                                     actionCard(
                                         icon: "photo.stack.fill",
-                                        title: "从相册导入",
-                                        detail: "适合批量挑选近期拍摄或已保存的图片",
+                                        title: AppLocalizer.localized("从相册导入"),
+                                        detail: AppLocalizer.localized("适合批量挑选近期拍摄或已保存的图片"),
                                         accent: AppColors.accentPurple,
                                         filled: true
                                     )
@@ -106,8 +106,8 @@ struct DocumentToolDetailView: View {
                                 }) {
                                     actionCard(
                                         icon: "link",
-                                        title: "输入网址",
-                                        detail: "直接输入网页链接提取内容或转为 PDF",
+                                        title: AppLocalizer.localized("输入网址"),
+                                        detail: AppLocalizer.localized("直接输入网页链接提取内容或转为 PDF"),
                                         accent: AppColors.accentPurple,
                                         filled: true
                                     )
@@ -120,8 +120,8 @@ struct DocumentToolDetailView: View {
                             }) {
                                 actionCard(
                                     icon: "folder.fill.badge.plus",
-                                    title: "从文件导入",
-                                    detail: "支持从 iCloud Drive 或本地目录选择文件",
+                                    title: AppLocalizer.localized("从文件导入"),
+                                    detail: AppLocalizer.localized("支持从 iCloud Drive 或本地目录选择文件"),
                                     accent: toolType == .pdfToWord || toolType == .ebookConvert ? AppColors.accentPurple : AppColors.accentBlue,
                                     filled: toolType == .pdfToWord || toolType == .ebookConvert
                                 )
@@ -133,7 +133,7 @@ struct DocumentToolDetailView: View {
                 .padding(20)
             }
         }
-        .navigationTitle(toolType.rawValue)
+        .navigationTitle(toolType.localizedTitle)
         .navigationBarTitleDisplayMode(.inline)
     }
     

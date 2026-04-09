@@ -10,13 +10,13 @@ enum NativeAudioConversionError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .noAudioTrack:
-            return "未检测到可导出的音频轨道"
+            return AppLocalizer.localized("未检测到可导出的音频轨道")
         case .exportSessionUnavailable:
-            return "系统原生导出器不可用"
+            return AppLocalizer.localized("系统原生导出器不可用")
         case .unsupportedOutputType:
-            return "当前文件不支持系统原生导出为 M4A"
+            return AppLocalizer.localized("当前文件不支持系统原生导出为 M4A")
         case .exportFailed(let message):
-            return "系统原生导出失败：\(message)"
+            return AppLocalizer.formatted("系统原生导出失败：%@", message)
         }
     }
 }

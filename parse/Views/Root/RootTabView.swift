@@ -9,8 +9,8 @@ struct RootTabView: View {
                 }
 
             PlaceholderTabView(
-                title: "传输",
-                subtitle: "局域网传输、链接导入和跨设备收发能力会放在这里。",
+                title: AppLocalizer.localized("传输"),
+                subtitle: AppLocalizer.localized("局域网传输、链接导入和跨设备收发能力会放在这里。"),
                 icon: "paperplane.circle.fill",
                 accentColor: AppColors.accentGreen
             )
@@ -19,8 +19,8 @@ struct RootTabView: View {
             }
 
             PlaceholderTabView(
-                title: "设置",
-                subtitle: "应用偏好、默认参数和更多配置会在这里逐步补齐。",
+                title: AppLocalizer.localized("设置"),
+                subtitle: AppLocalizer.localized("应用偏好、默认参数和更多配置会在这里逐步补齐。"),
                 icon: "gear",
                 accentColor: AppColors.accentPurple
             )

@@ -9,9 +9,9 @@ enum FFmpegAudioConversionError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unsupportedRemux:
-            return "当前格式组合不支持快速封装"
+            return AppLocalizer.localized("当前格式组合不支持快速封装")
         case .sessionUnavailable:
-            return "FFmpeg 转换会话创建失败"
+            return AppLocalizer.localized("FFmpeg 转换会话创建失败")
         case .conversionFailed(let message):
             return message
         }
@@ -153,25 +153,25 @@ struct FFmpegAudioConversionService {
         let lowercasedLogs = logs.lowercased()
         
         if lowercasedLogs.contains("no such file or directory") {
-            return "源音频文件不存在或已被移除"
+            return AppLocalizer.localized("源音频文件不存在或已被移除")
         }
         if lowercasedLogs.contains("permission denied") {
-            return "没有读取或写入该音频文件的权限"
+            return AppLocalizer.localized("没有读取或写入该音频文件的权限")
         }
         if lowercasedLogs.contains("invalid data found") || lowercasedLogs.contains("moov atom not found") {
-            return "音频文件已损坏或内容不完整"
+            return AppLocalizer.localized("音频文件已损坏或内容不完整")
         }
         if lowercasedLogs.contains("unknown encoder") {
-            return "当前设备上的音频编码器不可用"
+            return AppLocalizer.localized("当前设备上的音频编码器不可用")
         }
         if lowercasedLogs.contains("unsupported codec") || lowercasedLogs.contains("unknown decoder") {
-            return "不支持的源音频编码格式"
+            return AppLocalizer.localized("不支持的源音频编码格式")
         }
         if lowercasedLogs.contains("error initializing output stream") || lowercasedLogs.contains("could not write header") {
-            return "目标音频格式封装失败，请尝试更换输出格式"
+            return AppLocalizer.localized("目标音频格式封装失败，请尝试更换输出格式")
         }
         if lowercasedLogs.contains("no space left on device") {
-            return "设备存储空间不足"
+            return AppLocalizer.localized("设备存储空间不足")
         }
         
         let candidates = (logs + "\n" + stackTrace)
@@ -187,10 +187,10 @@ struct FFmpegAudioConversionService {
                 || lowercasedLine.contains("unknown")
                 || lowercasedLine.contains("invalid")
                 || lowercasedLine.contains("denied") {
-                return "转换失败：\(line)"
+                return AppLocalizer.formatted("转换失败：%@", line)
             }
         }
         
-        return "转换失败，可能是不支持的特殊音频格式"
+        return AppLocalizer.localized("转换失败，可能是不支持的特殊音频格式")
     }
 }

@@ -1,0 +1,2041 @@
+{
+  "sourceLanguage" : "zh-Hans",
+  "strings" : {
+    "%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld"
+          }
+        }
+      }
+    },
+    "%lld 项" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld items"
+          }
+        }
+      }
+    },
+    "%lld%%" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld%%"
+          }
+        }
+      }
+    },
+    "Audio Lab" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Lab"
+          }
+        }
+      }
+    },
+    "Document Lab" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document Lab"
+          }
+        }
+      }
+    },
+    "EPUB, MOBI 等格式完美互转" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert EPUB, MOBI, and more"
+          }
+        }
+      }
+    },
+    "EPUB, MOBI, AZW3 等格式互转" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert EPUB, MOBI, AZW3, and more"
+          }
+        }
+      }
+    },
+    "FFmpeg 转换会话创建失败" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not create the FFmpeg conversion session"
+          }
+        }
+      }
+    },
+    "Format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format"
+          }
+        }
+      }
+    },
+    "GIF 不支持音频轨，已改为仅导出视频画面" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GIF does not support audio tracks, so only the video frames will be exported"
+          }
+        }
+      }
+    },
+    "GIF 保存到相册失败，请确认系统照片支持动画图片导入，或改用“保存为文件”" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to save the GIF to Photos. Make sure Photos supports animated image import, or use Save to Files instead"
+          }
+        }
+      }
+    },
+    "GIF 保存到相册失败，请确认系统照片支持动画图片导入，或改用“保存到文件”" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to save the GIF to Photos. Make sure Photos supports animated image import, or use Save to Files instead"
+          }
+        }
+      }
+    },
+    "Image Lab" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image Lab"
+          }
+        }
+      }
+    },
+    "PDF" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF"
+          }
+        }
+      }
+    },
+    "PDF 转 Word" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF to Word"
+          }
+        }
+      }
+    },
+    "PDF 转换" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF"
+          }
+        }
+      }
+    },
+    "Video Lab" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video Lab"
+          }
+        }
+      }
+    },
+    "Welcome to Parse" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Parse"
+          }
+        }
+      }
+    },
+    "下载并识别" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download and Inspect"
+          }
+        }
+      }
+    },
+    "下载结果不是可识别的图片文件" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The downloaded content is not a recognizable image file"
+          }
+        }
+      }
+    },
+    "不支持的原始编码格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The original codec format is not supported"
+          }
+        }
+      }
+    },
+    "不支持的原视频编码格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The original video codec format is not supported"
+          }
+        }
+      }
+    },
+    "不支持的源音频编码格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source audio codec format is not supported"
+          }
+        }
+      }
+    },
+    "从文件导入" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Files"
+          }
+        }
+      }
+    },
+    "从相册导入" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Photos"
+          }
+        }
+      }
+    },
+    "传输" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfer"
+          }
+        }
+      }
+    },
+    "保存" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "保存为文件" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Files"
+          }
+        }
+      }
+    },
+    "保存到相册" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Photos"
+          }
+        }
+      }
+    },
+    "保存到相册失败，请稍后重试" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to save to Photos. Please try again later"
+          }
+        }
+      }
+    },
+    "保存到相册失败：\n%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to save to Photos:\n%1$@"
+          }
+        }
+      }
+    },
+    "保存失败：\n%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save failed:\n%1$@"
+          }
+        }
+      }
+    },
+    "保存结果" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Result"
+          }
+        }
+      }
+    },
+    "停止" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        }
+      }
+    },
+    "全选" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        }
+      }
+    },
+    "分享文件" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Files"
+          }
+        }
+      }
+    },
+    "创建压缩输出文件失败" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to create the compressed output file"
+          }
+        }
+      }
+    },
+    "即将推出" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coming Soon"
+          }
+        }
+      }
+    },
+    "压缩" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compress"
+          }
+        }
+      }
+    },
+    "压缩中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compressing"
+          }
+        }
+      }
+    },
+    "压缩会话未能创建" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not create the compression session"
+          }
+        }
+      }
+    },
+    "压缩只会优化当前格式内部的体积，不会修改原始扩展名。部分 PNG、WAV、FLAC 的压缩空间可能有限。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compression only reduces size within the current format and will not change the original extension. Some PNG, WAV, and FLAC files may have limited room for further compression."
+          }
+        }
+      }
+    },
+    "压缩后 %@ · 节省 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compressed %@ · Saved %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "压缩后 %1$@ · 节省 %2$@"
+          }
+        }
+      }
+    },
+    "压缩后体积没有变小，当前格式压缩空间有限" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The compressed file is not smaller. This format has limited room for further compression"
+          }
+        }
+      }
+    },
+    "压缩失败，可能是不支持的特殊媒体格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compression failed. The media format may be unsupported or unusual"
+          }
+        }
+      }
+    },
+    "压缩失败：%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compression failed: %@"
+          }
+        }
+      }
+    },
+    "压缩完成" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compression Complete"
+          }
+        }
+      }
+    },
+    "压缩强度" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compression Level"
+          }
+        }
+      }
+    },
+    "压缩输出文件写入失败" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to write the compressed output file"
+          }
+        }
+      }
+    },
+    "压缩队列" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compression Queue"
+          }
+        }
+      }
+    },
+    "取消" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "可先勾选要导出的压缩结果，再选择分享、相册或文件夹。相册仅支持图片、MP4、MOV 和 GIF。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the compressed results you want to export first, then choose sharing, Photos, or Files. Photos supports only images, MP4, MOV, and GIF."
+          }
+        }
+      }
+    },
+    "图片" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image"
+          }
+        }
+      }
+    },
+    "图片、视频、音频混合导入，同一个队列里批量压缩，不改变原始格式。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import images, videos, and audio together and compress them in one queue without changing the original format."
+          }
+        }
+      }
+    },
+    "图片格式转换" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image Format Conversion"
+          }
+        }
+      }
+    },
+    "图片转换" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Images"
+          }
+        }
+      }
+    },
+    "图片转文字" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OCR"
+          }
+        }
+      }
+    },
+    "图片转文档" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image to Document"
+          }
+        }
+      }
+    },
+    "图片较大，导入和转换可能更慢。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This image is large, so importing and converting it may take longer."
+          }
+        }
+      }
+    },
+    "均衡" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Balanced"
+          }
+        }
+      }
+    },
+    "处理中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing"
+          }
+        }
+      }
+    },
+    "处理完成" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        }
+      }
+    },
+    "失败" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed"
+          }
+        }
+      }
+    },
+    "媒体处理" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media Tools"
+          }
+        }
+      }
+    },
+    "导入 PDF 文件" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import PDF Files"
+          }
+        }
+      }
+    },
+    "导入列表" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import to Queue"
+          }
+        }
+      }
+    },
+    "导入媒体文件开始压缩" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Media to Start Compression"
+          }
+        }
+      }
+    },
+    "导入确认" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Confirmation"
+          }
+        }
+      }
+    },
+    "将 PDF 文件转换为可编辑的 Word 文档" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert PDF files into editable Word documents"
+          }
+        }
+      }
+    },
+    "将图片转换为 PDF 或 Word 文档" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert images into PDF or Word documents"
+          }
+        }
+      }
+    },
+    "局域网传输、链接导入和跨设备收发能力会放在这里。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LAN transfer, link import, and cross-device send and receive features will live here."
+          }
+        }
+      }
+    },
+    "已成功保存至文件：\n%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to Files successfully:\n%1$@"
+          }
+        }
+      }
+    },
+    "已选 %lld/%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected %1$lld/%2$lld"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "已选 %1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "并发处理数量" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concurrent Tasks"
+          }
+        }
+      }
+    },
+    "应用偏好、默认参数和更多配置会在这里逐步补齐。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App preferences, default parameters, and more configuration options will gradually be added here."
+          }
+        }
+      }
+    },
+    "开始图片格式转换" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Image Conversion"
+          }
+        }
+      }
+    },
+    "开始视频格式转换" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Video Conversion"
+          }
+        }
+      }
+    },
+    "开始转换" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Conversion"
+          }
+        }
+      }
+    },
+    "开始音频格式转换" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Audio Conversion"
+          }
+        }
+      }
+    },
+    "当前图片大小约为 %@，导入后会占用更多空间，并可能增加后续转换耗时。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This image is about %@. Importing it will use more storage and may increase later conversion time."
+          }
+        }
+      }
+    },
+    "当前应用内置的转码器不支持 libx264，已切换为系统硬件编码器" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The built-in transcoder does not support libx264. Switched to the system hardware encoder instead"
+          }
+        }
+      }
+    },
+    "当前文件不支持系统原生导出为 M4A" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This file cannot be exported as M4A using the native system exporter"
+          }
+        }
+      }
+    },
+    "当前文件格式暂不支持压缩" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This file format is not supported for compression yet"
+          }
+        }
+      }
+    },
+    "当前格式组合不支持快速封装" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This format combination does not support fast remuxing"
+          }
+        }
+      }
+    },
+    "当前设备上的压缩编码器不可用" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The compression encoder is unavailable on this device"
+          }
+        }
+      }
+    },
+    "当前设备上的视频编码器不可用" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The video encoder is unavailable on this device"
+          }
+        }
+      }
+    },
+    "当前设备上的音频编码器不可用" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The audio encoder is unavailable on this device"
+          }
+        }
+      }
+    },
+    "当前音视频编码与目标格式不兼容" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The current audio or video codec is incompatible with the target format"
+          }
+        }
+      }
+    },
+    "待处理" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
+          }
+        }
+      }
+    },
+    "总数" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
+      }
+    },
+    "成功" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Succeeded"
+          }
+        }
+      }
+    },
+    "成功保存 %lld 个视频到相册" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved %1$lld videos to Photos"
+          }
+        }
+      }
+    },
+    "成功保存 %lld 张图片到相册" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved %1$lld images to Photos"
+          }
+        }
+      }
+    },
+    "成功保存 %lld 项到相册" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved %1$lld items to Photos"
+          }
+        }
+      }
+    },
+    "成功保存 %lld 项到相册，已跳过 %lld 项不支持的音频或视频格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved %1$lld items to Photos and skipped %2$lld unsupported audio or video items"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "成功保存 %1$lld 项到相册，已跳过 %2$lld 项不支持的音频或视频格式"
+          }
+        }
+      }
+    },
+    "提取图片中的文字内容 (OCR)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extract text from images (OCR)"
+          }
+        }
+      }
+    },
+    "提取音频，或互转 MP3, WAV, M4A 等" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert MP3, WAV, M4A, and more"
+          }
+        }
+      }
+    },
+    "支持 PDF 转 DOCX、TXT、PNG 等" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supports converting PDF to DOCX, TXT, PNG, and more"
+          }
+        }
+      }
+    },
+    "支持从 iCloud Drive 或本地目录选择文件" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose files from iCloud Drive or local folders"
+          }
+        }
+      }
+    },
+    "支持从文件导入音频，统一转换为 MP3、WAV、AAC、M4A 或 FLAC。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import audio from files and convert everything to MP3, WAV, AAC, M4A, or FLAC."
+          }
+        }
+      }
+    },
+    "支持从相册、文件或链接导入图片，统一转换为 JPEG、PNG、HEIC 或 TIFF。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import images from Photos, Files, or a link and convert them to JPEG, PNG, HEIC, or TIFF."
+          }
+        }
+      }
+    },
+    "支持从相册或文件导入视频，统一转换为 MP4、MOV、GIF、AVI、MKV。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import videos from Photos or Files and convert them to MP4, MOV, GIF, AVI, or MKV."
+          }
+        }
+      }
+    },
+    "支持公开可访问的图片直链。确认后会先下载并识别真实格式，只有你确认导入后才会加入转换列表。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supports publicly accessible direct image links. The image is downloaded and inspected first, and it is added to the conversion list only after you confirm."
+          }
+        }
+      }
+    },
+    "支持混合导入图片、视频和音频文件，压缩完成后可以直接分享结果。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supports mixed importing of images, videos, and audio files. After compression, you can share the results directly."
+          }
+        }
+      }
+    },
+    "支持转为 DOCX, TXT, MD, PNG 等" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export to DOCX, TXT, MD, PNG"
+          }
+        }
+      }
+    },
+    "支持转为 DOCX, TXT, MD, PNG, JPEG" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supports converting to DOCX, TXT, MD, PNG, and JPEG"
+          }
+        }
+      }
+    },
+    "数据压缩" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compress"
+          }
+        }
+      }
+    },
+    "整体进度" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overall Progress"
+          }
+        }
+      }
+    },
+    "文件权限被拒绝，无法读取原视频" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File permission was denied, so the original video cannot be read"
+          }
+        }
+      }
+    },
+    "文本/网页转换" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text/Web Conversion"
+          }
+        }
+      }
+    },
+    "文档处理" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document Tools"
+          }
+        }
+      }
+    },
+    "无法生成目标格式的图片数据" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to generate image data in the target format"
+          }
+        }
+      }
+    },
+    "无法读取原始图片文件" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to read the original image file"
+          }
+        }
+      }
+    },
+    "未检测到可导出的音频轨道" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No exportable audio track was detected"
+          }
+        }
+      }
+    },
+    "未知" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown"
+          }
+        }
+      }
+    },
+    "本地处理" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On-Device"
+          }
+        }
+      }
+    },
+    "本地处理，安全高效，极简体验。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local, fast, and private."
+          }
+        }
+      }
+    },
+    "极速批量转换主流图片格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert JPG, PNG, HEIC, TIFF"
+          }
+        }
+      }
+    },
+    "极限" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum"
+          }
+        }
+      }
+    },
+    "正在导入 PDF..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing PDF..."
+          }
+        }
+      }
+    },
+    "正在导入图片..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing images..."
+          }
+        }
+      }
+    },
+    "正在导入媒体文件..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing media files..."
+          }
+        }
+      }
+    },
+    "正在导入视频..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing videos..."
+          }
+        }
+      }
+    },
+    "正在导入音频..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing audio..."
+          }
+        }
+      }
+    },
+    "没有读取或写入该文件的权限" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No permission to read or write this file"
+          }
+        }
+      }
+    },
+    "没有读取或写入该音频文件的权限" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No permission to read or write this audio file"
+          }
+        }
+      }
+    },
+    "混合批量压缩图片、视频与音频数据" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compress images, video, and audio"
+          }
+        }
+      }
+    },
+    "清空" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear"
+          }
+        }
+      }
+    },
+    "源文件不存在或已被移除" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source file does not exist or has been removed"
+          }
+        }
+      }
+    },
+    "源文件已损坏或内容不完整" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source file is corrupted or incomplete"
+          }
+        }
+      }
+    },
+    "源视频参数异常，暂时无法转换" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source video parameters are invalid and cannot be converted right now"
+          }
+        }
+      }
+    },
+    "源音频文件不存在或已被移除" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source audio file does not exist or has been removed"
+          }
+        }
+      }
+    },
+    "电子书转换" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-books"
+          }
+        }
+      }
+    },
+    "目标音频格式封装失败，请尝试更换输出格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to package the target audio format. Try a different output format"
+          }
+        }
+      }
+    },
+    "直接输入网页链接提取内容或转为 PDF" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a web link directly to extract content or convert it to PDF"
+          }
+        }
+      }
+    },
+    "相册不支持" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Supported by Photos"
+          }
+        }
+      }
+    },
+    "相册仅支持保存 MP4、MOV 和 GIF，请使用“保存到文件”导出其他格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos supports only MP4, MOV, and GIF. Use Save to Files for other formats"
+          }
+        }
+      }
+    },
+    "相册仅支持保存图片、MP4、MOV 和 GIF，音频及其他视频格式请使用“保存为文件”" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos supports only images, MP4, MOV, and GIF. For audio and other video formats, use Save to Files"
+          }
+        }
+      }
+    },
+    "相册支持图片和视频，音频请从文件导入。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos supports images and videos. Please import audio from Files."
+          }
+        }
+      }
+    },
+    "确定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "视频" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
+    "视频文件已损坏或不完整" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The video file is corrupted or incomplete"
+          }
+        }
+      }
+    },
+    "视频格式转换" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video Format Conversion"
+          }
+        }
+      }
+    },
+    "视频编码器初始化失败" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to initialize the video encoder"
+          }
+        }
+      }
+    },
+    "视频转换" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
+    "等待压缩" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting"
+          }
+        }
+      }
+    },
+    "精准提取图片中的文字内容" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extract text from images"
+          }
+        }
+      }
+    },
+    "系统原生导出器不可用" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The native system exporter is unavailable"
+          }
+        }
+      }
+    },
+    "系统原生导出失败：%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Native export failed: %@"
+          }
+        }
+      }
+    },
+    "纯文本、富文本与网页格式互转" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert between plain text, rich text, and web formats"
+          }
+        }
+      }
+    },
+    "统一转换为" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert All To"
+          }
+        }
+      }
+    },
+    "继续导入" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue Import"
+          }
+        }
+      }
+    },
+    "继续导入大图片？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue Importing This Large Image?"
+          }
+        }
+      }
+    },
+    "网页转文档" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web PDF"
+          }
+        }
+      }
+    },
+    "设备存储空间不足" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is not enough storage space on the device"
+          }
+        }
+      }
+    },
+    "设置" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
+    "识别中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspecting"
+          }
+        }
+      }
+    },
+    "请输入图片链接地址" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter an image URL"
+          }
+        }
+      }
+    },
+    "请输入完整且可访问的图片链接" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter a complete and accessible image URL"
+          }
+        }
+      }
+    },
+    "读取源文件失败" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to read the source file"
+          }
+        }
+      }
+    },
+    "质量优先" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quality First"
+          }
+        }
+      }
+    },
+    "超级转换工具箱" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Universal Conversion Toolbox"
+          }
+        }
+      }
+    },
+    "转换" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert"
+          }
+        }
+      }
+    },
+    "转换中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Converting"
+          }
+        }
+      }
+    },
+    "转换失败" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversion Failed"
+          }
+        }
+      }
+    },
+    "转换失败，可能是不支持的特殊视频格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversion failed. The video format may be unsupported or unusual"
+          }
+        }
+      }
+    },
+    "转换失败，可能是不支持的特殊音频格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversion failed. The audio format may be unsupported or unusual"
+          }
+        }
+      }
+    },
+    "转换失败：%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversion failed: %@"
+          }
+        }
+      }
+    },
+    "转换模式" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversion Mode"
+          }
+        }
+      }
+    },
+    "转码引擎内部错误" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An internal transcoding engine error occurred"
+          }
+        }
+      }
+    },
+    "轻度" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
+          }
+        }
+      }
+    },
+    "输入图片链接" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter Image Link"
+          }
+        }
+      }
+    },
+    "输入网址" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter URL"
+          }
+        }
+      }
+    },
+    "输入链接一键生成 PDF" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn a link into PDF"
+          }
+        }
+      }
+    },
+    "输出文件封装失败，请尝试更换目标格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to package the output file. Try a different target format"
+          }
+        }
+      }
+    },
+    "进入 PDF 转换工具" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the PDF Conversion Tool"
+          }
+        }
+      }
+    },
+    "适合批量挑选近期拍摄或已保存的图片" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Great for batch-selecting recently captured or saved photos"
+          }
+        }
+      }
+    },
+    "选择操作方式" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose an Action"
+          }
+        }
+      }
+    },
+    "选择要保存的资源" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Items to Save"
+          }
+        }
+      }
+    },
+    "速度优先" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speed First"
+          }
+        }
+      }
+    },
+    "链接导入" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Link"
+          }
+        }
+      }
+    },
+    "隐私安全" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Safe"
+          }
+        }
+      }
+    },
+    "需要相册的“添加照片”权限才能保存压缩结果" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Photos permission is required to save compressed results to Photos"
+          }
+        }
+      }
+    },
+    "需要相册的“添加照片”权限才能保存图片" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Photos permission is required to save images to Photos"
+          }
+        }
+      }
+    },
+    "需要相册的“添加照片”权限才能保存视频" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Photos permission is required to save videos to Photos"
+          }
+        }
+      }
+    },
+    "音频" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "音频文件已损坏或内容不完整" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The audio file is corrupted or incomplete"
+          }
+        }
+      }
+    },
+    "音频轨处理失败" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to process the audio track"
+          }
+        }
+      }
+    },
+    "音频转换" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "高保真" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High Fidelity"
+          }
+        }
+      }
+    },
+    "高效互转 MP4, MOV, GIF, AVI, MKV 等格式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert MP4, MOV, GIF, AVI, MKV"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -38,6 +38,15 @@ class VideoConverterViewModel: ObservableObject {
         case speed = "速度优先"
         
         var id: String { self.rawValue }
+
+        var localizedTitle: String {
+            switch self {
+            case .quality:
+                return AppLocalizer.localized("质量优先")
+            case .speed:
+                return AppLocalizer.localized("速度优先")
+            }
+        }
     }
     
     @Published var videoItems: [VideoItem] = []
@@ -629,38 +638,38 @@ class VideoConverterViewModel: ObservableObject {
     private func extractFriendlyErrorMessage(from logs: String, stackTrace: String) -> String {
         let lowercasedLogs = logs.lowercased()
         if lowercasedLogs.contains("unknown encoder 'libx264'") {
-            return "当前应用内置的转码器不支持 libx264，已切换为系统硬件编码器"
+            return AppLocalizer.localized("当前应用内置的转码器不支持 libx264，已切换为系统硬件编码器")
         } else if lowercasedLogs.contains("unknown encoder") {
-            return "当前设备上的视频编码器不可用"
+            return AppLocalizer.localized("当前设备上的视频编码器不可用")
         } else if lowercasedLogs.contains("no space left on device") {
-            return "设备存储空间不足"
+            return AppLocalizer.localized("设备存储空间不足")
         } else if lowercasedLogs.contains("permission denied") {
-            return "文件权限被拒绝，无法读取原视频"
+            return AppLocalizer.localized("文件权限被拒绝，无法读取原视频")
         } else if lowercasedLogs.contains("unsupported codec") || lowercasedLogs.contains("unknown decoder") {
-            return "不支持的原视频编码格式"
+            return AppLocalizer.localized("不支持的原视频编码格式")
         } else if lowercasedLogs.contains("error while opening encoder") {
-            return "视频编码器初始化失败"
+            return AppLocalizer.localized("视频编码器初始化失败")
         } else if lowercasedLogs.contains("could not write header") || lowercasedLogs.contains("error initializing output stream") {
-            return "输出文件封装失败，请尝试更换目标格式"
+            return AppLocalizer.localized("输出文件封装失败，请尝试更换目标格式")
         } else if lowercasedLogs.contains("tag") && lowercasedLogs.contains("is not supported") {
-            return "当前音视频编码与目标格式不兼容"
+            return AppLocalizer.localized("当前音视频编码与目标格式不兼容")
         } else if lowercasedLogs.contains("incorrect codec parameters") {
-            return "源视频参数异常，暂时无法转换"
+            return AppLocalizer.localized("源视频参数异常，暂时无法转换")
         } else if lowercasedLogs.contains("audio") && lowercasedLogs.contains("error") {
-            return "音频轨处理失败"
+            return AppLocalizer.localized("音频轨处理失败")
         } else if lowercasedLogs.contains("format gif") && lowercasedLogs.contains("encoder manually") {
-            return "GIF 不支持音频轨，已改为仅导出视频画面"
+            return AppLocalizer.localized("GIF 不支持音频轨，已改为仅导出视频画面")
         } else if lowercasedLogs.contains("invalid data found") || lowercasedLogs.contains("moov atom not found") {
-            return "视频文件已损坏或不完整"
+            return AppLocalizer.localized("视频文件已损坏或不完整")
         } else if lowercasedLogs.contains("conversion failed") {
-            return "转码引擎内部错误"
+            return AppLocalizer.localized("转码引擎内部错误")
         }
         
         if let detail = extractUsefulLogLine(from: logs, stackTrace: stackTrace) {
-            return "转换失败：\(detail)"
+            return AppLocalizer.formatted("转换失败：%@", detail)
         }
         
-        return "转换失败，可能是不支持的特殊视频格式"
+        return AppLocalizer.localized("转换失败，可能是不支持的特殊视频格式")
     }
     
     private func extractUsefulLogLine(from logs: String, stackTrace: String) -> String? {
@@ -786,10 +795,10 @@ enum VideoConversionError: Error, LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .photoLibraryAccessDenied: return "需要相册的“添加照片”权限才能保存视频"
-        case .unsupportedPhotoLibraryFormat: return "相册仅支持保存 MP4、MOV 和 GIF，请使用“保存到文件”导出其他格式"
-        case .photoLibrarySaveFailed: return "保存到相册失败，请稍后重试"
-        case .gifPhotoLibrarySaveFailed: return "GIF 保存到相册失败，请确认系统照片支持动画图片导入，或改用“保存到文件”"
+        case .photoLibraryAccessDenied: return AppLocalizer.localized("需要相册的“添加照片”权限才能保存视频")
+        case .unsupportedPhotoLibraryFormat: return AppLocalizer.localized("相册仅支持保存 MP4、MOV 和 GIF，请使用“保存到文件”导出其他格式")
+        case .photoLibrarySaveFailed: return AppLocalizer.localized("保存到相册失败，请稍后重试")
+        case .gifPhotoLibrarySaveFailed: return AppLocalizer.localized("GIF 保存到相册失败，请确认系统照片支持动画图片导入，或改用“保存到文件”")
         }
     }
 }

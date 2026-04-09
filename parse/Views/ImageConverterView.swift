@@ -132,10 +132,10 @@ struct ImageConverterView: View {
             ) { result in
                 switch result {
                 case .success(let url):
-                    saveMessage = "已成功保存至文件：\n\(url.lastPathComponent)"
+                    saveMessage = AppLocalizer.formatted("已成功保存至文件：\n%@", url.lastPathComponent)
                     showSaveAlert = true
                 case .failure(let error):
-                    saveMessage = "保存失败：\n\(error.localizedDescription)"
+                    saveMessage = AppLocalizer.formatted("保存失败：\n%@", error.localizedDescription)
                     showSaveAlert = true
                 }
             }
@@ -148,10 +148,10 @@ struct ImageConverterView: View {
                             let result = await viewModel.saveToPhotoLibrary()
                             switch result {
                             case .success(let count):
-                                saveMessage = "成功保存 \(count) 张图片到相册"
+                                saveMessage = AppLocalizer.formatted("成功保存 %lld 张图片到相册", count)
                                 showSaveAlert = true
                             case .failure(let error):
-                                saveMessage = "保存到相册失败：\n\(error.localizedDescription)"
+                                saveMessage = AppLocalizer.formatted("保存到相册失败：\n%@", error.localizedDescription)
                                 showSaveAlert = true
                             }
                         }
@@ -196,13 +196,13 @@ struct ImageConverterView: View {
             // 状态统计和进度
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
-                    StatItemView(title: "总数", count: viewModel.totalCount, color: AppColors.textPrimary)
+                    StatItemView(title: AppLocalizer.localized("总数"), count: viewModel.totalCount, color: AppColors.textPrimary)
                     Divider().background(AppColors.secondaryBackground)
-                    StatItemView(title: "待处理", count: viewModel.pendingCount + viewModel.convertingCount, color: AppColors.accentBlue)
+                    StatItemView(title: AppLocalizer.localized("待处理"), count: viewModel.pendingCount + viewModel.convertingCount, color: AppColors.accentBlue)
                     Divider().background(AppColors.secondaryBackground)
-                    StatItemView(title: "成功", count: viewModel.successCount, color: AppColors.accentGreen)
+                    StatItemView(title: AppLocalizer.localized("成功"), count: viewModel.successCount, color: AppColors.accentGreen)
                     Divider().background(AppColors.secondaryBackground)
-                    StatItemView(title: "失败", count: viewModel.failedCount, color: AppColors.accentRed)
+                    StatItemView(title: AppLocalizer.localized("失败"), count: viewModel.failedCount, color: AppColors.accentRed)
                 }
                 .padding(.vertical, 12)
                 

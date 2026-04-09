@@ -768,25 +768,25 @@ final class MediaCompressorViewModel: ObservableObject {
         let lowercasedLogs = logs.lowercased()
 
         if lowercasedLogs.contains("no such file or directory") {
-            return "源文件不存在或已被移除"
+            return AppLocalizer.localized("源文件不存在或已被移除")
         }
         if lowercasedLogs.contains("permission denied") {
-            return "没有读取或写入该文件的权限"
+            return AppLocalizer.localized("没有读取或写入该文件的权限")
         }
         if lowercasedLogs.contains("invalid data found") || lowercasedLogs.contains("moov atom not found") {
-            return "源文件已损坏或内容不完整"
+            return AppLocalizer.localized("源文件已损坏或内容不完整")
         }
         if lowercasedLogs.contains("unknown encoder") {
-            return "当前设备上的压缩编码器不可用"
+            return AppLocalizer.localized("当前设备上的压缩编码器不可用")
         }
         if lowercasedLogs.contains("unsupported codec") || lowercasedLogs.contains("unknown decoder") {
-            return "不支持的原始编码格式"
+            return AppLocalizer.localized("不支持的原始编码格式")
         }
         if lowercasedLogs.contains("could not write header") || lowercasedLogs.contains("error initializing output stream") {
-            return "压缩输出文件写入失败"
+            return AppLocalizer.localized("压缩输出文件写入失败")
         }
         if lowercasedLogs.contains("no space left on device") {
-            return "设备存储空间不足"
+            return AppLocalizer.localized("设备存储空间不足")
         }
 
         let candidates = (logs + "\n" + stackTrace)
@@ -802,11 +802,11 @@ final class MediaCompressorViewModel: ObservableObject {
                 || lowercasedLine.contains("unknown")
                 || lowercasedLine.contains("invalid")
                 || lowercasedLine.contains("denied") {
-                return "压缩失败：\(line)"
+                return AppLocalizer.formatted("压缩失败：%@", line)
             }
         }
 
-        return "压缩失败，可能是不支持的特殊媒体格式"
+        return AppLocalizer.localized("压缩失败，可能是不支持的特殊媒体格式")
     }
 }
 

@@ -480,9 +480,9 @@ enum ConversionError: Error, LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .failedToGenerateData: return "无法生成目标格式的图片数据"
-        case .failedToLoadSourceImage: return "无法读取原始图片文件"
-        case .photoLibraryAccessDenied: return "需要相册的“添加照片”权限才能保存图片"
+        case .failedToGenerateData: return AppLocalizer.localized("无法生成目标格式的图片数据")
+        case .failedToLoadSourceImage: return AppLocalizer.localized("无法读取原始图片文件")
+        case .photoLibraryAccessDenied: return AppLocalizer.localized("需要相册的“添加照片”权限才能保存图片")
         }
     }
 }
@@ -494,9 +494,9 @@ enum RemoteImageImportError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "请输入完整且可访问的图片链接"
+            return AppLocalizer.localized("请输入完整且可访问的图片链接")
         case .notAnImage:
-            return "下载结果不是可识别的图片文件"
+            return AppLocalizer.localized("下载结果不是可识别的图片文件")
         }
     }
 }

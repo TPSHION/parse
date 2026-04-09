@@ -8,6 +8,16 @@ enum DocumentToolType: String, CaseIterable, Identifiable {
     case textWebConvert = "文本/网页转换"
     
     var id: String { self.rawValue }
+
+    var localizedTitle: String {
+        switch self {
+        case .pdfToWord: return AppLocalizer.localized("PDF 转 Word")
+        case .imageToText: return AppLocalizer.localized("图片转文字")
+        case .imageToDoc: return AppLocalizer.localized("图片转文档")
+        case .ebookConvert: return AppLocalizer.localized("电子书转换")
+        case .textWebConvert: return AppLocalizer.localized("文本/网页转换")
+        }
+    }
     
     var iconName: String {
         switch self {
@@ -21,11 +31,11 @@ enum DocumentToolType: String, CaseIterable, Identifiable {
     
     var description: String {
         switch self {
-        case .pdfToWord: return "将 PDF 文件转换为可编辑的 Word 文档"
-        case .imageToText: return "提取图片中的文字内容 (OCR)"
-        case .imageToDoc: return "将图片转换为 PDF 或 Word 文档"
-        case .ebookConvert: return "EPUB, MOBI, AZW3 等格式互转"
-        case .textWebConvert: return "纯文本、富文本与网页格式互转"
+        case .pdfToWord: return AppLocalizer.localized("将 PDF 文件转换为可编辑的 Word 文档")
+        case .imageToText: return AppLocalizer.localized("提取图片中的文字内容 (OCR)")
+        case .imageToDoc: return AppLocalizer.localized("将图片转换为 PDF 或 Word 文档")
+        case .ebookConvert: return AppLocalizer.localized("EPUB, MOBI, AZW3 等格式互转")
+        case .textWebConvert: return AppLocalizer.localized("纯文本、富文本与网页格式互转")
         }
     }
 }

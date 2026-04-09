@@ -74,10 +74,10 @@ struct MediaCompressorView: View {
         ) { result in
             switch result {
             case .success(let url):
-                saveMessage = "已成功保存至文件：\n\(url.lastPathComponent)"
+                saveMessage = AppLocalizer.formatted("已成功保存至文件：\n%@", url.lastPathComponent)
                 showSaveAlert = true
             case .failure(let error):
-                saveMessage = "保存失败：\n\(error.localizedDescription)"
+                saveMessage = AppLocalizer.formatted("保存失败：\n%@", error.localizedDescription)
                 showSaveAlert = true
             }
         }
@@ -97,13 +97,13 @@ struct MediaCompressorView: View {
                         switch result {
                         case .success(let summary):
                             if summary.skippedCount > 0 {
-                                saveMessage = "成功保存 \(summary.savedCount) 项到相册，已跳过 \(summary.skippedCount) 项不支持的音频或视频格式"
+                                saveMessage = AppLocalizer.formatted("成功保存 %lld 项到相册，已跳过 %lld 项不支持的音频或视频格式", summary.savedCount, summary.skippedCount)
                             } else {
-                                saveMessage = "成功保存 \(summary.savedCount) 项到相册"
+                                saveMessage = AppLocalizer.formatted("成功保存 %lld 项到相册", summary.savedCount)
                             }
                             showSaveAlert = true
                         case .failure(let error):
-                            saveMessage = "保存到相册失败：\n\(error.localizedDescription)"
+                            saveMessage = AppLocalizer.formatted("保存到相册失败：\n%@", error.localizedDescription)
                             showSaveAlert = true
                         }
                     }
@@ -161,7 +161,7 @@ struct MediaCompressorView: View {
 
                 Picker("压缩强度", selection: $viewModel.compressionLevel) {
                     ForEach(MediaCompressionLevel.allCases) { level in
-                        Text(level.rawValue).tag(level)
+                        Text(level.localizedTitle).tag(level)
                     }
                 }
                 .pickerStyle(.segmented)

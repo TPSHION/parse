@@ -9,6 +9,17 @@ enum MediaCompressionType: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var localizedTitle: String {
+        switch self {
+        case .image:
+            return AppLocalizer.localized("图片")
+        case .video:
+            return AppLocalizer.localized("视频")
+        case .audio:
+            return AppLocalizer.localized("音频")
+        }
+    }
+
     var iconName: String {
         switch self {
         case .image:
@@ -27,6 +38,17 @@ enum MediaCompressionLevel: String, CaseIterable, Identifiable {
     case maximum = "极限"
 
     var id: String { rawValue }
+
+    var localizedTitle: String {
+        switch self {
+        case .light:
+            return AppLocalizer.localized("轻度")
+        case .balanced:
+            return AppLocalizer.localized("均衡")
+        case .maximum:
+            return AppLocalizer.localized("极限")
+        }
+    }
 
     var imageCompressionQuality: CGFloat {
         switch self {
@@ -153,7 +175,7 @@ struct MediaCompressionItem: Identifiable, Equatable {
     }
 
     var typeLabel: String {
-        type.rawValue
+        type.localizedTitle
     }
 
     var originalFormat: String {
@@ -236,15 +258,15 @@ enum MediaCompressionError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unsupportedFormat:
-            return "当前文件格式暂不支持压缩"
+            return AppLocalizer.localized("当前文件格式暂不支持压缩")
         case .failedToLoadSource:
-            return "读取源文件失败"
+            return AppLocalizer.localized("读取源文件失败")
         case .failedToCreateDestination:
-            return "创建压缩输出文件失败"
+            return AppLocalizer.localized("创建压缩输出文件失败")
         case .noCompressionBenefit:
-            return "压缩后体积没有变小，当前格式压缩空间有限"
+            return AppLocalizer.localized("压缩后体积没有变小，当前格式压缩空间有限")
         case .sessionUnavailable:
-            return "压缩会话未能创建"
+            return AppLocalizer.localized("压缩会话未能创建")
         case .ffmpegFailed(let message):
             return message
         }
@@ -265,13 +287,13 @@ enum MediaCompressionSaveError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .photoLibraryAccessDenied:
-            return "需要相册的“添加照片”权限才能保存压缩结果"
+            return AppLocalizer.localized("需要相册的“添加照片”权限才能保存压缩结果")
         case .unsupportedPhotoLibraryFormat:
-            return "相册仅支持保存图片、MP4、MOV 和 GIF，音频及其他视频格式请使用“保存为文件”"
+            return AppLocalizer.localized("相册仅支持保存图片、MP4、MOV 和 GIF，音频及其他视频格式请使用“保存为文件”")
         case .photoLibrarySaveFailed:
-            return "保存到相册失败，请稍后重试"
+            return AppLocalizer.localized("保存到相册失败，请稍后重试")
         case .gifPhotoLibrarySaveFailed:
-            return "GIF 保存到相册失败，请确认系统照片支持动画图片导入，或改用“保存为文件”"
+            return AppLocalizer.localized("GIF 保存到相册失败，请确认系统照片支持动画图片导入，或改用“保存为文件”")
         }
     }
 }
