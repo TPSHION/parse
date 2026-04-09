@@ -66,7 +66,7 @@ struct ImageConverterView: View {
                             .scaleEffect(1.5)
                             .tint(.white)
                         
-                        Text("正在导入图片...")
+                        Text(AppLocalizer.localized("正在导入图片..."))
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.white)
                     }
@@ -87,7 +87,7 @@ struct ImageConverterView: View {
                 if !viewModel.imageItems.isEmpty {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button(action: { viewModel.clearAll() }) {
-                            Text("清空")
+                            Text(AppLocalizer.localized("清空"))
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(.white)
                         }
@@ -183,7 +183,7 @@ struct ImageConverterView: View {
                 .presentationBackground(AppColors.background)
             }
         .alert("保存结果", isPresented: $showSaveAlert) {
-            Button("确定", role: .cancel) {}
+            Button(AppLocalizer.localized("确定"), role: .cancel) {}
         } message: {
             if let message = saveMessage {
                 Text(message)
@@ -210,7 +210,7 @@ struct ImageConverterView: View {
                 if viewModel.totalCount > 0 && (viewModel.isConverting || viewModel.successCount > 0 || viewModel.failedCount > 0) {
                     VStack(spacing: 8) {
                         HStack {
-                            Text(viewModel.isConverting ? "处理中" : "处理完成")
+                            Text(viewModel.isConverting ? AppLocalizer.localized("处理中") : AppLocalizer.localized("处理完成"))
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundColor(viewModel.isConverting ? AppColors.accentBlue : AppColors.accentGreen)
                             Spacer()
@@ -244,12 +244,12 @@ struct ImageConverterView: View {
             // 统一转换选项
             VStack(spacing: 12) {
                 HStack {
-                    Text("统一转换为")
+                    Text(AppLocalizer.localized("统一转换为"))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textSecondary)
                         .fontWeight(.medium)
                     Spacer()
-                    Picker("统一转换为", selection: $viewModel.batchTargetFormat) {
+                    Picker(AppLocalizer.localized("统一转换为"), selection: $viewModel.batchTargetFormat) {
                         ForEach(ImageFormat.allCases) { format in
                             Text(format.rawValue).tag(format)
                         }
@@ -347,9 +347,6 @@ struct ImageConverterView: View {
                             ProgressView()
                                 .tint(AppColors.textSecondary)
                                 .scaleEffect(0.8)
-                        } else {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                                .font(.system(size: 14, weight: .semibold))
                         }
                         Text(isConverting ? "转换中" : "转换")
                             .font(.system(size: 15, weight: .bold))
@@ -370,8 +367,6 @@ struct ImageConverterView: View {
                     isSaveActionSheetPresented = true
                 }) {
                     HStack(spacing: 4) {
-                        Image(systemName: "square.and.arrow.down")
-                            .font(.system(size: 14, weight: .semibold))
                         Text("保存")
                             .font(.system(size: 15, weight: .bold))
                             .lineLimit(1)

@@ -3,12 +3,18 @@ import SwiftUI
 struct MediaSaveSelectionSheet: View {
     let items: [MediaCompressionItem]
     @Binding var selectedItemIDs: Set<UUID>
-    let shareableURLs: [URL]
     let onSaveToAlbum: () -> Void
     let onSaveToFile: () -> Void
 
     private var selectedCount: Int {
         items.filter { selectedItemIDs.contains($0.id) }.count
+    }
+
+    private var selectedShareableURLs: [URL] {
+        items.compactMap { item in
+            guard selectedItemIDs.contains(item.id) else { return nil }
+            return item.outputURL
+        }
     }
 
     private var selectedPhotoLibraryEligibleCount: Int {
@@ -28,11 +34,11 @@ struct MediaSaveSelectionSheet: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("选择要保存的资源")
+            Text(AppLocalizer.localized("选择要保存的资源"))
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
 
-            Text("可先勾选要导出的压缩结果，再选择分享、相册或文件夹。相册仅支持图片、MP4、MOV 和 GIF。")
+            Text(AppLocalizer.localized("可先勾选要导出的压缩结果，再选择分享、相册或文件夹。相册仅支持图片、MP4、MOV 和 GIF。"))
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -42,19 +48,19 @@ struct MediaSaveSelectionSheet: View {
 
     private var selectionToolbar: some View {
         HStack {
-            Text("已选 \(selectedCount)/\(items.count)")
+            Text(AppLocalizer.formatted("已选 %lld/%lld", selectedCount, items.count))
                 .font(.system(size: 12, weight: .bold))
                 .foregroundColor(AppColors.textSecondary)
 
             Spacer()
 
-            Button("全选") {
+            Button(AppLocalizer.localized("全选")) {
                 selectedItemIDs = Set(items.map(\.id))
             }
             .font(.system(size: 12, weight: .bold))
             .foregroundColor(AppColors.accentBlue)
 
-            Button("清空") {
+            Button(AppLocalizer.localized("清空")) {
                 selectedItemIDs.removeAll()
             }
             .font(.system(size: 12, weight: .bold))
@@ -82,18 +88,18 @@ struct MediaSaveSelectionSheet: View {
     private var actionButtons: some View {
         VStack(spacing: 12) {
             Group {
-                if shareableURLs.isEmpty {
+                if selectedShareableURLs.isEmpty {
                     actionButton(
                         icon: "square.and.arrow.up",
-                        title: "分享文件",
+                        title: AppLocalizer.localized("分享文件"),
                         accent: AppColors.secondaryBackground.opacity(0.5),
                         foreground: AppColors.textSecondary.opacity(0.5)
                     )
                 } else {
-                    ShareLink(items: shareableURLs) {
+                    ShareLink(items: selectedShareableURLs) {
                         actionButton(
                             icon: "square.and.arrow.up",
-                            title: "分享文件",
+                            title: AppLocalizer.localized("分享文件"),
                             accent: AppColors.accentBlue,
                             foreground: .white
                         )
@@ -106,7 +112,7 @@ struct MediaSaveSelectionSheet: View {
                 Button(action: onSaveToAlbum) {
                     actionButton(
                         icon: "photo.on.rectangle.angled",
-                        title: "保存到相册",
+                        title: AppLocalizer.localized("保存到相册"),
                         accent: selectedPhotoLibraryEligibleCount > 0 ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5),
                         foreground: selectedPhotoLibraryEligibleCount > 0 ? .white : AppColors.textSecondary.opacity(0.5)
                     )
@@ -117,7 +123,7 @@ struct MediaSaveSelectionSheet: View {
                 Button(action: onSaveToFile) {
                     actionButton(
                         icon: "folder",
-                        title: "保存为文件",
+                        title: AppLocalizer.localized("保存为文件"),
                         accent: selectedCount > 0 ? AppColors.accentOrange : AppColors.secondaryBackground.opacity(0.5),
                         foreground: selectedCount > 0 ? .white : AppColors.textSecondary.opacity(0.5)
                     )
@@ -188,7 +194,7 @@ private struct MediaSaveSelectionRow: View {
                         .lineLimit(2)
 
                     if !item.supportsPhotoLibrarySave {
-                        Text("相册不支持")
+                        Text(AppLocalizer.localized("相册不支持"))
                             .font(.system(size: 11, weight: .bold))
                             .foregroundColor(AppColors.accentRed)
                     }

@@ -89,7 +89,6 @@ struct MediaCompressorView: View {
             MediaSaveSelectionSheet(
                 items: viewModel.successfulItems,
                 selectedItemIDs: $selectedSaveItemIDs,
-                shareableURLs: viewModel.shareableURLs(for: selectedSaveItemIDs),
                 onSaveToAlbum: {
                     isSaveActionSheetPresented = false
                     Task {
@@ -128,30 +127,15 @@ struct MediaCompressorView: View {
     }
 
     private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("数据压缩")
                         .font(.system(size: 24, weight: .heavy))
                         .foregroundColor(AppColors.textPrimary)
-
-                    Text("图片、视频、音频混合导入，同一个队列里批量压缩，不改变原始格式。")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(AppColors.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 Spacer()
-
-                ZStack {
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(AppColors.accentTeal.opacity(0.18))
-                        .frame(width: 58, height: 58)
-
-                    Image(systemName: "archivebox.fill")
-                        .font(.system(size: 26, weight: .bold))
-                        .foregroundColor(AppColors.accentTeal)
-                }
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -167,12 +151,6 @@ struct MediaCompressorView: View {
                 .pickerStyle(.segmented)
                 .disabled(viewModel.isCompressing)
             }
-
-            Text("压缩只会优化当前格式内部的体积，不会修改原始扩展名。部分 PNG、WAV、FLAC 的压缩空间可能有限。")
-                .font(.system(size: 11, weight: .medium))
-                .foregroundColor(AppColors.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-
         }
         .padding(20)
         .background(AppColors.cardBackground)
@@ -182,16 +160,16 @@ struct MediaCompressorView: View {
     private var statsCard: some View {
         VStack(spacing: 12) {
             HStack(spacing: 0) {
-                StatItemView(title: "总数", count: viewModel.totalCount, color: AppColors.textPrimary)
-                StatItemView(title: "待压缩", count: viewModel.pendingCount, color: AppColors.accentBlue)
-                StatItemView(title: "成功", count: viewModel.successCount, color: AppColors.accentGreen)
-                StatItemView(title: "失败", count: viewModel.failedCount, color: AppColors.accentRed)
+                StatItemView(title: AppLocalizer.localized("总数"), count: viewModel.totalCount, color: AppColors.textPrimary)
+                StatItemView(title: AppLocalizer.localized("待压缩"), count: viewModel.pendingCount, color: AppColors.accentBlue)
+                StatItemView(title: AppLocalizer.localized("成功"), count: viewModel.successCount, color: AppColors.accentGreen)
+                StatItemView(title: AppLocalizer.localized("失败"), count: viewModel.failedCount, color: AppColors.accentRed)
             }
 
             if viewModel.totalCount > 0 {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("整体进度")
+                        Text(AppLocalizer.localized("整体进度"))
                             .font(.system(size: 12, weight: .bold))
                             .foregroundColor(AppColors.textSecondary)
                         Spacer()
@@ -222,7 +200,7 @@ struct MediaCompressorView: View {
     @ViewBuilder
     private var queueSection: some View {
         if viewModel.items.isEmpty {
-            VStack(spacing: 16) {
+            VStack(spacing: 14) {
                 Image(systemName: "shippingbox.fill")
                     .font(.system(size: 34, weight: .bold))
                     .foregroundColor(AppColors.accentBlue)
@@ -230,12 +208,6 @@ struct MediaCompressorView: View {
                 Text("导入媒体文件开始压缩")
                     .font(.system(size: 20, weight: .heavy))
                     .foregroundColor(AppColors.textPrimary)
-
-                Text("支持混合导入图片、视频和音频文件，压缩完成后可以直接分享结果。")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(AppColors.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
 
                 VStack(spacing: 12) {
                     PhotosPicker(selection: $selectedLibraryItems, matching: .any(of: [.images, .videos]), photoLibrary: .shared()) {
@@ -338,9 +310,6 @@ struct MediaCompressorView: View {
                     if viewModel.isCompressing {
                         ProgressView()
                             .tint(.white)
-                    } else {
-                        Image(systemName: "bolt.fill")
-                            .font(.system(size: 16, weight: .semibold))
                     }
                     Text(viewModel.isCompressing ? "压缩中" : "压缩")
                         .font(.system(size: 16, weight: .bold))
@@ -408,9 +377,7 @@ struct MediaCompressorView: View {
 
     private func saveButtonLabel(isEnabled: Bool) -> some View {
         HStack(spacing: 6) {
-            Image(systemName: "square.and.arrow.down")
-                .font(.system(size: 16, weight: .semibold))
-            Text("保存")
+            Text(AppLocalizer.localized("保存"))
                 .font(.system(size: 16, weight: .bold))
                 .lineLimit(1)
         }

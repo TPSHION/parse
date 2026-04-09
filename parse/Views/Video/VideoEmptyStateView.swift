@@ -41,11 +41,11 @@ struct VideoEmptyStateView: View {
                             Spacer()
                             
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("开始视频格式转换")
+                                Text(AppLocalizer.localized("开始视频格式转换"))
                                     .font(.system(size: 28, weight: .heavy))
                                     .foregroundColor(AppColors.textPrimary)
                                 
-                                Text("支持从相册或文件导入视频，统一转换为 MP4、MOV、GIF、AVI、MKV。")
+                                Text(AppLocalizer.localized("支持从相册或文件导入视频，统一转换为 MP4、MOV、GIF、AVI、MKV。"))
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -55,9 +55,9 @@ struct VideoEmptyStateView: View {
                     }
                     
                     HStack(spacing: 12) {
-                        featureChip(icon: "bolt.fill", text: "本地处理")
-                        featureChip(icon: "square.stack.3d.up.fill", text: "批量导入")
-                        featureChip(icon: "waveform.path.ecg", text: "进度可视化")
+                        featureChip(icon: "bolt.fill", text: AppLocalizer.localized("本地处理"))
+                        featureChip(icon: "square.stack.3d.up.fill", text: AppLocalizer.localized("批量导入"))
+                        featureChip(icon: "waveform.path.ecg", text: AppLocalizer.localized("进度可视化"))
                     }
                 }
                 
@@ -65,8 +65,8 @@ struct VideoEmptyStateView: View {
                     PhotosPicker(selection: $selectedVideos, matching: .videos, photoLibrary: .shared()) {
                         actionCard(
                             icon: "photo.stack.fill",
-                            title: "从相册导入",
-                            detail: "适合批量挑选近期拍摄或已保存的视频",
+                            title: AppLocalizer.localized("从相册导入"),
+                            detail: AppLocalizer.localized("适合批量挑选近期拍摄或已保存的视频"),
                             accent: AppColors.accentGreen,
                             filled: true
                         )
@@ -78,8 +78,8 @@ struct VideoEmptyStateView: View {
                     }) {
                         actionCard(
                             icon: "folder.fill.badge.plus",
-                            title: "从文件导入",
-                            detail: "支持从 iCloud Drive 或本地目录选择视频文件",
+                            title: AppLocalizer.localized("从文件导入"),
+                            detail: AppLocalizer.localized("支持从 iCloud Drive 或本地目录选择视频文件"),
                             accent: AppColors.accentBlue,
                             filled: false
                         )

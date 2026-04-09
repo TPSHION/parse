@@ -24,7 +24,7 @@ struct RemoteImageImportPreviewSheet: View {
                 .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
 
                 HStack(spacing: 12) {
-                    Button("取消") {
+                    Button(AppLocalizer.localized("取消")) {
                         onCancel()
                     }
                     .font(.system(size: 16, weight: .semibold))
@@ -38,7 +38,7 @@ struct RemoteImageImportPreviewSheet: View {
                         HStack(spacing: 8) {
                             Image(systemName: "square.and.arrow.down.fill")
                                 .font(.system(size: 16, weight: .semibold))
-                            Text("导入列表")
+                            Text(AppLocalizer.localized("导入列表"))
                                 .font(.system(size: 16, weight: .bold))
                         }
                         .foregroundColor(.white)
@@ -51,20 +51,20 @@ struct RemoteImageImportPreviewSheet: View {
             }
             .padding(20)
             .background(AppColors.background.ignoresSafeArea())
-            .navigationTitle("导入确认")
+            .navigationTitle(AppLocalizer.localized("导入确认"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(AppColors.background, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
         }
         .interactiveDismissDisabled()
-        .alert("继续导入大图片？", isPresented: $isLargeFileAlertPresented) {
-            Button("取消", role: .cancel) {}
-            Button("继续导入") {
+        .alert(AppLocalizer.localized("继续导入大图片？"), isPresented: $isLargeFileAlertPresented) {
+            Button(AppLocalizer.localized("取消"), role: .cancel) {}
+            Button(AppLocalizer.localized("继续导入")) {
                 onImport()
             }
         } message: {
-            Text("当前图片大小约为 \(preview.fileSizeText)，导入后会占用更多空间，并可能增加后续转换耗时。")
+            Text(AppLocalizer.formatted("当前图片大小约为 %@，导入后会占用更多空间，并可能增加后续转换耗时。", preview.fileSizeText))
         }
     }
     
@@ -98,7 +98,7 @@ struct RemoteImageImportPreviewSheet: View {
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(AppColors.accentOrange)
                     
-                    Text("图片较大，导入和转换可能更慢。")
+                    Text(AppLocalizer.localized("图片较大，导入和转换可能更慢。"))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(AppColors.accentOrange)
                         .fixedSize(horizontal: false, vertical: true)
@@ -125,9 +125,9 @@ struct RemoteImageImportPreviewSheet: View {
                 
                 // Badges for specs
                 VStack(alignment: .leading, spacing: 8) {
-                    infoBadge(icon: "photo.fill", text: "格式：\(preview.detectedFormat)", color: AppColors.accentBlue)
-                    infoBadge(icon: "ruler.fill", text: "尺寸：\(preview.dimensionsText)", color: AppColors.textSecondary)
-                    infoBadge(icon: "externaldrive.fill", text: "大小：\(preview.fileSizeText)", color: AppColors.textSecondary)
+                    infoBadge(icon: "photo.fill", text: AppLocalizer.formatted("格式：%@", preview.detectedFormat), color: AppColors.accentBlue)
+                    infoBadge(icon: "ruler.fill", text: AppLocalizer.formatted("尺寸：%@", preview.dimensionsText), color: AppColors.textSecondary)
+                    infoBadge(icon: "externaldrive.fill", text: AppLocalizer.formatted("大小：%@", preview.fileSizeText), color: AppColors.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }

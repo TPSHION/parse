@@ -39,11 +39,11 @@ struct AudioEmptyStateView: View {
                             Spacer()
                             
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("开始音频格式转换")
+                                Text(AppLocalizer.localized("开始音频格式转换"))
                                     .font(.system(size: 28, weight: .heavy))
                                     .foregroundColor(AppColors.textPrimary)
                                 
-                                Text("支持从文件导入音频，统一转换为 MP3、WAV、AAC、M4A 或 FLAC。")
+                                Text(AppLocalizer.localized("支持从文件导入音频，统一转换为 MP3、WAV、AAC、M4A 或 FLAC。"))
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -53,9 +53,9 @@ struct AudioEmptyStateView: View {
                     }
                     
                     HStack(spacing: 12) {
-                        featureChip(icon: "bolt.fill", text: "极速处理")
-                        featureChip(icon: "square.stack.3d.up.fill", text: "批量操作")
-                        featureChip(icon: "speaker.wave.3.fill", text: "高保真")
+                        featureChip(icon: "bolt.fill", text: AppLocalizer.localized("极速处理"))
+                        featureChip(icon: "square.stack.3d.up.fill", text: AppLocalizer.localized("批量操作"))
+                        featureChip(icon: "speaker.wave.3.fill", text: AppLocalizer.localized("高保真"))
                     }
                 }
                 
@@ -65,8 +65,8 @@ struct AudioEmptyStateView: View {
                     }) {
                         actionCard(
                             icon: "folder.fill.badge.plus",
-                            title: "从文件导入",
-                            detail: "支持从 iCloud Drive 或本地目录选择音频文件",
+                            title: AppLocalizer.localized("从文件导入"),
+                            detail: AppLocalizer.localized("支持从 iCloud Drive 或本地目录选择音频文件"),
                             accent: AppColors.accentOrange,
                             filled: true
                         )

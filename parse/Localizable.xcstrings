@@ -262,6 +262,17 @@
         }
       }
     },
+    "从链接导入" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Link"
+          }
+        }
+      }
+    },
     "传输" : {
       "localizations" : {
         "en" : {
@@ -356,6 +367,7 @@
       }
     },
     "全选" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -428,6 +440,7 @@
       }
     },
     "压缩只会优化当前格式内部的体积，不会修改原始扩展名。部分 PNG、WAV、FLAC 的压缩空间可能有限。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -527,6 +540,17 @@
         }
       }
     },
+    "原画质导出" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full Quality"
+          }
+        }
+      }
+    },
     "取消" : {
       "localizations" : {
         "en" : {
@@ -538,6 +562,7 @@
       }
     },
     "可先勾选要导出的压缩结果，再选择分享、相册或文件夹。相册仅支持图片、MP4、MOV 和 GIF。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -559,6 +584,7 @@
       }
     },
     "图片、视频、音频混合导入，同一个队列里批量压缩，不改变原始格式。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -612,6 +638,7 @@
       }
     },
     "图片较大，导入和转换可能更慢。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -652,6 +679,17 @@
         }
       }
     },
+    "大小：%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size: %@"
+          }
+        }
+      }
+    },
     "失败" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -685,6 +723,7 @@
       }
     },
     "导入列表" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -705,6 +744,7 @@
       }
     },
     "导入确认" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -736,6 +776,17 @@
         }
       }
     },
+    "尺寸：%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dimensions: %@"
+          }
+        }
+      }
+    },
     "局域网传输、链接导入和跨设备收发能力会放在这里。" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -759,6 +810,7 @@
       }
     },
     "已选 %lld/%lld" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -796,6 +848,7 @@
       }
     },
     "开始图片格式转换" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -806,6 +859,7 @@
       }
     },
     "开始视频格式转换" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -826,6 +880,7 @@
       }
     },
     "开始音频格式转换" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -836,6 +891,7 @@
       }
     },
     "当前图片大小约为 %@，导入后会占用更多空间，并可能增加后续转换耗时。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -933,6 +989,17 @@
         }
       }
     },
+    "待压缩" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
+          }
+        }
+      }
+    },
     "待处理" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1016,6 +1083,28 @@
         }
       }
     },
+    "批量导入" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batch Import"
+          }
+        }
+      }
+    },
+    "批量操作" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batch Actions"
+          }
+        }
+      }
+    },
     "提取图片中的文字内容 (OCR)" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1048,6 +1137,17 @@
         }
       }
     },
+    "支持从 iCloud Drive 或本地目录选择图片文件" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose image files from iCloud Drive or local folders"
+          }
+        }
+      }
+    },
     "支持从 iCloud Drive 或本地目录选择文件" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1059,7 +1159,30 @@
         }
       }
     },
+    "支持从 iCloud Drive 或本地目录选择视频文件" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose video files from iCloud Drive or local folders"
+          }
+        }
+      }
+    },
+    "支持从 iCloud Drive 或本地目录选择音频文件" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose audio files from iCloud Drive or local folders"
+          }
+        }
+      }
+    },
     "支持从文件导入音频，统一转换为 MP3、WAV、AAC、M4A 或 FLAC。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1070,6 +1193,7 @@
       }
     },
     "支持从相册、文件或链接导入图片，统一转换为 JPEG、PNG、HEIC 或 TIFF。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1080,6 +1204,7 @@
       }
     },
     "支持从相册或文件导入视频，统一转换为 MP4、MOV、GIF、AVI、MKV。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1100,6 +1225,7 @@
       }
     },
     "支持混合导入图片、视频和音频文件，压缩完成后可以直接分享结果。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1142,6 +1268,7 @@
       }
     },
     "整体进度" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1249,6 +1376,17 @@
         }
       }
     },
+    "极速处理" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fast Processing"
+          }
+        }
+      }
+    },
     "极速批量转换主流图片格式" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1271,6 +1409,17 @@
         }
       }
     },
+    "格式：%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format: %@"
+          }
+        }
+      }
+    },
     "正在导入 PDF..." : {
       "localizations" : {
         "en" : {
@@ -1282,6 +1431,7 @@
       }
     },
     "正在导入图片..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1442,6 +1592,7 @@
       }
     },
     "相册不支持" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1557,6 +1708,17 @@
         }
       }
     },
+    "粘贴公开图片链接，先识别真实格式和尺寸，再确认导入" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste a public image link, inspect the real format and size, then confirm import"
+          }
+        }
+      }
+    },
     "精准提取图片中的文字内容" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1612,6 +1774,7 @@
       }
     },
     "继续导入" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1622,6 +1785,7 @@
       }
     },
     "继续导入大图片？" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1711,7 +1875,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quality First"
+            "value" : "Quality"
           }
         }
       }
@@ -1875,13 +2039,35 @@
         }
       }
     },
+    "进度可视化" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress Tracking"
+          }
+        }
+      }
+    },
     "适合批量挑选近期拍摄或已保存的图片" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Great for batch-selecting recently captured or saved photos"
+            "value" : "Pick recent or saved images in batches"
+          }
+        }
+      }
+    },
+    "适合批量挑选近期拍摄或已保存的视频" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick recent or saved videos in batches"
           }
         }
       }
@@ -1897,6 +2083,7 @@
       }
     },
     "选择要保存的资源" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1912,7 +2099,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Speed First"
+            "value" : "Speed"
           }
         }
       }

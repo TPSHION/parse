@@ -249,9 +249,6 @@ struct AudioConverterView: View {
                     if viewModel.isConverting {
                         ProgressView()
                             .tint(AppColors.textSecondary)
-                    } else {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                            .font(.system(size: 16, weight: .semibold))
                     }
                     Text(viewModel.isConverting ? "转换中" : "转换")
                         .font(.system(size: 16, weight: .bold))
@@ -272,8 +269,6 @@ struct AudioConverterView: View {
                 isSaveActionSheetPresented = true
             }) {
                 HStack(spacing: 6) {
-                    Image(systemName: "square.and.arrow.down")
-                        .font(.system(size: 16, weight: .semibold))
                     Text("保存")
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)

@@ -47,7 +47,7 @@ struct ConversionHomeView: View {
                             }
 
                             ToolRouteCard(route: .mediaCompressor) {
-                                ToolGridCard(icon: "archivebox.fill", title: AppLocalizer.localized("数据压缩"), description: AppLocalizer.localized("混合批量压缩图片、视频与音频数据"), color: AppColors.accentTeal)
+                                ToolGridCard(icon: "bolt.fill", title: AppLocalizer.localized("数据压缩"), description: AppLocalizer.localized("混合批量压缩图片、视频与音频数据"), color: AppColors.accentTeal)
                             }
                         }
                     }

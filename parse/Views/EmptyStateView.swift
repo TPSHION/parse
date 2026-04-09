@@ -42,11 +42,11 @@ struct EmptyStateView: View {
                             Spacer()
                             
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("开始图片格式转换")
+                                Text(AppLocalizer.localized("开始图片格式转换"))
                                     .font(.system(size: 28, weight: .heavy))
                                     .foregroundColor(AppColors.textPrimary)
                                 
-                                Text("支持从相册、文件或链接导入图片，统一转换为 JPEG、PNG、HEIC 或 TIFF。")
+                                Text(AppLocalizer.localized("支持从相册、文件或链接导入图片，统一转换为 JPEG、PNG、HEIC 或 TIFF。"))
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -56,9 +56,9 @@ struct EmptyStateView: View {
                     }
                     
                     HStack(spacing: 12) {
-                        featureChip(icon: "bolt.fill", text: "本地处理")
-                        featureChip(icon: "square.stack.3d.up.fill", text: "批量导入")
-                        featureChip(icon: "sparkles", text: "原画质导出")
+                        featureChip(icon: "bolt.fill", text: AppLocalizer.localized("本地处理"))
+                        featureChip(icon: "square.stack.3d.up.fill", text: AppLocalizer.localized("批量导入"))
+                        featureChip(icon: "sparkles", text: AppLocalizer.localized("原画质导出"))
                     }
                 }
                 
@@ -66,8 +66,8 @@ struct EmptyStateView: View {
                     PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
                         actionCard(
                             icon: "photo.stack.fill",
-                            title: "从相册导入",
-                            detail: "适合批量挑选近期拍摄或已保存的图片",
+                            title: AppLocalizer.localized("从相册导入"),
+                            detail: AppLocalizer.localized("适合批量挑选近期拍摄或已保存的图片"),
                             accent: AppColors.accentBlue,
                             filled: true
                         )
@@ -79,8 +79,8 @@ struct EmptyStateView: View {
                     }) {
                         actionCard(
                             icon: "folder.fill.badge.plus",
-                            title: "从文件导入",
-                            detail: "支持从 iCloud Drive 或本地目录选择图片文件",
+                            title: AppLocalizer.localized("从文件导入"),
+                            detail: AppLocalizer.localized("支持从 iCloud Drive 或本地目录选择图片文件"),
                             accent: AppColors.accentGreen,
                             filled: false
                         )
@@ -90,8 +90,8 @@ struct EmptyStateView: View {
                     Button(action: onImportFromLink) {
                         actionCard(
                             icon: "link",
-                            title: "从链接导入",
-                            detail: "粘贴公开图片链接，先识别真实格式和尺寸，再确认导入",
+                            title: AppLocalizer.localized("从链接导入"),
+                            detail: AppLocalizer.localized("粘贴公开图片链接，先识别真实格式和尺寸，再确认导入"),
                             accent: AppColors.accentOrange,
                             filled: false
                         )

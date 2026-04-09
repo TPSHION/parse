@@ -318,8 +318,6 @@ struct VideoConverterView: View {
                 }
             }) {
                 HStack(spacing: 6) {
-                    Image(systemName: isConverting ? "stop.fill" : "arrow.triangle.2.circlepath")
-                        .font(.system(size: 16, weight: .semibold))
                     Text(isConverting ? "停止" : "转换")
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
@@ -339,8 +337,6 @@ struct VideoConverterView: View {
                 isSaveActionSheetPresented = true
             }) {
                 HStack(spacing: 6) {
-                    Image(systemName: "square.and.arrow.down")
-                        .font(.system(size: 16, weight: .semibold))
                     Text("保存")
                         .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
