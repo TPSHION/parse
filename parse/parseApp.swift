@@ -9,10 +9,33 @@ import SwiftUI
 
 @main
 struct parseApp: App {
+    @State private var router = RouterManager.shared
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .preferredColorScheme(.dark)
+            @Bindable var bindableRouter = router
+
+            NavigationStack(path: $bindableRouter.path) {
+                ContentView()
+                    .preferredColorScheme(.dark)
+                    .navigationDestination(for: AppRoute.self) { route in
+                        switch route {
+                        case .imageConverter:
+                            ImageConverterView()
+                        case .videoConverter:
+                            VideoConverterView()
+                        case .audioConverter:
+                            AudioConverterView()
+                        case .mediaCompressor:
+                            MediaCompressorView()
+                        case .pdfConverter:
+                            PDFConverterView()
+                        case .documentTool(let toolType):
+                            DocumentToolDetailView(toolType: toolType)
+                        }
+                    }
+            }
+            .environment(router)
         }
     }
 }
