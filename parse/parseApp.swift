@@ -10,10 +10,10 @@ import SwiftUI
 @main
 struct parseApp: App {
     @State private var router = RouterManager.shared
-    @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.simplifiedChinese.rawValue
+    @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automaticValue
 
     private var appLanguage: AppLanguage {
-        AppLanguage.resolve(from: appLanguageRawValue)
+        AppLanguage.effective(from: appLanguageRawValue)
     }
 
     var body: some Scene {

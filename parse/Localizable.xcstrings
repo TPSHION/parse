@@ -21,16 +21,6 @@
         }
       }
     },
-    "%lld%%" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%%"
-          }
-        }
-      }
-    },
     "Audio Lab" : {
       "localizations" : {
         "en" : {
@@ -52,7 +42,7 @@
       }
     },
     "EPUB, MOBI 等格式完美互转" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -63,7 +53,7 @@
       }
     },
     "EPUB, MOBI, AZW3 等格式互转" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -74,7 +64,7 @@
       }
     },
     "FFmpeg 转换会话创建失败" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -95,7 +85,7 @@
       }
     },
     "GIF 不支持音频轨，已改为仅导出视频画面" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -106,7 +96,7 @@
       }
     },
     "GIF 保存到相册失败，请确认系统照片支持动画图片导入，或改用“保存为文件”" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -117,7 +107,7 @@
       }
     },
     "GIF 保存到相册失败，请确认系统照片支持动画图片导入，或改用“保存到文件”" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -148,7 +138,7 @@
       }
     },
     "PDF 转 Word" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -199,7 +189,7 @@
       }
     },
     "下载结果不是可识别的图片文件" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -210,7 +200,7 @@
       }
     },
     "不支持的原始编码格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -221,7 +211,7 @@
       }
     },
     "不支持的原视频编码格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -232,7 +222,7 @@
       }
     },
     "不支持的源音频编码格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -263,7 +253,7 @@
       }
     },
     "从链接导入" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -314,7 +304,7 @@
       }
     },
     "保存到相册失败，请稍后重试" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -325,7 +315,7 @@
       }
     },
     "保存到相册失败：\n%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -336,7 +326,7 @@
       }
     },
     "保存失败：\n%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -367,7 +357,7 @@
       }
     },
     "全选" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -388,7 +378,7 @@
       }
     },
     "创建压缩输出文件失败" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -429,7 +419,7 @@
       }
     },
     "压缩会话未能创建" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -439,35 +429,8 @@
         }
       }
     },
-    "压缩只会优化当前格式内部的体积，不会修改原始扩展名。部分 PNG、WAV、FLAC 的压缩空间可能有限。" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compression only reduces size within the current format and will not change the original extension. Some PNG, WAV, and FLAC files may have limited room for further compression."
-          }
-        }
-      }
-    },
-    "压缩后 %@ · 节省 %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compressed %@ · Saved %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "压缩后 %1$@ · 节省 %2$@"
-          }
-        }
-      }
-    },
     "压缩后体积没有变小，当前格式压缩空间有限" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -478,7 +441,7 @@
       }
     },
     "压缩失败，可能是不支持的特殊媒体格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -489,7 +452,7 @@
       }
     },
     "压缩失败：%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -520,7 +483,7 @@
       }
     },
     "压缩输出文件写入失败" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -541,7 +504,7 @@
       }
     },
     "原画质导出" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -562,7 +525,7 @@
       }
     },
     "可先勾选要导出的压缩结果，再选择分享、相册或文件夹。相册仅支持图片、MP4、MOV 和 GIF。" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -573,23 +536,12 @@
       }
     },
     "图片" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Image"
-          }
-        }
-      }
-    },
-    "图片、视频、音频混合导入，同一个队列里批量压缩，不改变原始格式。" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import images, videos, and audio together and compress them in one queue without changing the original format."
           }
         }
       }
@@ -605,7 +557,7 @@
       }
     },
     "图片转换" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -616,7 +568,7 @@
       }
     },
     "图片转文字" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -627,7 +579,7 @@
       }
     },
     "图片转文档" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -638,7 +590,7 @@
       }
     },
     "图片较大，导入和转换可能更慢。" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -649,7 +601,7 @@
       }
     },
     "均衡" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -680,7 +632,7 @@
       }
     },
     "大小：%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -691,7 +643,7 @@
       }
     },
     "失败" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -702,7 +654,7 @@
       }
     },
     "媒体处理" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -723,7 +675,7 @@
       }
     },
     "导入列表" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -744,7 +696,7 @@
       }
     },
     "导入确认" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -755,7 +707,7 @@
       }
     },
     "将 PDF 文件转换为可编辑的 Word 文档" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -766,7 +718,7 @@
       }
     },
     "将图片转换为 PDF 或 Word 文档" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -777,7 +729,7 @@
       }
     },
     "尺寸：%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -788,7 +740,7 @@
       }
     },
     "局域网传输、链接导入和跨设备收发能力会放在这里。" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -799,7 +751,7 @@
       }
     },
     "已成功保存至文件：\n%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -810,7 +762,7 @@
       }
     },
     "已选 %lld/%lld" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -837,7 +789,7 @@
       }
     },
     "应用偏好、默认参数和更多配置会在这里逐步补齐。" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -848,7 +800,7 @@
       }
     },
     "开始图片格式转换" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -859,7 +811,7 @@
       }
     },
     "开始视频格式转换" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -880,7 +832,7 @@
       }
     },
     "开始音频格式转换" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -891,7 +843,7 @@
       }
     },
     "当前图片大小约为 %@，导入后会占用更多空间，并可能增加后续转换耗时。" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -902,7 +854,7 @@
       }
     },
     "当前应用内置的转码器不支持 libx264，已切换为系统硬件编码器" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -913,7 +865,7 @@
       }
     },
     "当前文件不支持系统原生导出为 M4A" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -924,7 +876,7 @@
       }
     },
     "当前文件格式暂不支持压缩" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -935,7 +887,7 @@
       }
     },
     "当前格式组合不支持快速封装" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -946,7 +898,7 @@
       }
     },
     "当前设备上的压缩编码器不可用" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -957,7 +909,7 @@
       }
     },
     "当前设备上的视频编码器不可用" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -968,7 +920,7 @@
       }
     },
     "当前设备上的音频编码器不可用" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -979,7 +931,7 @@
       }
     },
     "当前音视频编码与目标格式不兼容" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -990,7 +942,7 @@
       }
     },
     "待压缩" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1001,7 +953,7 @@
       }
     },
     "待处理" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1012,7 +964,7 @@
       }
     },
     "总数" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1023,7 +975,7 @@
       }
     },
     "成功" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1034,7 +986,7 @@
       }
     },
     "成功保存 %lld 个视频到相册" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1045,7 +997,7 @@
       }
     },
     "成功保存 %lld 张图片到相册" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1056,7 +1008,7 @@
       }
     },
     "成功保存 %lld 项到相册" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1067,7 +1019,7 @@
       }
     },
     "成功保存 %lld 项到相册，已跳过 %lld 项不支持的音频或视频格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1084,7 +1036,7 @@
       }
     },
     "批量导入" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1095,7 +1047,7 @@
       }
     },
     "批量操作" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1106,7 +1058,7 @@
       }
     },
     "提取图片中的文字内容 (OCR)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1117,7 +1069,7 @@
       }
     },
     "提取音频，或互转 MP3, WAV, M4A 等" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1138,7 +1090,7 @@
       }
     },
     "支持从 iCloud Drive 或本地目录选择图片文件" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1149,7 +1101,7 @@
       }
     },
     "支持从 iCloud Drive 或本地目录选择文件" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1160,7 +1112,7 @@
       }
     },
     "支持从 iCloud Drive 或本地目录选择视频文件" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1171,7 +1123,7 @@
       }
     },
     "支持从 iCloud Drive 或本地目录选择音频文件" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1182,7 +1134,7 @@
       }
     },
     "支持从文件导入音频，统一转换为 MP3、WAV、AAC、M4A 或 FLAC。" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1193,7 +1145,7 @@
       }
     },
     "支持从相册、文件或链接导入图片，统一转换为 JPEG、PNG、HEIC 或 TIFF。" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1204,7 +1156,7 @@
       }
     },
     "支持从相册或文件导入视频，统一转换为 MP4、MOV、GIF、AVI、MKV。" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1224,19 +1176,8 @@
         }
       }
     },
-    "支持混合导入图片、视频和音频文件，压缩完成后可以直接分享结果。" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Supports mixed importing of images, videos, and audio files. After compression, you can share the results directly."
-          }
-        }
-      }
-    },
     "支持转为 DOCX, TXT, MD, PNG 等" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1247,7 +1188,7 @@
       }
     },
     "支持转为 DOCX, TXT, MD, PNG, JPEG" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1268,7 +1209,7 @@
       }
     },
     "整体进度" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1279,7 +1220,7 @@
       }
     },
     "文件权限被拒绝，无法读取原视频" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1290,7 +1231,7 @@
       }
     },
     "文本/网页转换" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1301,7 +1242,7 @@
       }
     },
     "文档处理" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1312,7 +1253,7 @@
       }
     },
     "无法生成目标格式的图片数据" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1323,7 +1264,7 @@
       }
     },
     "无法读取原始图片文件" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1334,7 +1275,7 @@
       }
     },
     "未检测到可导出的音频轨道" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1345,7 +1286,7 @@
       }
     },
     "未知" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1356,7 +1297,7 @@
       }
     },
     "本地处理" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1377,7 +1318,7 @@
       }
     },
     "极速处理" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1388,7 +1329,7 @@
       }
     },
     "极速批量转换主流图片格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1399,7 +1340,7 @@
       }
     },
     "极限" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1410,7 +1351,7 @@
       }
     },
     "格式：%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1431,7 +1372,7 @@
       }
     },
     "正在导入图片..." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1472,7 +1413,7 @@
       }
     },
     "没有读取或写入该文件的权限" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1483,7 +1424,7 @@
       }
     },
     "没有读取或写入该音频文件的权限" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1494,7 +1435,7 @@
       }
     },
     "混合批量压缩图片、视频与音频数据" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1515,7 +1456,7 @@
       }
     },
     "源文件不存在或已被移除" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1526,7 +1467,7 @@
       }
     },
     "源文件已损坏或内容不完整" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1537,7 +1478,7 @@
       }
     },
     "源视频参数异常，暂时无法转换" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1548,7 +1489,7 @@
       }
     },
     "源音频文件不存在或已被移除" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1559,7 +1500,7 @@
       }
     },
     "电子书转换" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1570,7 +1511,7 @@
       }
     },
     "目标音频格式封装失败，请尝试更换输出格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1581,7 +1522,7 @@
       }
     },
     "直接输入网页链接提取内容或转为 PDF" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1592,7 +1533,7 @@
       }
     },
     "相册不支持" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1603,7 +1544,7 @@
       }
     },
     "相册仅支持保存 MP4、MOV 和 GIF，请使用“保存到文件”导出其他格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1614,7 +1555,7 @@
       }
     },
     "相册仅支持保存图片、MP4、MOV 和 GIF，音频及其他视频格式请使用“保存为文件”" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1645,7 +1586,7 @@
       }
     },
     "视频" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1656,7 +1597,7 @@
       }
     },
     "视频文件已损坏或不完整" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1677,7 +1618,7 @@
       }
     },
     "视频编码器初始化失败" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1688,7 +1629,7 @@
       }
     },
     "视频转换" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1709,7 +1650,7 @@
       }
     },
     "粘贴公开图片链接，先识别真实格式和尺寸，再确认导入" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1720,7 +1661,7 @@
       }
     },
     "精准提取图片中的文字内容" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1731,7 +1672,7 @@
       }
     },
     "系统原生导出器不可用" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1742,7 +1683,7 @@
       }
     },
     "系统原生导出失败：%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1753,7 +1694,7 @@
       }
     },
     "纯文本、富文本与网页格式互转" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1774,7 +1715,7 @@
       }
     },
     "继续导入" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1785,7 +1726,7 @@
       }
     },
     "继续导入大图片？" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1796,7 +1737,7 @@
       }
     },
     "网页转文档" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1807,7 +1748,7 @@
       }
     },
     "设备存储空间不足" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1848,7 +1789,7 @@
       }
     },
     "请输入完整且可访问的图片链接" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1859,7 +1800,7 @@
       }
     },
     "读取源文件失败" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1870,7 +1811,7 @@
       }
     },
     "质量优先" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1921,7 +1862,7 @@
       }
     },
     "转换失败，可能是不支持的特殊视频格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1932,7 +1873,7 @@
       }
     },
     "转换失败，可能是不支持的特殊音频格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1943,7 +1884,7 @@
       }
     },
     "转换失败：%@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1964,7 +1905,7 @@
       }
     },
     "转码引擎内部错误" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1975,7 +1916,7 @@
       }
     },
     "轻度" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1996,7 +1937,7 @@
       }
     },
     "输入网址" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2007,7 +1948,7 @@
       }
     },
     "输入链接一键生成 PDF" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2018,7 +1959,7 @@
       }
     },
     "输出文件封装失败，请尝试更换目标格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2029,7 +1970,7 @@
       }
     },
     "进入 PDF 转换工具" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2040,7 +1981,7 @@
       }
     },
     "进度可视化" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2051,7 +1992,7 @@
       }
     },
     "适合批量挑选近期拍摄或已保存的图片" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2062,7 +2003,7 @@
       }
     },
     "适合批量挑选近期拍摄或已保存的视频" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2083,7 +2024,7 @@
       }
     },
     "选择要保存的资源" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2094,7 +2035,7 @@
       }
     },
     "速度优先" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2115,7 +2056,7 @@
       }
     },
     "隐私安全" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2126,7 +2067,7 @@
       }
     },
     "需要相册的“添加照片”权限才能保存压缩结果" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2137,7 +2078,7 @@
       }
     },
     "需要相册的“添加照片”权限才能保存图片" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2148,7 +2089,7 @@
       }
     },
     "需要相册的“添加照片”权限才能保存视频" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2159,7 +2100,7 @@
       }
     },
     "音频" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2170,7 +2111,7 @@
       }
     },
     "音频文件已损坏或内容不完整" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2181,7 +2122,7 @@
       }
     },
     "音频轨处理失败" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2202,7 +2143,7 @@
       }
     },
     "高保真" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2213,7 +2154,7 @@
       }
     },
     "高效互转 MP4, MOV, GIF, AVI, MKV 等格式" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {

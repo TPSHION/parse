@@ -5,6 +5,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case english = "en"
 
     nonisolated static let storageKey = "selected_app_language"
+    nonisolated static let automaticValue = ""
 
     nonisolated var id: String { rawValue }
 
@@ -33,13 +34,33 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     nonisolated static func resolve(from rawValue: String) -> AppLanguage {
         AppLanguage(rawValue: rawValue) ?? .simplifiedChinese
     }
+
+    nonisolated static func resolveStored(from rawValue: String?) -> AppLanguage? {
+        guard let rawValue, !rawValue.isEmpty else { return nil }
+        return AppLanguage(rawValue: rawValue)
+    }
+
+    nonisolated static var systemPreferred: AppLanguage {
+        for identifier in Locale.preferredLanguages {
+            let normalizedIdentifier = identifier.lowercased()
+            if normalizedIdentifier.hasPrefix("zh") {
+                return .simplifiedChinese
+            }
+            if normalizedIdentifier.hasPrefix("en") {
+                return .english
+            }
+        }
+        return .simplifiedChinese
+    }
+
+    nonisolated static func effective(from rawValue: String?) -> AppLanguage {
+        resolveStored(from: rawValue) ?? systemPreferred
+    }
 }
 
 enum AppLocalizer {
     nonisolated static var currentLanguage: AppLanguage {
-        let rawValue = UserDefaults.standard.string(forKey: AppLanguage.storageKey)
-            ?? AppLanguage.simplifiedChinese.rawValue
-        return AppLanguage.resolve(from: rawValue)
+        AppLanguage.effective(from: UserDefaults.standard.string(forKey: AppLanguage.storageKey))
     }
 
     nonisolated static func localized(_ key: String) -> String {

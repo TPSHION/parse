@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ConversionHomeView: View {
-    @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.simplifiedChinese.rawValue
+    @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automaticValue
     @State private var appearAnimation = false
 
     private let columns = [
@@ -10,7 +10,7 @@ struct ConversionHomeView: View {
     ]
 
     private var appLanguage: AppLanguage {
-        AppLanguage.resolve(from: appLanguageRawValue)
+        AppLanguage.effective(from: appLanguageRawValue)
     }
 
     var body: some View {
