@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 struct RemoteImageImportPreview: Identifiable, Equatable {
-    static let largeFileThresholdInBytes: Int64 = 100 * 1024
+    static let largeFileThresholdInBytes: Int64 = 10 * 1024 * 1024
 
     let id = UUID()
     let sourceURL: URL

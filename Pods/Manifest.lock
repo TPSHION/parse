@@ -1,23 +1,16 @@
 PODS:
-  - AMSMB2 (2.7.1)
   - ffmpeg-kit-ios-full (6.0)
 
 DEPENDENCIES:
-  - AMSMB2 (~> 2.7)
   - ffmpeg-kit-ios-full (from `https://raw.githubusercontent.com/luthviar/ffmpeg-kit-ios-full/main/ffmpeg-kit-ios-full.podspec`)
-
-SPEC REPOS:
-  trunk:
-    - AMSMB2
 
 EXTERNAL SOURCES:
   ffmpeg-kit-ios-full:
     :podspec: https://raw.githubusercontent.com/luthviar/ffmpeg-kit-ios-full/main/ffmpeg-kit-ios-full.podspec
 
 SPEC CHECKSUMS:
-  AMSMB2: 4017852863a688970e8c4f38a4fae9826fbbec34
   ffmpeg-kit-ios-full: 2da77324b0e9fb007195ab6661f64be4cf31dc12
 
-PODFILE CHECKSUM: 303c9b3ec9b9956fb7da342c825f32ecdce70794
+PODFILE CHECKSUM: 0a1a048b57807dded8bd62d0bcdb351e69642264
 
 COCOAPODS: 1.16.2

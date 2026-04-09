@@ -38,7 +38,7 @@ struct MediaCompressorView: View {
                 importingOverlay
             }
         }
-        .navigationTitle("媒体压缩")
+        .navigationTitle("数据压缩")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbarBackground(AppColors.background, for: .navigationBar)
@@ -131,7 +131,7 @@ struct MediaCompressorView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("统一批量压缩")
+                    Text("数据压缩")
                         .font(.system(size: 24, weight: .heavy))
                         .foregroundColor(AppColors.textPrimary)
 
@@ -145,12 +145,12 @@ struct MediaCompressorView: View {
 
                 ZStack {
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(AppColors.accentBlue.opacity(0.18))
+                        .fill(AppColors.accentTeal.opacity(0.18))
                         .frame(width: 58, height: 58)
 
-                    Image(systemName: "arrow.down.circle.fill")
+                    Image(systemName: "archivebox.fill")
                         .font(.system(size: 26, weight: .bold))
-                        .foregroundColor(AppColors.accentBlue)
+                        .foregroundColor(AppColors.accentTeal)
                 }
             }
 

@@ -60,11 +60,6 @@ struct ContentView: View {
                             sectionHeader(title: "媒体处理", icon: "photo.on.rectangle.angled", color: AppColors.accentBlue)
                             
                             LazyVGrid(columns: columns, spacing: 16) {
-                                NavigationLink(destination: MediaCompressorView()) {
-                                    ToolGridCard(icon: "arrow.down.circle.fill", title: "媒体压缩", description: "混合批量压缩图片、视频与音频文件", color: AppColors.accentOrange)
-                                }
-                                .buttonStyle(.plain)
-
                                 NavigationLink(destination: ImageConverterView()) {
                                     ToolGridCard(icon: "photo.badge.arrow.down.fill", title: "图片转换", description: "极速批量转换主流图片格式", color: AppColors.accentBlue)
                                 }
@@ -77,6 +72,11 @@ struct ContentView: View {
                                 
                                 NavigationLink(destination: AudioConverterView()) {
                                     ToolGridCard(icon: "waveform.circle.fill", title: "音频转换", description: "提取音频，或互转 MP3, WAV, M4A 等", color: AppColors.accentOrange)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                NavigationLink(destination: MediaCompressorView()) {
+                                    ToolGridCard(icon: "bolt.fill", title: "数据压缩", description: "混合批量压缩图片、视频与音频数据", color: AppColors.accentTeal)
                                 }
                                 .buttonStyle(.plain)
                             }

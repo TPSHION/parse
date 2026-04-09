@@ -2,7 +2,6 @@ import SwiftUI
 
 struct AudioEmptyStateView: View {
     @Binding var isFileImporterPresented: Bool
-    let onImportFromSMB: () -> Void
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -44,7 +43,7 @@ struct AudioEmptyStateView: View {
                                     .font(.system(size: 28, weight: .heavy))
                                     .foregroundColor(AppColors.textPrimary)
                                 
-                                Text("支持从文件或局域网 Windows 共享导入音频，统一转换为 MP3、WAV、AAC、M4A 或 FLAC。")
+                                Text("支持从文件导入音频，统一转换为 MP3、WAV、AAC、M4A 或 FLAC。")
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -70,17 +69,6 @@ struct AudioEmptyStateView: View {
                             detail: "支持从 iCloud Drive 或本地目录选择音频文件",
                             accent: AppColors.accentOrange,
                             filled: true
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: onImportFromSMB) {
-                        actionCard(
-                            icon: "externaldrive.connected.to.line.below.fill",
-                            title: "从局域网导入",
-                            detail: "手动输入 Windows 共享信息，直接导入局域网中的音频文件",
-                            accent: AppColors.accentBlue,
-                            filled: false
                         )
                     }
                     .buttonStyle(.plain)
