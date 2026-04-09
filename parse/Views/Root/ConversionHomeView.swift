@@ -39,7 +39,7 @@ struct ConversionHomeView: View {
                             }
 
                             ToolRouteCard(route: .videoConverter) {
-                                ToolGridCard(icon: "video.fill.badge.ellipsis", title: AppLocalizer.localized("视频转换"), description: AppLocalizer.localized("高效互转 MP4, MOV, GIF, AVI, MKV 等格式"), color: AppColors.accentGreen)
+                                ToolGridCard(icon: "video.fill.badge.ellipsis", title: AppLocalizer.localized("视频转换"), description: AppLocalizer.localized("高效互转 MP4, MOV, TS, GIF, AVI, MKV 等格式"), color: AppColors.accentGreen)
                             }
 
                             ToolRouteCard(route: .audioConverter) {

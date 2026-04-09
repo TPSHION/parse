@@ -45,7 +45,7 @@ struct VideoEmptyStateView: View {
                                     .font(.system(size: 28, weight: .heavy))
                                     .foregroundColor(AppColors.textPrimary)
                                 
-                                Text(AppLocalizer.localized("支持从相册或文件导入视频，统一转换为 MP4、MOV、GIF、AVI、MKV。"))
+                                Text(AppLocalizer.localized("支持从相册或文件导入视频，统一转换为 MP4、MOV、TS、GIF、AVI、MKV。"))
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
                                     .fixedSize(horizontal: false, vertical: true)

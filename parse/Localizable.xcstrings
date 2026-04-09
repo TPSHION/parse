@@ -21,6 +21,9 @@
         }
       }
     },
+    "%lld%%" : {
+
+    },
     "Audio Lab" : {
       "localizations" : {
         "en" : {
@@ -425,6 +428,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Could not create the compression session"
+          }
+        }
+      }
+    },
+    "压缩后 %@ · 节省 %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "压缩后 %1$@ · 节省 %2$@"
           }
         }
       }
@@ -1155,13 +1168,13 @@
         }
       }
     },
-    "支持从相册或文件导入视频，统一转换为 MP4、MOV、GIF、AVI、MKV。" : {
+    "支持从相册或文件导入视频，统一转换为 MP4、MOV、TS、GIF、AVI、MKV。" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import videos from Photos or Files and convert them to MP4, MOV, GIF, AVI, or MKV."
+            "value" : "Import videos from Photos or Files and convert them to MP4, MOV, TS, GIF, AVI, or MKV."
           }
         }
       }
@@ -2153,13 +2166,13 @@
         }
       }
     },
-    "高效互转 MP4, MOV, GIF, AVI, MKV 等格式" : {
+    "高效互转 MP4, MOV, TS, GIF, AVI, MKV 等格式" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Convert MP4, MOV, GIF, AVI, MKV"
+            "value" : "Convert MP4, MOV, TS, GIF, AVI, MKV"
           }
         }
       }

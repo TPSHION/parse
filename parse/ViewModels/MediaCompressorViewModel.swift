@@ -497,6 +497,9 @@ final class MediaCompressorViewModel: ObservableObject {
             let videoFilters = videoFilterArguments(for: level)
             let fastStart = format == .mp4 || format == .mov ? "-movflags +faststart " : ""
             return "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? \(videoFilters)-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v \(level.videoBitrate) -maxrate \(level.videoMaxRate) -c:a aac -b:a \(level.audioBitrate) -ar \(level.audioSampleRate) \(fastStart)-y \"\(outputPath)\""
+        case .ts:
+            let videoFilters = videoFilterArguments(for: level)
+            return "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? \(videoFilters)-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v \(level.videoBitrate) -maxrate \(level.videoMaxRate) -c:a aac -b:a \(level.audioBitrate) -ar \(level.audioSampleRate) -f mpegts -y \"\(outputPath)\""
         }
     }
 

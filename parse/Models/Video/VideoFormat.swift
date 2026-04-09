@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 enum VideoFormat: String, CaseIterable, Identifiable {
     case mp4 = "MP4"
     case mov = "MOV"
+    case ts = "TS"
     case gif = "GIF"
     case avi = "AVI"
     case mkv = "MKV"
@@ -16,6 +17,8 @@ enum VideoFormat: String, CaseIterable, Identifiable {
             self = .mp4
         case "mov":
             self = .mov
+        case "ts":
+            self = .ts
         case "gif":
             self = .gif
         case "avi":
@@ -31,6 +34,7 @@ enum VideoFormat: String, CaseIterable, Identifiable {
         switch self {
         case .mp4: return "mp4"
         case .mov: return "mov"
+        case .ts: return "ts"
         case .gif: return "gif"
         case .avi: return "avi"
         case .mkv: return "mkv"

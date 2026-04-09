@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import UniformTypeIdentifiers
 
 struct VideoConverterView: View {
     @StateObject private var viewModel = VideoConverterViewModel()
@@ -9,6 +10,14 @@ struct VideoConverterView: View {
     @State private var isSaveActionSheetPresented = false
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
+
+    private var importContentTypes: [UTType] {
+        var types: [UTType] = [.movie, .video]
+        if let tsType = UTType(filenameExtension: "ts", conformingTo: .movie) {
+            types.append(tsType)
+        }
+        return types
+    }
     
     var body: some View {
         let isBusy = viewModel.isConverting || viewModel.isImporting
@@ -93,7 +102,7 @@ struct VideoConverterView: View {
         }
         .fileImporter(
             isPresented: $isFileImporterPresented,
-            allowedContentTypes: [.movie, .video],
+            allowedContentTypes: importContentTypes,
             allowsMultipleSelection: true
         ) { result in
             viewModel.handleFileImportResult(result)

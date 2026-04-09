@@ -391,7 +391,8 @@ class VideoConverterViewModel: ObservableObject {
     
     private func shouldTryLosslessRemux(for item: VideoItem) -> Bool {
         switch (item.originalFormat.lowercased(), item.targetFormat) {
-        case ("mov", .mp4), ("mp4", .mov), ("mov", .mov), ("mp4", .mp4):
+        case ("mov", .mp4), ("mp4", .mov), ("mov", .mov), ("mp4", .mp4),
+             ("mp4", .ts), ("mov", .ts), ("ts", .mp4), ("ts", .mov), ("ts", .ts):
             return true
         default:
             return false
@@ -402,14 +403,16 @@ class VideoConverterViewModel: ObservableObject {
         switch item.targetFormat {
         case .mp4, .mov:
             return true
-        case .gif, .avi, .mkv:
+        case .ts, .gif, .avi, .mkv:
             return false
         }
     }
     
     private func shouldTryFastRemux(for item: VideoItem) -> Bool {
         switch (item.originalFormat.lowercased(), item.targetFormat) {
-        case ("mov", .mp4), ("mp4", .mp4), ("mov", .mov), ("mp4", .mov), ("mov", .mkv), ("mp4", .mkv):
+        case ("mov", .mp4), ("mp4", .mp4), ("mov", .mov), ("mp4", .mov),
+             ("mov", .mkv), ("mp4", .mkv),
+             ("mov", .ts), ("mp4", .ts), ("ts", .ts), ("ts", .mp4), ("ts", .mov), ("ts", .mkv):
             return true
         default:
             return false
@@ -419,13 +422,15 @@ class VideoConverterViewModel: ObservableObject {
     private func remuxWithoutReencode(item: VideoItem, outputURL: URL) async -> ConversionAttemptResult {
         let inputPath = item.originalURL.path
         let outputPath = outputURL.path
-        let movFlags = switch item.targetFormat {
+        let command: String
+        switch item.targetFormat {
         case .mp4, .mov:
-            " -movflags +faststart"
+            command = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? -c copy -movflags +faststart -y \"\(outputPath)\""
+        case .ts:
+            command = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? -c copy -bsf:v h264_mp4toannexb -f mpegts -y \"\(outputPath)\""
         case .gif, .avi, .mkv:
-            ""
+            command = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? -c copy -y \"\(outputPath)\""
         }
-        let command = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? -c copy\(movFlags) -y \"\(outputPath)\""
         return await executeFFmpegCommand(command, outputURL: outputURL, stageLabel: "无损封装")
     }
     
@@ -441,7 +446,7 @@ class VideoConverterViewModel: ObservableObject {
             outputFileType = .mp4
         case .mov:
             outputFileType = .mov
-        case .gif, .avi, .mkv:
+        case .ts, .gif, .avi, .mkv:
             return nil
         }
         
@@ -537,6 +542,16 @@ class VideoConverterViewModel: ObservableObject {
                 ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 15M -maxrate 20M -c:a aac -b:a 192k "
             case .speed:
                 ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 4M -maxrate 5M -c:a aac -b:a 96k "
+            }
+            ffmpegCommand += "-y \"\(outputPath)\""
+            return ffmpegCommand
+        case .ts:
+            var ffmpegCommand = "-i \"\(inputPath)\" -map 0:v:0 -map 0:a? "
+            switch profile {
+            case .quality:
+                ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 12M -maxrate 16M -c:a aac -b:a 192k -f mpegts "
+            case .speed:
+                ffmpegCommand += "-c:v h264_videotoolbox -allow_sw 1 -pix_fmt yuv420p -b:v 4M -maxrate 5M -c:a aac -b:a 96k -f mpegts "
             }
             ffmpegCommand += "-y \"\(outputPath)\""
             return ffmpegCommand
@@ -748,7 +763,7 @@ class VideoConverterViewModel: ObservableObject {
             switch item.targetFormat {
             case .mp4, .mov, .gif:
                 return true
-            case .avi, .mkv:
+            case .ts, .avi, .mkv:
                 return false
             }
         }
