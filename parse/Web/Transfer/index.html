@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parse Transfer</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-compact">
+        <div class="topbar-compact-main">
+          <span class="status-dot" id="connection-dot"></span>
+          <div>
+            <p class="topbar-label">连接状态</p>
+            <strong id="connection-state-text">连接中</strong>
+          </div>
+        </div>
+        <button id="topbar-toggle-button" class="soft-button topbar-toggle-button" type="button" aria-expanded="false">
+          展开
+        </button>
+      </div>
+
+      <div class="topbar-details">
+        <div class="topbar-address">
+          <p class="topbar-label">连接地址</p>
+          <strong id="share-address">--</strong>
+        </div>
+
+        <div class="topbar-actions">
+          <button id="copy-address-button" class="soft-button" type="button">复制地址</button>
+          <button id="disconnect-button" class="danger-button" type="button">断开连接</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="sidebar">
+        <div class="brand-card">
+          <div class="brand-logo">P</div>
+          <div>
+            <p class="brand-kicker">Parse</p>
+            <h1>局域网工作台</h1>
+          </div>
+        </div>
+
+        <section class="sidebar-status">
+          <div class="sidebar-status-row">
+            <span class="status-dot" id="sidebar-connection-dot"></span>
+            <div>
+              <p class="sidebar-note-title">连接状态</p>
+              <strong id="sidebar-connection-state-text">连接中</strong>
+            </div>
+          </div>
+          <div class="sidebar-status-block">
+            <p class="sidebar-note-title">连接地址</p>
+            <strong id="sidebar-share-address">--</strong>
+          </div>
+          <div class="sidebar-status-actions">
+            <button id="sidebar-copy-address-button" class="soft-button" type="button">复制地址</button>
+            <button id="sidebar-disconnect-button" class="danger-button" type="button">断开连接</button>
+          </div>
+        </section>
+
+        <nav class="menu">
+          <button class="menu-item is-active" data-view="images" type="button">
+            <span class="menu-icon">▣</span>
+            <span>图片</span>
+          </button>
+          <button class="menu-item" data-view="videos" type="button">
+            <span class="menu-icon">▶</span>
+            <span>视频</span>
+          </button>
+          <button class="menu-item" data-view="results" type="button">
+            <span class="menu-icon">◎</span>
+            <span>结果</span>
+          </button>
+          <button class="menu-item" data-view="transfer" type="button">
+            <span class="menu-icon">⇅</span>
+            <span>传输</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-note">
+          <p class="sidebar-note-title">访问提示</p>
+          <p>保持手机端 App 处于前台，可获得更稳定的网页传输体验。</p>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section class="content-view is-active" data-view-panel="images">
+          <div class="section-header">
+            <div>
+              <p class="section-kicker">Photos</p>
+              <h2>手机相册图片</h2>
+              <p class="section-subtitle">展示 iPhone 相册中的图片内容，点击卡片右侧按钮可直接下载原文件。</p>
+            </div>
+            <button id="refresh-images-button" class="soft-button" type="button">刷新图片</button>
+          </div>
+          <div id="images-empty" class="empty-state hidden"></div>
+          <div id="images-grid" class="media-grid"></div>
+        </section>
+
+        <section class="content-view" data-view-panel="videos">
+          <div class="section-header">
+            <div>
+              <p class="section-kicker">Videos</p>
+              <h2>手机相册视频</h2>
+              <p class="section-subtitle">展示相册中的视频条目，并支持从浏览器直接拉取原始视频文件。</p>
+            </div>
+            <button id="refresh-videos-button" class="soft-button" type="button">刷新视频</button>
+          </div>
+          <div id="videos-empty" class="empty-state hidden"></div>
+          <div id="videos-grid" class="media-grid"></div>
+        </section>
+
+        <section class="content-view" data-view-panel="results">
+          <div class="section-header">
+            <div>
+              <p class="section-kicker">Results</p>
+              <h2>处理结果</h2>
+              <p class="section-subtitle">集中展示格式转换和压缩后的结果文件，方便在 PC 端统一下载。</p>
+            </div>
+            <div class="results-toolbar-actions">
+              <button id="refresh-results-button" class="soft-button" type="button">刷新结果</button>
+            </div>
+          </div>
+          <div class="results-toolbar">
+            <label class="results-search">
+              <span>搜索</span>
+              <input id="results-search-input" type="search" placeholder="按文件名搜索结果">
+            </label>
+            <label class="results-sort">
+              <span>排序</span>
+              <select id="results-sort-select">
+                <option value="time_desc">最新优先</option>
+                <option value="time_asc">最早优先</option>
+              </select>
+            </label>
+          </div>
+          <div id="results-empty" class="empty-state hidden"></div>
+          <div id="results-stack" class="results-stack"></div>
+        </section>
+
+        <section class="content-view" data-view-panel="transfer">
+          <div class="section-header">
+            <div>
+              <p class="section-kicker">Transfer</p>
+              <h2>共享传输中心</h2>
+              <p class="section-subtitle">上传文件到共享目录，或从共享目录下载、删除已有文件。</p>
+            </div>
+            <button id="refresh-transfer-button" class="soft-button" type="button">刷新传输</button>
+          </div>
+
+          <div class="transfer-layout">
+            <section class="panel upload-panel">
+              <div class="dropzone" id="dropzone">
+                <input id="file-input" type="file" multiple hidden>
+                <div class="dropzone-icon">+</div>
+                <h3>拖拽上传到共享目录</h3>
+                <p>支持从桌面拖拽文件，或者点击按钮选择文件上传。</p>
+                <button id="pick-files-button" class="primary-button" type="button">选择文件</button>
+              </div>
+              <div id="upload-list" class="upload-list"></div>
+            </section>
+
+            <aside class="panel transfer-summary">
+              <div class="summary-card">
+                <span class="summary-label">共享文件数量</span>
+                <strong id="file-count">0</strong>
+              </div>
+              <div class="summary-card">
+                <span class="summary-label">共享总大小</span>
+                <strong id="total-size">0 B</strong>
+              </div>
+              <div class="summary-card accent">
+                <span class="summary-label">当前设备</span>
+                <strong id="device-name">Parse</strong>
+              </div>
+            </aside>
+          </div>
+
+          <div id="transfer-empty" class="empty-state hidden"></div>
+          <div id="file-grid" class="file-grid"></div>
+        </section>
+
+        <footer class="footer-status" id="status-banner">页面已连接到本地传输服务。</footer>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+  <div class="dialog-backdrop hidden" id="dialog-backdrop">
+    <div class="dialog-card" role="dialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-message">
+      <p class="dialog-kicker">Parse Prompt</p>
+      <h3 id="dialog-title">确认操作</h3>
+      <p id="dialog-message">是否继续执行当前操作？</p>
+      <div class="dialog-actions">
+        <button class="soft-button" id="dialog-cancel-button" type="button">取消</button>
+        <button class="danger-button" id="dialog-confirm-button" type="button">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-backdrop hidden" id="preview-backdrop">
+    <div class="preview-card" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+      <div class="preview-head">
+        <div>
+          <p class="dialog-kicker">Result Preview</p>
+          <h3 id="preview-title">视频预览</h3>
+        </div>
+        <button class="soft-button" id="preview-close-button" type="button">关闭</button>
+      </div>
+      <div class="preview-body">
+        <video id="preview-video" class="preview-video" controls playsinline preload="metadata"></video>
+        <div id="preview-message" class="preview-message hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <template id="file-card-template">
+    <article class="file-card">
+      <div class="file-badge"></div>
+      <div class="file-main">
+        <div class="file-headline">
+          <h3 class="file-name"></h3>
+          <span class="file-ext"></span>
+        </div>
+        <p class="file-meta"></p>
+      </div>
+      <div class="file-actions">
+        <a class="download-button" target="_blank" rel="noopener">下载</a>
+        <button class="delete-button" type="button">删除</button>
+      </div>
+    </article>
+  </template>
+
+  <template id="media-card-template">
+    <article class="media-card">
+      <div class="media-thumb-shell">
+        <img class="media-thumb" alt="">
+        <span class="media-kind-badge"></span>
+      </div>
+      <div class="media-copy">
+        <h3 class="media-name"></h3>
+        <p class="media-meta"></p>
+      </div>
+      <div class="media-actions">
+        <a class="download-button" target="_blank" rel="noopener">下载原文件</a>
+      </div>
+    </article>
+  </template>
+
+  <template id="upload-item-template">
+    <div class="upload-item">
+      <div class="upload-copy">
+        <strong class="upload-name"></strong>
+        <span class="upload-state"></span>
+      </div>
+      <div class="upload-bar">
+        <span class="upload-progress"></span>
+      </div>
+    </div>
+  </template>
+
+  <script src="/mpegts.js"></script>
+  <script src="/app.js" defer></script>
+</body>
+</html>

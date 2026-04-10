@@ -339,6 +339,7 @@ final class MediaCompressorViewModel: ObservableObject {
             items[latestIndex].compressedSizeInBytes = compressedSize
             items[latestIndex].compressionProgress = 1.0
             items[latestIndex].status = .success
+            TransferResultArchiveService.scheduleArchive(url: outputURL, category: .compression)
         } catch {
             try? FileManager.default.removeItem(at: outputURL)
             guard let latestIndex = items.firstIndex(where: { $0.id == item.id }) else { return }

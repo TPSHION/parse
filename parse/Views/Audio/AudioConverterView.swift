@@ -97,9 +97,14 @@ struct AudioConverterView: View {
                     isSaveActionSheetPresented = false
                     viewModel.prepareExportDocument()
                     isFileExporterPresented = viewModel.exportDocument != nil
+                },
+                onOpenTransferGuide: {
+                    isSaveActionSheetPresented = false
+                    saveMessage = AppLocalizer.localized("无需再次保存文件。请到「传输」页启动服务，然后在 PC 浏览器打开局域网地址，在网页的“结果”页下载当前转换结果。")
+                    showSaveAlert = true
                 }
             )
-            .presentationDetents([.height(200)])
+            .presentationDetents([.height(280)])
             .presentationDragIndicator(.visible)
             .presentationBackground(AppColors.background)
         }

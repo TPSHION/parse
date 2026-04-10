@@ -190,6 +190,7 @@ class AudioConverterViewModel: ObservableObject {
             audioItems[latestIndex].convertedURL = outputURL
             audioItems[latestIndex].status = .success
             audioItems[latestIndex].conversionProgress = 1.0
+            TransferResultArchiveService.scheduleArchive(url: outputURL, category: .audioConversion)
         } catch {
             try? FileManager.default.removeItem(at: outputURL)
             guard let latestIndex = audioItems.firstIndex(where: { $0.id == item.id }) else { return }

@@ -1,4 +1,5 @@
 ${PODS_ROOT}/Target Support Files/Pods-parse/Pods-parse-frameworks.sh
+${BUILT_PRODUCTS_DIR}/GCDWebServer/GCDWebServer.framework
 ${PODS_XCFRAMEWORKS_BUILD_DIR}/ffmpeg-kit-ios-full/ffmpegkit.framework/ffmpegkit
 ${PODS_XCFRAMEWORKS_BUILD_DIR}/ffmpeg-kit-ios-full/libavcodec.framework/libavcodec
 ${PODS_XCFRAMEWORKS_BUILD_DIR}/ffmpeg-kit-ios-full/libavdevice.framework/libavdevice

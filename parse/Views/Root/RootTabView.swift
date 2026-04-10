@@ -8,15 +8,15 @@ struct RootTabView: View {
                     Label("转换", systemImage: "arrow.triangle.2.circlepath.circle.fill")
                 }
 
-            PlaceholderTabView(
-                title: AppLocalizer.localized("传输"),
-                subtitle: AppLocalizer.localized("局域网传输、链接导入和跨设备收发能力会放在这里。"),
-                icon: "paperplane.circle.fill",
-                accentColor: AppColors.accentGreen
-            )
-            .tabItem {
-                Label("传输", systemImage: "paperplane.circle.fill")
-            }
+            ResultsHomeView()
+                .tabItem {
+                    Label("结果", systemImage: "tray.full.fill")
+                }
+
+            TransferHomeView()
+                .tabItem {
+                    Label("传输", systemImage: "paperplane.circle.fill")
+                }
 
             PlaceholderTabView(
                 title: AppLocalizer.localized("设置"),

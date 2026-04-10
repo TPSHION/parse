@@ -342,6 +342,7 @@ class VideoConverterViewModel: ObservableObject {
             videoItems[index].convertedFileURL = outputURL
             videoItems[index].status = .success
             videoItems[index].conversionProgress = 1.0
+            TransferResultArchiveService.scheduleArchive(url: outputURL, category: .videoConversion)
         case .failure(let message):
             videoItems[index].status = .failed(message)
             try? FileManager.default.removeItem(at: outputURL)

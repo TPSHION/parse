@@ -4,6 +4,7 @@ struct SaveActionSheetView: View {
     let shareableURLs: [URL]
     let onSaveToAlbum: (() -> Void)? // 设为可选，如果为 nil 则不显示“保存到相册”选项
     let onSaveToFile: () -> Void
+    let onOpenTransferGuide: (() -> Void)?
     
     var body: some View {
         VStack(spacing: 20) {
@@ -65,6 +66,29 @@ struct SaveActionSheetView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
                 .buttonStyle(.plain)
+
+                if let onOpenTransferGuide = onOpenTransferGuide {
+                    Button(action: onOpenTransferGuide) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "wifi")
+                                .font(.system(size: 20))
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("局域网页下载")
+                                    .font(.system(size: 16, weight: .semibold))
+                                Text("开启传输服务后，可在 PC 网页的结果页直接下载")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(AppColors.textSecondary)
+                            }
+                            Spacer()
+                        }
+                        .foregroundColor(AppColors.textPrimary)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(AppColors.cardBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
             }
             .padding(.horizontal, 20)
             

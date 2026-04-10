@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "zh-Hans",
   "strings" : {
+    "%@ · %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
       "localizations" : {
         "en" : {
@@ -129,6 +139,12 @@
           }
         }
       }
+    },
+    "Parse Results" : {
+
+    },
+    "Parse Transfer" : {
+
     },
     "PDF" : {
       "localizations" : {
@@ -390,6 +406,15 @@
           }
         }
       }
+    },
+    "删除" : {
+
+    },
+    "删除结果" : {
+
+    },
+    "刷新" : {
+
     },
     "即将推出" : {
       "localizations" : {
@@ -677,6 +702,9 @@
         }
       }
     },
+    "完成图片、视频、音频转换或压缩后，历史结果会自动出现在这里。" : {
+
+    },
     "导入 PDF 文件" : {
       "localizations" : {
         "en" : {
@@ -763,6 +791,9 @@
         }
       }
     },
+    "局域网页下载" : {
+
+    },
     "已成功保存至文件：\n%@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -811,6 +842,9 @@
           }
         }
       }
+    },
+    "开启传输服务后，可在 PC 网页的结果页直接下载" : {
+
     },
     "开始图片格式转换" : {
       "extractionState" : "manual",
@@ -1468,6 +1502,9 @@
         }
       }
     },
+    "清空结果" : {
+
+    },
     "源文件不存在或已被移除" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1598,6 +1635,12 @@
         }
       }
     },
+    "确认一键清空%@中的全部历史结果吗？此操作不可撤销。" : {
+
+    },
+    "确认删除 %@ 吗？删除后将不会再出现在历史结果中。" : {
+
+    },
     "视频" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1716,6 +1759,15 @@
           }
         }
       }
+    },
+    "结果" : {
+
+    },
+    "结果提示" : {
+
+    },
+    "统一查看历史转换与压缩结果，并在这里快速清理不需要的旧文件。" : {
+
     },
     "统一转换为" : {
       "localizations" : {
@@ -1981,6 +2033,9 @@
           }
         }
       }
+    },
+    "还没有历史结果" : {
+
     },
     "进入 PDF 转换工具" : {
       "extractionState" : "manual",

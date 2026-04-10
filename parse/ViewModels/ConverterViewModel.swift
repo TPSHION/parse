@@ -229,6 +229,7 @@ class ConverterViewModel: ObservableObject {
             let fileURL = try await performConversionAndSave(sourceURL: item.originalFileURL, to: item.targetFormat, originalName: item.originalName)
             imageItems[index].convertedFileURL = fileURL
             imageItems[index].status = .success
+            TransferResultArchiveService.scheduleArchive(url: fileURL, category: .imageConversion)
         } catch {
             imageItems[index].status = .failed(error.localizedDescription)
         }
