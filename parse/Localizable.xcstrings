@@ -11,6 +11,39 @@
         }
       }
     },
+    "%@：%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%@：HTTP %d" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: HTTP %2$d"
+          }
+        }
+      }
+    },
+    "%@：失败（%@）" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: Failed (%2$@)"
+          }
+        }
+      }
+    },
     "%lld" : {
       "localizations" : {
         "en" : {
@@ -22,6 +55,7 @@
       }
     },
     "%lld 项" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -252,6 +286,7 @@
       }
     },
     "从文件导入" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -262,6 +297,7 @@
       }
     },
     "从相册导入" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -292,6 +328,28 @@
         }
       }
     },
+    "传输提示" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfer"
+          }
+        }
+      }
+    },
+    "传输服务启动失败，请检查网络后重试。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to start transfer. Check the network and try again."
+          }
+        }
+      }
+    },
     "保存" : {
       "localizations" : {
         "en" : {
@@ -303,6 +361,7 @@
       }
     },
     "保存为文件" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -313,6 +372,7 @@
       }
     },
     "保存到相册" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -375,6 +435,17 @@
         }
       }
     },
+    "先从 App 导入文件，或在浏览器端上传。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from the app or upload from the browser."
+          }
+        }
+      }
+    },
     "全选" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -386,12 +457,68 @@
         }
       }
     },
+    "共享文件" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared Files"
+          }
+        }
+      }
+    },
+    "共享文件 %d 个" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d shared files"
+          }
+        }
+      }
+    },
+    "共享目录里还没有文件" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No shared files yet"
+          }
+        }
+      }
+    },
     "分享文件" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Share Files"
+          }
+        }
+      }
+    },
+    "分类" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Types"
+          }
+        }
+      }
+    },
+    "创建共享目录失败：%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to create shared folder: %@"
           }
         }
       }
@@ -408,6 +535,7 @@
       }
     },
     "删除" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -417,7 +545,19 @@
         }
       }
     },
+    "删除文件失败：%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete failed: %@"
+          }
+        }
+      }
+    },
     "删除结果" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -428,11 +568,23 @@
       }
     },
     "刷新" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Refresh"
+          }
+        }
+      }
+    },
+    "前往设置" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
           }
         }
       }
@@ -529,6 +681,7 @@
       }
     },
     "压缩完成" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -539,11 +692,23 @@
       }
     },
     "压缩强度" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compression Level"
+          }
+        }
+      }
+    },
+    "压缩结果" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compressed"
           }
         }
       }
@@ -560,6 +725,7 @@
       }
     },
     "压缩队列" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -597,6 +763,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select the compressed items to export, then choose Share, Photos, Files, or Web Download. Photos supports images, MP4, MOV, and GIF only."
+          }
+        }
+      }
+    },
+    "同网设备可在浏览器打开上方地址。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Devices on the same network can open the address above in a browser."
+          }
+        }
+      }
+    },
+    "同网设备可直接访问共享文件。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Devices on the same network can access shared files."
+          }
+        }
+      }
+    },
+    "启动后会生成访问地址，可在浏览器直接打开。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start the service to get a browser address."
+          }
+        }
+      }
+    },
+    "启动后会生成访问地址，同网设备可在浏览器中上传和下载文件。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start the service to get a browser address for uploads and downloads."
+          }
+        }
+      }
+    },
+    "启动失败" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start failed"
+          }
+        }
+      }
+    },
+    "启动服务" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
           }
         }
       }
@@ -666,6 +898,17 @@
         }
       }
     },
+    "地址已复制" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address Copied"
+          }
+        }
+      }
+    },
     "均衡" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -697,6 +940,17 @@
         }
       }
     },
+    "处理完成后，结果会自动出现在这里。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished files appear here automatically."
+          }
+        }
+      }
+    },
     "大小：%@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -715,6 +969,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed"
+          }
+        }
+      }
+    },
+    "好的" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
@@ -752,11 +1017,34 @@
       }
     },
     "导入媒体文件开始压缩" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import Media to Start Compression"
+          }
+        }
+      }
+    },
+    "导入文件" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Files"
+          }
+        }
+      }
+    },
+    "导入文件失败：%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import failed: %@"
           }
         }
       }
@@ -805,6 +1093,17 @@
         }
       }
     },
+    "局域网传输" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LAN Transfer"
+          }
+        }
+      }
+    },
     "局域网传输、链接导入和跨设备收发能力会放在这里。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -816,13 +1115,24 @@
         }
       }
     },
-    "网页下载" : {
+    "局域网地址" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Web Download"
+            "value" : "LAN"
+          }
+        }
+      }
+    },
+    "局域网自检" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LAN Check"
           }
         }
       }
@@ -834,6 +1144,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saved to Files successfully:\n%1$@"
+          }
+        }
+      }
+    },
+    "已连接" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected"
           }
         }
       }
@@ -876,9 +1197,6 @@
         }
       }
     },
-    "开启传输服务后，可在 PC 网页的结果页直接下载" : {
-      "extractionState" : "manual"
-    },
     "开启传输后，可在网页结果页下载" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -889,6 +1207,9 @@
           }
         }
       }
+    },
+    "开启传输服务后，可在 PC 网页的结果页直接下载" : {
+      "extractionState" : "manual"
     },
     "开始图片格式转换" : {
       "extractionState" : "manual",
@@ -1290,6 +1611,7 @@
       }
     },
     "数据压缩" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1343,6 +1665,17 @@
         }
       }
     },
+    "无可用地址" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No address"
+          }
+        }
+      }
+    },
     "无法生成目标格式的图片数据" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1361,6 +1694,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unable to read the original image file"
+          }
+        }
+      }
+    },
+    "时间未知" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown time"
+          }
+        }
+      }
+    },
+    "暂无结果" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No results yet"
+          }
+        }
+      }
+    },
+    "服务尚未启动" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Service is off"
+          }
+        }
+      }
+    },
+    "服务已启动，但自检失败。可先用本机 Safari 打开 127.0.0.1 地址确认服务是否正常。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The service started, but self-check failed. Try opening 127.0.0.1 in Safari on this device first."
+          }
+        }
+      }
+    },
+    "服务已启动，等待设备连接" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Service is running"
+          }
+        }
+      }
+    },
+    "未检测" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not checked"
           }
         }
       }
@@ -1408,6 +1807,39 @@
         }
       }
     },
+    "本地网络权限探测初始化失败：%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to initialize local network permission check: %@"
+          }
+        }
+      }
+    },
+    "本机地址" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local"
+          }
+        }
+      }
+    },
+    "本机自检" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local Check"
+          }
+        }
+      }
+    },
     "极速处理" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1441,6 +1873,17 @@
         }
       }
     },
+    "查看全部处理结果，快速清理旧文件。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View all results and clear old files."
+          }
+        }
+      }
+    },
     "格式：%@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1448,6 +1891,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Format: %@"
+          }
+        }
+      }
+    },
+    "检测中..." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking..."
           }
         }
       }
@@ -1474,6 +1928,7 @@
       }
     },
     "正在导入媒体文件..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1525,6 +1980,17 @@
         }
       }
     },
+    "浏览器上传的文件会显示在这里，也可从本机导入。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser uploads appear here. You can also import local files."
+          }
+        }
+      }
+    },
     "混合批量压缩图片、视频与音频数据" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1546,7 +2012,19 @@
         }
       }
     },
+    "清空%@中的全部结果？此操作不可撤销。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear all items in %@? This can't be undone."
+          }
+        }
+      }
+    },
     "清空结果" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1667,11 +2145,23 @@
       }
     },
     "相册支持图片和视频，音频请从文件导入。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Photos supports images and videos. Please import audio from Files."
+          }
+        }
+      }
+    },
+    "知道了" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
@@ -1693,50 +2183,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete %@? It will no longer appear here."
-          }
-        }
-      }
-    },
-    "分类" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Types"
-          }
-        }
-      }
-    },
-    "压缩结果" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compressed"
-          }
-        }
-      }
-    },
-    "处理完成后，结果会自动出现在这里。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finished files appear here automatically."
-          }
-        }
-      }
-    },
-    "清空%@中的全部结果？此操作不可撤销。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear all items in %@? This can't be undone."
           }
         }
       }
@@ -1796,6 +2242,29 @@
       }
     },
     "等待压缩" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting"
+          }
+        }
+      }
+    },
+    "等待启动" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting to start"
+          }
+        }
+      }
+    },
+    "等待连接" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1871,33 +2340,12 @@
       }
     },
     "结果提示" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Results"
-          }
-        }
-      }
-    },
-    "时间未知" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unknown time"
-          }
-        }
-      }
-    },
-    "查看全部处理结果，快速清理旧文件。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View all results and clear old files."
           }
         }
       }
@@ -1934,6 +2382,28 @@
         }
       }
     },
+    "网页下载" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web Download"
+          }
+        }
+      }
+    },
+    "网页资源缺失，请检查传输页资源文件。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web assets are missing. Check the Transfer page resources."
+          }
+        }
+      }
+    },
     "网页转文档" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1941,6 +2411,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Web PDF"
+          }
+        }
+      }
+    },
+    "若地址无法访问，请到系统设置检查权限。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If the address can't be reached, check permissions in Settings."
           }
         }
       }
@@ -1966,12 +2447,34 @@
         }
       }
     },
+    "访问地址" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address"
+          }
+        }
+      }
+    },
     "识别中" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inspecting"
+          }
+        }
+      }
+    },
+    "请在电脑浏览器打开上方地址，连接后会自动更新状态。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the address above in a desktop browser. Status updates automatically after connection."
           }
         }
       }
@@ -2167,17 +2670,6 @@
         }
       }
     },
-    "暂无结果" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No results yet"
-          }
-        }
-      }
-    },
     "进入 PDF 转换工具" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2223,11 +2715,23 @@
       }
     },
     "选择操作方式" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose an Action"
+          }
+        }
+      }
+    },
+    "选择文件失败：%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File selection failed: %@"
           }
         }
       }
@@ -2250,6 +2754,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Speed"
+          }
+        }
+      }
+    },
+    "重新检测" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry Check"
           }
         }
       }
@@ -2351,6 +2866,17 @@
         }
       }
     },
+    "首次启动时，系统可能会请求本地网络权限。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The system may ask for local network permission the first time."
+          }
+        }
+      }
+    },
     "高保真" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2369,512 +2895,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Convert MP4, MOV, TS, GIF, AVI, MKV"
-          }
-        }
-      }
-    },
-    "好的" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        }
-      }
-    },
-    "知道了" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        }
-      }
-    },
-    "地址已复制" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Address Copied"
-          }
-        }
-      }
-    },
-    "传输提示" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transfer"
-          }
-        }
-      }
-    },
-    "局域网传输" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LAN Transfer"
-          }
-        }
-      }
-    },
-    "同网设备可直接访问共享文件。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Devices on the same network can access shared files."
-          }
-        }
-      }
-    },
-    "服务尚未启动" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Service is off"
-          }
-        }
-      }
-    },
-    "启动后会生成访问地址，同网设备可在浏览器中上传和下载文件。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start the service to get a browser address for uploads and downloads."
-          }
-        }
-      }
-    },
-    "首次启动时，系统可能会请求本地网络权限。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The system may ask for local network permission the first time."
-          }
-        }
-      }
-    },
-    "若地址无法访问，请到系统设置检查权限。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "If the address can't be reached, check permissions in Settings."
-          }
-        }
-      }
-    },
-    "启动服务" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start"
-          }
-        }
-      }
-    },
-    "前往设置" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings"
-          }
-        }
-      }
-    },
-    "已连接" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connected"
-          }
-        }
-      }
-    },
-    "等待连接" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Waiting"
-          }
-        }
-      }
-    },
-    "访问地址" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Address"
-          }
-        }
-      }
-    },
-    "服务已启动，等待设备连接" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Service is running"
-          }
-        }
-      }
-    },
-    "请在电脑浏览器打开上方地址，连接后会自动更新状态。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open the address above in a desktop browser. Status updates automatically after connection."
-          }
-        }
-      }
-    },
-    "本机自检" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Local Check"
-          }
-        }
-      }
-    },
-    "局域网自检" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LAN Check"
-          }
-        }
-      }
-    },
-    "重新检测" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retry Check"
-          }
-        }
-      }
-    },
-    "导入文件" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import Files"
-          }
-        }
-      }
-    },
-    "共享文件" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shared Files"
-          }
-        }
-      }
-    },
-    "浏览器上传的文件会显示在这里，也可从本机导入。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Browser uploads appear here. You can also import local files."
-          }
-        }
-      }
-    },
-    "共享目录里还没有文件" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No shared files yet"
-          }
-        }
-      }
-    },
-    "先从 App 导入文件，或在浏览器端上传。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import from the app or upload from the browser."
-          }
-        }
-      }
-    },
-    "等待启动" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Waiting to start"
-          }
-        }
-      }
-    },
-    "未检测" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Not checked"
-          }
-        }
-      }
-    },
-    "检测中..." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Checking..."
-          }
-        }
-      }
-    },
-    "启动失败" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start failed"
-          }
-        }
-      }
-    },
-    "选择文件失败：%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "File selection failed: %@"
-          }
-        }
-      }
-    },
-    "导入文件失败：%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import failed: %@"
-          }
-        }
-      }
-    },
-    "删除文件失败：%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete failed: %@"
-          }
-        }
-      }
-    },
-    "传输服务启动失败，请检查网络后重试。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to start transfer. Check the network and try again."
-          }
-        }
-      }
-    },
-    "网页资源缺失，请检查传输页资源文件。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Web assets are missing. Check the Transfer page resources."
-          }
-        }
-      }
-    },
-    "创建共享目录失败：%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to create shared folder: %@"
-          }
-        }
-      }
-    },
-    "本地网络权限探测初始化失败：%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to initialize local network permission check: %@"
-          }
-        }
-      }
-    },
-    "本机地址" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Local"
-          }
-        }
-      }
-    },
-    "局域网地址" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LAN"
-          }
-        }
-      }
-    },
-    "无可用地址" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No address"
-          }
-        }
-      }
-    },
-    "%@：%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@: %2$@"
-          }
-        }
-      }
-    },
-    "%@：HTTP %d" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@: HTTP %2$d"
-          }
-        }
-      }
-    },
-    "%@：失败（%@）" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@: Failed (%2$@)"
-          }
-        }
-      }
-    },
-    "同网设备可在浏览器打开上方地址。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Devices on the same network can open the address above in a browser."
-          }
-        }
-      }
-    },
-    "启动后会生成访问地址，可在浏览器直接打开。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start the service to get a browser address."
-          }
-        }
-      }
-    },
-    "服务已启动，但自检失败。可先用本机 Safari 打开 127.0.0.1 地址确认服务是否正常。" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The service started, but self-check failed. Try opening 127.0.0.1 in Safari on this device first."
-          }
-        }
-      }
-    },
-    "共享文件 %d 个" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$d shared files"
           }
         }
       }

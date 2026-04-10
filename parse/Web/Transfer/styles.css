@@ -133,7 +133,6 @@ body::before {
 }
 
 .topbar-label,
-.brand-kicker,
 .section-kicker,
 .summary-label,
 .sidebar-note-title {
@@ -175,11 +174,12 @@ body::before {
 
 .brand-card {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
 }
 
 .brand-copy {
+  flex: 1;
   min-width: 0;
 }
 
@@ -194,6 +194,16 @@ body::before {
 
 .sidebar-lang-switch {
   margin-left: auto;
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 3px;
+}
+
+.sidebar-lang-switch .lang-button {
+  min-width: 34px;
+  padding: 7px 9px;
+  font-size: 11px;
+  letter-spacing: 0.02em;
 }
 
 .lang-button {
@@ -216,18 +226,6 @@ body::before {
 }
 
 .lang-button.is-active {
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--teal), var(--green));
-}
-
-.brand-logo {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  display: grid;
-  place-items: center;
-  font-size: 26px;
-  font-weight: 800;
   color: #ffffff;
   background: linear-gradient(135deg, var(--teal), var(--green));
 }
