@@ -1,12 +1,25 @@
 {
   "sourceLanguage" : "zh-Hans",
   "strings" : {
+    "" : {
+
+    },
     "%@ · %@" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
           }
         }
       }
@@ -67,6 +80,16 @@
     },
     "%lld%%" : {
 
+    },
+    "© %@ Parse. %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "© %1$@ Parse. %2$@"
+          }
+        }
+      }
     },
     "Audio Lab" : {
       "localizations" : {
@@ -174,11 +197,36 @@
         }
       }
     },
+    "Parse" : {
+
+    },
     "Parse Results" : {
 
     },
     "Parse Transfer" : {
 
+    },
+    "Parse 是一款专注本地处理的转换与传输工具。所有操作都在设备上完成，帮助你更安全地处理文件。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parse is a local conversion and transfer tool. Everything runs on your device to keep file handling more private and secure."
+          }
+        }
+      }
+    },
+    "Parse 设置" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parse Settings"
+          }
+        }
+      }
     },
     "PDF" : {
       "localizations" : {
@@ -210,6 +258,9 @@
           }
         }
       }
+    },
+    "tpshion@163.com" : {
+
     },
     "Video Lab" : {
       "localizations" : {
@@ -319,6 +370,7 @@
       }
     },
     "传输" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -425,6 +477,28 @@
         }
       }
     },
+    "保留所有权利。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All rights reserved."
+          }
+        }
+      }
+    },
+    "偏好设置" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferences"
+          }
+        }
+      }
+    },
     "停止" : {
       "localizations" : {
         "en" : {
@@ -486,6 +560,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No shared files yet"
+          }
+        }
+      }
+    },
+    "关于" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        }
+      }
+    },
+    "关于应用" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About Parse"
+          }
+        }
+      }
+    },
+    "关于我们" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About Us"
           }
         }
       }
@@ -991,6 +1098,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Media Tools"
+          }
+        }
+      }
+    },
+    "存储" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage"
           }
         }
       }
@@ -2034,6 +2152,17 @@
         }
       }
     },
+    "清除缓存" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Cache"
+          }
+        }
+      }
+    },
     "源文件不存在或已被移除" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2074,6 +2203,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The source audio file does not exist or has been removed"
+          }
+        }
+      }
+    },
+    "版本" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
           }
         }
       }
@@ -2274,6 +2414,17 @@
         }
       }
     },
+    "管理语言、偏好设置和缓存数据。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage language, preferences, and cached data."
+          }
+        }
+      }
+    },
     "粘贴公开图片链接，先识别真实格式和尺寸，再确认导入" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2330,6 +2481,7 @@
       }
     },
     "结果" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2415,6 +2567,17 @@
         }
       }
     },
+    "联系我们" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact Us"
+          }
+        }
+      }
+    },
     "若地址无法访问，请到系统设置检查权限。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2438,6 +2601,7 @@
       }
     },
     "设置" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2464,6 +2628,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inspecting"
+          }
+        }
+      }
+    },
+    "语言切换" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
           }
         }
       }
@@ -2528,6 +2703,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Universal Conversion Toolbox"
+          }
+        }
+      }
+    },
+    "跟随系统" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow System"
           }
         }
       }
