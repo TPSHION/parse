@@ -81,12 +81,177 @@
     "%lld%%" : {
 
     },
-    "© %@ Parse. %@" : {
+    "© %@ TPSHION. %@" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "© %1$@ Parse. %2$@"
+            "value" : "© %1$@ TPSHION. %2$@"
+          }
+        }
+      }
+    },
+    "15 天免费试用已结束" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your 15-day trial has ended"
+          }
+        }
+      }
+    },
+    "15 天后需一次性购买才能继续使用全部功能。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After 15 days, a one-time purchase is required to keep all features available."
+          }
+        }
+      }
+    },
+    "一个应用，处理常用格式" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handle Common Formats in One Place"
+          }
+        }
+      }
+    },
+    "先完整体验全部核心能力，再决定是否解锁终身版。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try every core feature first, then decide whether to unlock lifetime access."
+          }
+        }
+      }
+    },
+    "多媒体工作台" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media Workspace"
+          }
+        }
+      }
+    },
+    "开始体验" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        }
+      }
+    },
+    "处理结果和共享文件可直接在电脑浏览器中下载与管理。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download and manage results or shared files directly from a desktop browser."
+          }
+        }
+      }
+    },
+    "图片、视频、音频与文档工具集中在一起，减少来回切换。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image, video, audio, and document tools live together in one app."
+          }
+        }
+      }
+    },
+    "所有转换、压缩与传输都在设备上完成，兼顾速度与隐私。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversion, compression, and transfer stay on your device for speed and privacy."
+          }
+        }
+      }
+    },
+    "本地处理，更安心" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local by Design"
+          }
+        }
+      }
+    },
+    "浏览器也能快速互传" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Files Fast in Browser"
+          }
+        }
+      }
+    },
+    "欢迎使用 Parse" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Parse"
+          }
+        }
+      }
+    },
+    "继续" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "免费试用 15 天" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15-Day Free Trial"
+          }
+        }
+      }
+    },
+    "跳过" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
           }
         }
       }
@@ -278,6 +443,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Welcome to Parse"
+          }
+        }
+      }
+    },
+    "一次买断" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-Time"
+          }
+        }
+      }
+    },
+    "一次买断，无订阅" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Subscription"
+          }
+        }
+      }
+    },
+    "一次性购买" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Once"
           }
         }
       }
@@ -520,6 +718,17 @@
         }
       }
     },
+    "免费试用剩余 %d 天" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d trial days left"
+          }
+        }
+      }
+    },
     "全选" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -527,6 +736,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select All"
+          }
+        }
+      }
+    },
+    "全部转换与压缩工具" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Conversion Tools"
           }
         }
       }
@@ -940,6 +1160,17 @@
         }
       }
     },
+    "商品暂不可用，请稍后重试。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The product is unavailable right now. Please try again later."
+          }
+        }
+      }
+    },
     "图片" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -947,6 +1178,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Image"
+          }
+        }
+      }
+    },
+    "图片、视频、音频与文档工具全部可用。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock image, video, audio, and document tools."
           }
         }
       }
@@ -1113,6 +1355,17 @@
         }
       }
     },
+    "完成一次性购买后，即可继续使用全部转换、压缩与传输能力。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make one purchase to keep using conversion, compression, and transfer features."
+          }
+        }
+      }
+    },
     "导入 PDF 文件" : {
       "localizations" : {
         "en" : {
@@ -1233,6 +1486,17 @@
         }
       }
     },
+    "局域网传输与结果管理" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfer and Results"
+          }
+        }
+      }
+    },
     "局域网地址" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1255,6 +1519,17 @@
         }
       }
     },
+    "已完成一次性购买，可继续使用全部功能。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime access is unlocked and all features stay available."
+          }
+        }
+      }
+    },
     "已成功保存至文件：\n%@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1262,6 +1537,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saved to Files successfully:\n%1$@"
+          }
+        }
+      }
+    },
+    "已解锁" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlocked"
+          }
+        }
+      }
+    },
+    "已解锁完整版" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime Unlocked"
           }
         }
       }
@@ -1368,6 +1665,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start Audio Conversion"
+          }
+        }
+      }
+    },
+    "当前价格" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Price"
           }
         }
       }
@@ -1493,6 +1801,17 @@
         }
       }
     },
+    "待获取" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading"
+          }
+        }
+      }
+    },
     "总数" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1500,6 +1819,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Total"
+          }
+        }
+      }
+    },
+    "恢复购买" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore"
+          }
+        }
+      }
+    },
+    "恢复购买失败：%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore failed: %1$@"
           }
         }
       }
@@ -1871,6 +2212,17 @@
         }
       }
     },
+    "未找到可恢复的购买记录。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No purchases were found to restore."
+          }
+        }
+      }
+    },
     "未检测" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1921,6 +2273,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Local, fast, and private."
+          }
+        }
+      }
+    },
+    "本地处理体验保持不变，无需持续订阅。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the same local workflow without an ongoing subscription."
           }
         }
       }
@@ -2072,6 +2435,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Importing audio..."
+          }
+        }
+      }
+    },
+    "正在检查试用状态..." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking trial access..."
           }
         }
       }
@@ -2480,6 +2854,17 @@
         }
       }
     },
+    "终身解锁" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime Access"
+          }
+        }
+      }
+    },
     "结果" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2508,6 +2893,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Convert All To"
+          }
+        }
+      }
+    },
+    "继续使用网页传输、结果下载与批量管理。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep using web transfer, result downloads, and batch management."
           }
         }
       }
@@ -2632,6 +3028,39 @@
         }
       }
     },
+    "试用已结束" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trial Ended"
+          }
+        }
+      }
+    },
+    "试用截止 %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trial ends %1$@"
+          }
+        }
+      }
+    },
+    "试用期已结束，请完成一次性购买后继续使用。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your trial has ended. Complete the one-time purchase to keep using the app."
+          }
+        }
+      }
+    },
     "语言切换" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2693,6 +3122,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quality"
+          }
+        }
+      }
+    },
+    "购买失败：%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase failed: %1$@"
+          }
+        }
+      }
+    },
+    "购买正在等待确认，请稍后再试。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The purchase is pending confirmation. Please try again shortly."
+          }
+        }
+      }
+    },
+    "购买结果未知，请稍后重试。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The purchase result is unknown. Please try again later."
           }
         }
       }
@@ -3081,6 +3543,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Convert MP4, MOV, TS, GIF, AVI, MKV"
+          }
+        }
+      }
+    },
+    "高级版" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium"
           }
         }
       }

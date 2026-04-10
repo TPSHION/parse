@@ -11,6 +11,7 @@ import SwiftUI
 struct parseApp: App {
     @State private var router = RouterManager.shared
     @State private var tabRouter = TabRouter.shared
+    @State private var purchaseManager = PurchaseManager.shared
     @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automaticValue
 
     private var appLanguage: AppLanguage {
@@ -44,6 +45,7 @@ struct parseApp: App {
             .environment(\.locale, appLanguage.locale)
             .environment(router)
             .environment(tabRouter)
+            .environment(purchaseManager)
         }
     }
 }

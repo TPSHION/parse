@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsHomeView: View {
     @AppStorage(AppLanguage.storageKey) private var selectedLanguage: String = AppLanguage.automaticValue
+    @Environment(PurchaseManager.self) private var purchaseManager
     
     @State private var cacheSize: String = "..."
     @State private var isClearingCache: Bool = false
@@ -14,6 +15,7 @@ struct SettingsHomeView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 20) {
                         headerSection
+                        purchaseSection
                         preferencesSection
                         storageSection
                         supportSection
@@ -26,6 +28,32 @@ struct SettingsHomeView: View {
             .onAppear {
                 calculateCache()
             }
+        }
+    }
+
+    private var purchaseSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(AppLocalizer.localized("高级版"))
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.white)
+                .padding(.horizontal, 4)
+
+            PremiumAccessCard(
+                purchaseManager: purchaseManager,
+                onPurchase: {
+                    Task {
+                        await purchaseManager.purchaseLifetime()
+                    }
+                },
+                onRestore: {
+                    Task {
+                        await purchaseManager.restorePurchases()
+                    }
+                }
+            )
+        }
+        .task {
+            await purchaseManager.prepareIfNeeded()
         }
     }
     
@@ -213,4 +241,247 @@ struct SettingsHomeView: View {
 
 #Preview {
     SettingsHomeView()
+        .environment(PurchaseManager.shared)
+}
+
+private struct PremiumAccessCard: View {
+    let purchaseManager: PurchaseManager
+    let onPurchase: () -> Void
+    let onRestore: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            header
+            detailBlock
+            metrics
+
+            if let errorMessage = purchaseManager.lastErrorMessage, !errorMessage.isEmpty {
+                messageRow(
+                    text: errorMessage,
+                    color: AppColors.accentRed,
+                    icon: "exclamationmark.triangle.fill",
+                    backgroundOpacity: 0.14
+                )
+            } else if purchaseManager.hasUnlockedLifetime {
+                messageRow(
+                    text: AppLocalizer.localized("已完成一次性购买，可继续使用全部功能。"),
+                    color: AppColors.accentGreen,
+                    icon: "checkmark.seal.fill",
+                    backgroundOpacity: 0.16
+                )
+            }
+
+            actionButtons
+        }
+        .padding(18)
+        .background(cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .strokeBorder(.white.opacity(0.08), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: Color.black.opacity(0.18), radius: 16, x: 0, y: 10)
+    }
+
+    private var header: some View {
+        HStack(alignment: .top, spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [AppColors.accentOrange.opacity(0.35), AppColors.accentOrange.opacity(0.12)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 54, height: 54)
+
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(AppColors.accentOrange)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(AppLocalizer.localized("终身解锁"))
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(AppColors.accentOrange)
+                    .textCase(.uppercase)
+                    .tracking(1.2)
+
+                Text(purchaseManager.accessTitle)
+                    .font(.system(size: 20, weight: .heavy))
+                    .foregroundColor(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 10)
+
+            statusBadge
+        }
+    }
+
+    private var detailBlock: some View {
+        Text(purchaseManager.accessDetail)
+            .font(.system(size: 14, weight: .medium))
+            .foregroundColor(AppColors.textSecondary)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    @ViewBuilder
+    private var metrics: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) {
+                priceMetric
+                trialMetric
+            }
+
+            VStack(spacing: 12) {
+                priceMetric
+                trialMetric
+            }
+        }
+    }
+
+    private var priceMetric: some View {
+        metricCard(
+            title: AppLocalizer.localized("当前价格"),
+            value: purchaseManager.hasUnlockedLifetime ? AppLocalizer.localized("已解锁") : purchaseManager.purchasePriceText
+        )
+    }
+
+    private var trialMetric: some View {
+        metricCard(
+            title: AppLocalizer.localized("试用截止"),
+            value: purchaseManager.hasUnlockedLifetime ? AppLocalizer.localized("一次买断") : purchaseManager.trialEndDateText
+        )
+    }
+
+    private var actionButtons: some View {
+        VStack(spacing: 10) {
+            if !purchaseManager.hasUnlockedLifetime {
+                Button(action: onPurchase) {
+                    HStack(spacing: 10) {
+                        if purchaseManager.isPurchasing {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Image(systemName: "creditcard.fill")
+                                .font(.system(size: 15, weight: .semibold))
+
+                            Text(AppLocalizer.localized("一次性购买"))
+                                .font(.system(size: 15, weight: .bold))
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .foregroundColor(.white)
+                    .background(AppColors.accentBlue)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+                .disabled(purchaseManager.isPurchasing || purchaseManager.isRestoring)
+            }
+
+            Button(action: onRestore) {
+                HStack(spacing: 10) {
+                    if purchaseManager.isRestoring {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 14, weight: .bold))
+
+                        Text(AppLocalizer.localized("恢复购买"))
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 13)
+                .foregroundColor(.white)
+                .background(Color.white.opacity(0.05))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .strokeBorder(.white.opacity(0.08), lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+            .disabled(purchaseManager.isPurchasing || purchaseManager.isRestoring)
+        }
+    }
+
+    private var statusBadge: some View {
+        Text(purchaseManager.hasUnlockedLifetime ? AppLocalizer.localized("已解锁") : AppLocalizer.localized("一次买断"))
+            .font(.system(size: 12, weight: .bold))
+            .foregroundColor(purchaseManager.hasUnlockedLifetime ? AppColors.accentGreen : AppColors.accentOrange)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill((purchaseManager.hasUnlockedLifetime ? AppColors.accentGreen : AppColors.accentOrange).opacity(0.14))
+            )
+    }
+
+    private var cardBackground: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    AppColors.cardBackground.opacity(0.98),
+                    AppColors.secondaryBackground.opacity(0.82)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            Circle()
+                .fill(AppColors.accentBlue.opacity(0.16))
+                .frame(width: 180, height: 180)
+                .blur(radius: 70)
+                .offset(x: 110, y: -80)
+
+            Circle()
+                .fill(AppColors.accentOrange.opacity(0.12))
+                .frame(width: 140, height: 140)
+                .blur(radius: 60)
+                .offset(x: -80, y: 90)
+        }
+    }
+
+    private func metricCard(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(AppColors.textSecondary)
+
+            Text(value)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundColor(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color.white.opacity(0.05))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(.white.opacity(0.06), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func messageRow(text: String, color: Color, icon: String, backgroundOpacity: Double) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(color)
+                .padding(.top, 1)
+
+            Text(text)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(color)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(color.opacity(backgroundOpacity))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
 }

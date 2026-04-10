@@ -38,4 +38,5 @@ struct RootTabView: View {
 #Preview {
     RootTabView()
         .environment(TabRouter.shared)
+        .environment(PurchaseManager.shared)
 }

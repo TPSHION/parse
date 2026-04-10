@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		43D7A09B44E8187B735FEB3E /* Pods_parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 902E3CBED005C7BBA0270D8A /* Pods_parse.framework */; };
+		74D36DEB2F88D185000AB26F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74D36DEA2F88D185000AB26F /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6EC5DF57CCFBA7470D885AC5 /* Pods-parse.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-parse.release.xcconfig"; path = "Target Support Files/Pods-parse/Pods-parse.release.xcconfig"; sourceTree = "<group>"; };
 		74D3609C2F84D89E000AB26F /* parse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = parse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		74D36DEA2F88D185000AB26F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		862C30B1BB83FBC8D2575676 /* PDFItem.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PDFItem.swift; path = parse/Models/Document/PDFItem.swift; sourceTree = "<group>"; };
 		902E3CBED005C7BBA0270D8A /* Pods_parse.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_parse.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A218634EBF16FF018C86A758 /* PDFConverterViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PDFConverterViewModel.swift; path = parse/ViewModels/Document/PDFConverterViewModel.swift; sourceTree = "<group>"; };
@@ -36,6 +38,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				43D7A09B44E8187B735FEB3E /* Pods_parse.framework in Frameworks */,
+				74D36DEB2F88D185000AB26F /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +65,7 @@
 		1ED03FEC2E8C782D4C661265 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				74D36DEA2F88D185000AB26F /* StoreKit.framework */,
 				902E3CBED005C7BBA0270D8A /* Pods_parse.framework */,
 			);
 			name = Frameworks;
@@ -399,6 +403,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSBonjourServices = "_http._tcp _preflight_check._tcp";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要访问本地网络，才能开启局域网传输并让其他设备访问共享文件。";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要“添加到照片”权限，才能将转换后的图片、视频或 GIF 保存到系统相册中。我们不会主动读取您现有的照片或视频。";
@@ -450,6 +455,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSBonjourServices = "_http._tcp _preflight_check._tcp";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要访问本地网络，才能开启局域网传输并让其他设备访问共享文件。";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要“添加到照片”权限，才能将转换后的图片、视频或 GIF 保存到系统相册中。我们不会主动读取您现有的照片或视频。";
