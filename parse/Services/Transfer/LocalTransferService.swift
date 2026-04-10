@@ -1,6 +1,6 @@
 import Foundation
 import Combine
-import GCDWebServer
+@preconcurrency import GCDWebServer
 import Darwin
 import Network
 import UIKit
@@ -22,11 +22,12 @@ final class LocalTransferService: NSObject, ObservableObject {
     private var permissionProbeConnection: NWConnection?
     private var permissionBrowser: NWBrowser?
     private var permissionListener: NWListener?
-    private var clientHeartbeatMonitor: Timer?
-    private var lastExternalClientActivityAt: Date?
+    private var isStoppingServer = false
+    private let serverStopQueue = DispatchQueue(
+        label: "cn.tpshion.parse.transfer.server-stop",
+        qos: .userInitiated
+    )
     private let permissionServiceType = "_preflight_check._tcp"
-    private let clientHeartbeatTimeout: TimeInterval = 15
-    private let heartbeatIntervalHintSeconds: Int = 5
 
     private static let webResourceDirectory = "Web/Transfer"
 
@@ -64,9 +65,9 @@ final class LocalTransferService: NSObject, ObservableObject {
 
     var shareHintText: String {
         if isRunning {
-            return AppLocalizer.localized("请让其他设备连接同一 Wi-Fi，然后在浏览器里打开上方地址。")
+            return AppLocalizer.localized("同网设备可在浏览器打开上方地址。")
         }
-        return AppLocalizer.localized("启动后会生成局域网访问地址，电脑或其他手机浏览器可直接打开。")
+        return AppLocalizer.localized("启动后会生成访问地址，可在浏览器直接打开。")
     }
 
     var filesCountText: String {
@@ -84,14 +85,21 @@ final class LocalTransferService: NSObject, ObservableObject {
         files = Self.readSharedFiles(from: sharedDirectoryURL)
     }
 
-    private func registerClientActivityIfNeeded(for request: GCDWebServerRequest) {
-        guard isExternalClientRequest(request) else { return }
-        lastExternalClientActivityAt = Date()
-        refreshClientConnectionState()
+    private func registerClientActivityIfNeeded(for remoteAddress: String?) {
+        guard isExternalClientRequest(remoteAddress: remoteAddress) else { return }
+        if !isClientConnected {
+            isClientConnected = true
+        }
     }
 
-    private func isExternalClientRequest(_ request: GCDWebServerRequest) -> Bool {
-        guard let host = normalizedHost(from: request.remoteAddressString) else {
+    private nonisolated func scheduleClientActivityRegistration(for remoteAddress: String?) {
+        Task { @MainActor [weak self] in
+            self?.registerClientActivityIfNeeded(for: remoteAddress)
+        }
+    }
+
+    private func isExternalClientRequest(remoteAddress: String?) -> Bool {
+        guard let host = normalizedHost(from: remoteAddress) else {
             return false
         }
 
@@ -126,7 +134,7 @@ final class LocalTransferService: NSObject, ObservableObject {
     }
 
     func startServer() {
-        guard !isRunning else { return }
+        guard !isRunning, !isStoppingServer else { return }
 
         prepareSharedDirectoryIfNeeded()
         requestLocalNetworkPermissionIfNeeded()
@@ -141,35 +149,42 @@ final class LocalTransferService: NSObject, ObservableObject {
             self.webServer = webServer
             isRunning = true
             isClientConnected = false
-            lastExternalClientActivityAt = nil
             serverURL = webServer.serverURL
-            startClientHeartbeatMonitor()
             refreshFiles()
             Task {
                 await runConnectivityChecks()
             }
         } else {
-            lastErrorMessage = AppLocalizer.localized("传输服务启动失败，请确认当前网络可用后重试。")
+            lastErrorMessage = AppLocalizer.localized("传输服务启动失败，请检查网络后重试。")
             loopbackCheckMessage = AppLocalizer.localized("启动失败")
             lanCheckMessage = AppLocalizer.localized("启动失败")
         }
     }
 
     func stopServer() {
-        guard let webServer else { return }
-        webServer.stop()
+        guard let webServer, !isStoppingServer else { return }
+
         self.webServer = nil
+        isStoppingServer = true
         permissionProbeConnection?.cancel()
         permissionProbeConnection = nil
         permissionBrowser?.cancel()
         permissionBrowser = nil
         permissionListener?.cancel()
         permissionListener = nil
-        stopClientHeartbeatMonitor()
-        lastExternalClientActivityAt = nil
-        isRunning = false
         isClientConnected = false
         serverURL = nil
+
+        // GCDWebServer.stop() blocks while its internal sockets cancel, so keep it
+        // off the main actor to avoid Thread Performance Checker QoS inversion warnings.
+        serverStopQueue.async { [weak self] in
+            webServer.stop()
+
+            Task { @MainActor [weak self] in
+                self?.isStoppingServer = false
+                self?.isRunning = false
+            }
+        }
     }
 
     func toggleServer() {
@@ -234,7 +249,7 @@ final class LocalTransferService: NSObject, ObservableObject {
             let scriptPath = Self.webResourcePath(named: "app", withExtension: "js"),
             let mpegtsPath = Self.webResourcePath(named: "mpegts", withExtension: "js")
         else {
-            lastErrorMessage = AppLocalizer.localized("网页资源未打包进应用，请检查传输页资源文件。")
+            lastErrorMessage = AppLocalizer.localized("网页资源缺失，请检查传输页资源文件。")
             return nil
         }
 
@@ -243,50 +258,47 @@ final class LocalTransferService: NSObject, ObservableObject {
 
         let sharedDirectoryURL = sharedDirectoryURL
         let deviceName = UIDevice.current.name
+        let markClientActivity: (GCDWebServerRequest) -> Void = { [weak self] request in
+            self?.scheduleClientActivityRegistration(for: request.remoteAddressString)
+        }
 
         server.addHandler(forMethod: "GET", path: "/", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
-            return GCDWebServerFileResponse(file: indexPath)
+            markClientActivity(request)
+            return Self.htmlResponse(
+                filePath: indexPath,
+                appLanguageCode: AppLocalizer.currentLanguage.rawValue
+            )
         }
 
         server.addHandler(forMethod: "GET", path: "/styles.css", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             return GCDWebServerFileResponse(file: stylesPath)
         }
 
         server.addHandler(forMethod: "GET", path: "/app.js", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             return GCDWebServerFileResponse(file: scriptPath)
         }
 
         server.addHandler(forMethod: "GET", path: "/mpegts.js", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             return GCDWebServerFileResponse(file: mpegtsPath)
         }
 
         server.addHandler(forMethod: "GET", path: "/api/meta", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             let payload = Self.metaPayload(
                 sharedDirectoryURL: sharedDirectoryURL,
                 deviceName: deviceName,
                 host: request.headers["Host"] ?? request.localAddressString,
-                isConnected: self.isClientConnected
+                isConnected: self.isClientConnected,
+                appLanguageCode: AppLocalizer.currentLanguage.rawValue
             )
             return Self.jsonResponse(payload)
         }
 
-        server.addHandler(forMethod: "GET", path: "/api/ping", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
-            return Self.jsonResponse([
-                "ok": true,
-                "heartbeatIntervalSeconds": self.heartbeatIntervalHintSeconds,
-                "timeoutSeconds": Int(self.clientHeartbeatTimeout),
-                "connectionState": self.isClientConnected ? "connected" : "idle"
-            ])
-        }
-
         server.addHandler(forMethod: "GET", path: "/api/library/images", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             Task {
                 let payload = await TransferPhotoLibraryService.fetchLibraryPayload(for: .image)
                 completion(Self.jsonResponse(payload))
@@ -294,7 +306,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         })
 
         server.addHandler(forMethod: "GET", path: "/api/library/videos", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             Task {
                 let payload = await TransferPhotoLibraryService.fetchLibraryPayload(for: .video)
                 completion(Self.jsonResponse(payload))
@@ -302,14 +314,14 @@ final class LocalTransferService: NSObject, ObservableObject {
         })
 
         server.addHandler(forMethod: "GET", path: "/api/results", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             return Self.jsonResponse([
                 "sections": TransferResultArchiveService.allPayload()
             ])
         }
 
         server.addHandler(forMethod: "GET", path: "/api/results/download", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             guard
                 let category = request.query?["category"],
                 let filename = request.query?["name"],
@@ -322,7 +334,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "GET", path: "/api/results/stream", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             guard
                 let category = request.query?["category"],
                 let filename = request.query?["name"],
@@ -338,7 +350,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "GET", path: "/api/results/thumbnail", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             guard
                 let category = request.query?["category"],
                 let filename = request.query?["name"]
@@ -360,7 +372,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         })
 
         server.addHandler(forMethod: "DELETE", path: "/api/results", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             guard
                 let category = request.query?["category"],
                 let filename = request.query?["name"]
@@ -377,7 +389,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "GET", path: "/api/library/thumbnail", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             guard
                 let identifier = request.query?["id"],
                 let rawKind = request.query?["kind"],
@@ -390,7 +402,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         })
 
         server.addHandler(forMethod: "GET", path: "/api/library/download", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             guard
                 let identifier = request.query?["id"],
                 let rawKind = request.query?["kind"],
@@ -403,7 +415,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         })
 
         server.addHandler(forMethod: "GET", path: "/api/files", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             let payload: [String: Any] = [
                 "items": Self.webFileItems(from: sharedDirectoryURL)
             ]
@@ -411,7 +423,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "GET", path: "/api/download", request: GCDWebServerRequest.self) { request in
-            self.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             guard
                 let filename = request.query?["name"],
                 let fileURL = Self.sharedFileURL(for: filename, in: sharedDirectoryURL),
@@ -430,7 +442,7 @@ final class LocalTransferService: NSObject, ObservableObject {
             guard let request = request as? GCDWebServerMultiPartFormRequest else {
                 return Self.errorResponse(statusCode: 400, message: "Invalid upload request")
             }
-            self?.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
 
             let result = Self.handleUpload(request: request, sharedDirectoryURL: sharedDirectoryURL)
             if result["uploadedCount"] as? Int ?? 0 > 0 {
@@ -442,7 +454,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "DELETE", path: "/api/files", request: GCDWebServerRequest.self) { [weak self] request in
-            self?.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             guard
                 let filename = request.query?["name"],
                 let fileURL = Self.sharedFileURL(for: filename, in: sharedDirectoryURL),
@@ -463,7 +475,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "POST", path: "/api/disconnect", request: GCDWebServerDataRequest.self) { [weak self] request in
-            self?.registerClientActivityIfNeeded(for: request)
+            markClientActivity(request)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 self?.stopServer()
             }
@@ -481,40 +493,13 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
     }
 
-    private func startClientHeartbeatMonitor() {
-        stopClientHeartbeatMonitor()
-        clientHeartbeatMonitor = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.refreshClientConnectionState()
-            }
-        }
-    }
-
-    private func stopClientHeartbeatMonitor() {
-        clientHeartbeatMonitor?.invalidate()
-        clientHeartbeatMonitor = nil
-    }
-
-    private func refreshClientConnectionState() {
-        let isConnected: Bool
-        if let lastExternalClientActivityAt {
-            isConnected = isRunning && Date().timeIntervalSince(lastExternalClientActivityAt) <= clientHeartbeatTimeout
-        } else {
-            isConnected = false
-        }
-
-        if self.isClientConnected != isConnected {
-            self.isClientConnected = isConnected
-        }
-    }
-
     private func runConnectivityChecks() async {
         loopbackCheckMessage = await checkMessage(for: loopbackURL, label: AppLocalizer.localized("本机地址"))
         lanCheckMessage = await checkMessage(for: accessibleURL, label: AppLocalizer.localized("局域网地址"))
 
         if loopbackCheckMessage.hasPrefix(AppLocalizer.localized("失败")),
            lanCheckMessage.hasPrefix(AppLocalizer.localized("失败")) {
-            lastErrorMessage = AppLocalizer.localized("服务已标记为启动，但自检无法访问。请先尝试本机 Safari 打开 127.0.0.1 地址；若仍失败，说明服务监听本身异常。")
+            lastErrorMessage = AppLocalizer.localized("服务已启动，但自检失败。可先用本机 Safari 打开 127.0.0.1 地址确认服务是否正常。")
         }
     }
 
@@ -680,7 +665,13 @@ final class LocalTransferService: NSObject, ObservableObject {
         return nil
     }
 
-    private static func metaPayload(sharedDirectoryURL: URL, deviceName: String, host: String, isConnected: Bool) -> [String: Any] {
+    private static func metaPayload(
+        sharedDirectoryURL: URL,
+        deviceName: String,
+        host: String,
+        isConnected: Bool,
+        appLanguageCode: String
+    ) -> [String: Any] {
         let items = readSharedFiles(from: sharedDirectoryURL)
         let totalBytes = items.reduce(Int64(0)) { $0 + $1.fileSize }
         return [
@@ -689,7 +680,8 @@ final class LocalTransferService: NSObject, ObservableObject {
             "note": "Keep the app in the foreground for more stable transfers.",
             "fileCount": items.count,
             "totalBytes": totalBytes,
-            "connectionState": isConnected ? "connected" : "idle"
+            "connectionState": isConnected ? "connected" : "idle",
+            "appLanguage": appLanguageCode
         ]
     }
 
@@ -814,6 +806,18 @@ final class LocalTransferService: NSObject, ObservableObject {
         return response
     }
 
+    private static func htmlResponse(filePath: String, appLanguageCode: String) -> GCDWebServerDataResponse {
+        let rawHTML = (try? String(contentsOfFile: filePath, encoding: .utf8)) ?? ""
+        let documentLanguage = appLanguageCode == "en" ? "en" : "zh-CN"
+        let html = rawHTML
+            .replacingOccurrences(of: "__PARSE_DOC_LANG__", with: documentLanguage)
+            .replacingOccurrences(of: "__PARSE_APP_LANGUAGE__", with: appLanguageCode)
+        let response = GCDWebServerDataResponse(text: html)
+        response?.contentType = "text/html; charset=utf-8"
+        response?.statusCode = 200
+        return response ?? GCDWebServerDataResponse()
+    }
+
     private static func errorResponse(statusCode: Int, message: String) -> GCDWebServerDataResponse {
         jsonResponse(["error": message], statusCode: statusCode)
     }
@@ -831,16 +835,18 @@ final class LocalTransferService: NSObject, ObservableObject {
 
 extension LocalTransferService: GCDWebServerDelegate {
     func webServerDidStart(_ server: GCDWebServer) {
-        isRunning = true
-        serverURL = server.serverURL
+        Task { @MainActor [weak self] in
+            self?.isRunning = true
+            self?.serverURL = server.serverURL
+        }
     }
 
     func webServerDidStop(_ server: GCDWebServer) {
-        stopClientHeartbeatMonitor()
-        lastExternalClientActivityAt = nil
-        isRunning = false
-        isClientConnected = false
-        serverURL = nil
+        Task { @MainActor [weak self] in
+            self?.isRunning = false
+            self?.isClientConnected = false
+            self?.serverURL = nil
+        }
     }
 
     func webServerDidConnect(_ server: GCDWebServer) {}

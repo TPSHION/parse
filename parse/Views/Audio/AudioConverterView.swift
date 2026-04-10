@@ -2,6 +2,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct AudioConverterView: View {
+    @Environment(RouterManager.self) private var router
+    @Environment(TabRouter.self) private var tabRouter
     @StateObject private var viewModel = AudioConverterViewModel()
     @State private var isFileImporterPresented = false
     @State private var isFileExporterPresented = false
@@ -100,8 +102,8 @@ struct AudioConverterView: View {
                 },
                 onOpenTransferGuide: {
                     isSaveActionSheetPresented = false
-                    saveMessage = AppLocalizer.localized("无需再次保存文件。请到「传输」页启动服务，然后在 PC 浏览器打开局域网地址，在网页的“结果”页下载当前转换结果。")
-                    showSaveAlert = true
+                    router.popToRoot()
+                    tabRouter.select(.transfer)
                 }
             )
             .presentationDetents([.height(280)])

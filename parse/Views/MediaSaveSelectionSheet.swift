@@ -39,7 +39,7 @@ struct MediaSaveSelectionSheet: View {
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
 
-            Text(AppLocalizer.localized("可先勾选要导出的压缩结果，再选择分享、相册、文件夹或局域网页下载。相册仅支持图片、MP4、MOV 和 GIF。"))
+            Text(AppLocalizer.localized("可先勾选要导出的压缩结果，再选择分享、相册、文件夹或网页下载。相册仅支持图片、MP4、MOV 和 GIF。"))
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -136,7 +136,7 @@ struct MediaSaveSelectionSheet: View {
             Button(action: onOpenTransferGuide) {
                 actionButton(
                     icon: "wifi",
-                    title: AppLocalizer.localized("局域网页下载"),
+                    title: AppLocalizer.localized("网页下载"),
                     accent: selectedCount > 0 ? AppColors.accentPurple : AppColors.secondaryBackground.opacity(0.5),
                     foreground: selectedCount > 0 ? .white : AppColors.textSecondary.opacity(0.5)
                 )

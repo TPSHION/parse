@@ -1,19 +1,26 @@
 import SwiftUI
 
 struct RootTabView: View {
+    @Environment(TabRouter.self) private var tabRouter
+
     var body: some View {
-        TabView {
+        @Bindable var bindableTabRouter = tabRouter
+
+        TabView(selection: $bindableTabRouter.selectedTab) {
             ConversionHomeView()
+                .tag(AppTab.conversion)
                 .tabItem {
                     Label("转换", systemImage: "arrow.triangle.2.circlepath.circle.fill")
                 }
 
             ResultsHomeView()
+                .tag(AppTab.results)
                 .tabItem {
                     Label("结果", systemImage: "tray.full.fill")
                 }
 
             TransferHomeView()
+                .tag(AppTab.transfer)
                 .tabItem {
                     Label("传输", systemImage: "paperplane.circle.fill")
                 }
@@ -24,6 +31,7 @@ struct RootTabView: View {
                 icon: "gear",
                 accentColor: AppColors.accentPurple
             )
+            .tag(AppTab.settings)
             .tabItem {
                 Label("设置", systemImage: "gear")
             }
@@ -34,4 +42,5 @@ struct RootTabView: View {
 
 #Preview {
     RootTabView()
+        .environment(TabRouter.shared)
 }

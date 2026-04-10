@@ -15,13 +15,13 @@ enum TransferResultCategory: String, CaseIterable {
     nonisolated var displayTitle: String {
         switch self {
         case .imageConversion:
-            return "图片转换"
+            return AppLocalizer.localized("图片转换")
         case .videoConversion:
-            return "视频转换"
+            return AppLocalizer.localized("视频转换")
         case .audioConversion:
-            return "音频转换"
+            return AppLocalizer.localized("音频转换")
         case .compression:
-            return "压缩结果"
+            return AppLocalizer.localized("压缩结果")
         }
     }
 }

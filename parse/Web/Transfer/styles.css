@@ -88,7 +88,8 @@ body::before {
 .topbar-details,
 .topbar-group,
 .topbar-address,
-.topbar-actions {
+.topbar-actions,
+.topbar-compact-actions {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -96,6 +97,10 @@ body::before {
 
 .topbar-compact {
   justify-content: space-between;
+}
+
+.topbar-compact-actions {
+  justify-content: flex-end;
 }
 
 .topbar-compact-main {
@@ -172,6 +177,47 @@ body::before {
   display: flex;
   gap: 16px;
   align-items: center;
+}
+
+.brand-copy {
+  min-width: 0;
+}
+
+.lang-switch {
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(45, 156, 219, 0.08);
+  border: 1px solid var(--line);
+}
+
+.sidebar-lang-switch {
+  margin-left: auto;
+}
+
+.lang-button {
+  appearance: none;
+  border: 0;
+  min-width: 42px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+.lang-button:hover {
+  transform: translateY(-1px);
+}
+
+.lang-button.is-active {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--teal), var(--green));
 }
 
 .brand-logo {
@@ -968,6 +1014,10 @@ body::before {
 
   .topbar {
     padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .topbar-compact-actions {
     gap: 10px;
   }
 

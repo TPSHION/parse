@@ -26,28 +26,28 @@ struct ResultsHomeView: View {
             }
         }
         .toolbar(.hidden, for: .navigationBar)
-        .alert("删除结果", isPresented: .constant(pendingDeletion != nil), presenting: pendingDeletion) { item in
-            Button("取消", role: .cancel) {
+        .alert(AppLocalizer.localized("删除结果"), isPresented: .constant(pendingDeletion != nil), presenting: pendingDeletion) { item in
+            Button(AppLocalizer.localized("取消"), role: .cancel) {
                 pendingDeletion = nil
             }
-            Button("删除", role: .destructive) {
+            Button(AppLocalizer.localized("删除"), role: .destructive) {
                 delete(item)
             }
         } message: { item in
-            Text("确认删除 \(item.filename) 吗？删除后将不会再出现在历史结果中。")
+            Text(AppLocalizer.formatted("确认删除 %@？移除后不会再显示。", item.filename))
         }
-        .alert("清空结果", isPresented: .constant(pendingClearCategory != nil), presenting: pendingClearCategory) { category in
-            Button("取消", role: .cancel) {
+        .alert(AppLocalizer.localized("清空结果"), isPresented: .constant(pendingClearCategory != nil), presenting: pendingClearCategory) { category in
+            Button(AppLocalizer.localized("取消"), role: .cancel) {
                 pendingClearCategory = nil
             }
-            Button("清空", role: .destructive) {
+            Button(AppLocalizer.localized("清空"), role: .destructive) {
                 clear(category)
             }
         } message: { category in
-            Text("确认一键清空\(category.displayTitle)中的全部历史结果吗？此操作不可撤销。")
+            Text(AppLocalizer.formatted("清空%@中的全部结果？此操作不可撤销。", category.displayTitle))
         }
-        .alert("结果提示", isPresented: .constant(feedbackMessage != nil)) {
-            Button("确定", role: .cancel) {
+        .alert(AppLocalizer.localized("结果提示"), isPresented: .constant(feedbackMessage != nil)) {
+            Button(AppLocalizer.localized("确定"), role: .cancel) {
                 feedbackMessage = nil
             }
         } message: {
@@ -66,11 +66,11 @@ struct ResultsHomeView: View {
                         .textCase(.uppercase)
                         .tracking(1.5)
 
-                    Text("结果")
+                    Text(AppLocalizer.localized("结果"))
                         .font(.system(size: 32, weight: .heavy))
                         .foregroundColor(.white)
 
-                    Text("统一查看历史转换与压缩结果，并在这里快速清理不需要的旧文件。")
+                    Text(AppLocalizer.localized("查看全部处理结果，快速清理旧文件。"))
                         .font(.body)
                         .foregroundColor(AppColors.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -81,7 +81,7 @@ struct ResultsHomeView: View {
                 Button(action: reloadResults) {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.clockwise")
-                        Text("刷新")
+                        Text(AppLocalizer.localized("刷新"))
                     }
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
@@ -98,13 +98,13 @@ struct ResultsHomeView: View {
     private var summarySection: some View {
         HStack(spacing: 12) {
             summaryCard(
-                title: "总结果数",
+                title: AppLocalizer.localized("总数"),
                 value: "\(totalCount)",
                 accent: AppColors.accentPurple
             )
 
             summaryCard(
-                title: "结果分类",
+                title: AppLocalizer.localized("分类"),
                 value: "\(sections.filter { !$0.items.isEmpty }.count)",
                 accent: AppColors.accentBlue
             )
@@ -131,11 +131,11 @@ struct ResultsHomeView: View {
                 .font(.system(size: 36, weight: .semibold))
                 .foregroundColor(AppColors.textSecondary)
 
-            Text("还没有历史结果")
+            Text(AppLocalizer.localized("暂无结果"))
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.white)
 
-            Text("完成图片、视频、音频转换或压缩后，历史结果会自动出现在这里。")
+            Text(AppLocalizer.localized("处理完成后，结果会自动出现在这里。"))
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -164,7 +164,7 @@ struct ResultsHomeView: View {
                 Button {
                     pendingClearCategory = section.category
                 } label: {
-                    Text("清空")
+                    Text(AppLocalizer.localized("清空"))
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(AppColors.accentRed)
                         .padding(.horizontal, 10)
@@ -174,7 +174,7 @@ struct ResultsHomeView: View {
                 }
                 .buttonStyle(.plain)
 
-                Text("\(section.count) 项")
+                Text(AppLocalizer.formatted("%lld 项", section.count))
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(sectionColor(for: section.category))
                     .padding(.horizontal, 10)
@@ -318,16 +318,14 @@ struct ResultsHomeView: View {
     }
 
     private func dateText(for date: Date?) -> String {
-        guard let date else { return "时间未知" }
-        return Self.dateFormatter.string(from: date)
-    }
-
-    private static let dateFormatter: DateFormatter = {
+        guard let date else { return AppLocalizer.localized("时间未知") }
         let formatter = DateFormatter()
+        formatter.locale = AppLocalizer.currentLanguage.locale
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter
-    }()
+            .string(from: date)
+    }
 }
 
 private struct ResultsThumbnailView: View {

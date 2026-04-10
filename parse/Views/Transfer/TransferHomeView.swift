@@ -79,7 +79,7 @@ struct TransferHomeView: View {
                 .font(.system(size: 32, weight: .heavy))
                 .foregroundColor(.white)
 
-            Text(AppLocalizer.localized("让同一网络下的 Windows、macOS、Android 或其他手机浏览器直接访问共享文件。"))
+            Text(AppLocalizer.localized("同网设备可直接访问共享文件。"))
                 .font(.body)
                 .foregroundColor(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -97,19 +97,19 @@ struct TransferHomeView: View {
                     .font(.system(size: 24, weight: .heavy))
                     .foregroundColor(.white)
 
-                Text(AppLocalizer.localized("启动后会生成局域网访问地址。PC 端在同一 Wi-Fi 下打开浏览器输入该地址后，即可上传、下载和管理文件。"))
+                Text(AppLocalizer.localized("启动后会生成访问地址，同网设备可在浏览器中上传和下载文件。"))
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(AppLocalizer.localized("首次启动传输服务时，系统可能会请求网络访问权限。"))
+                Text(AppLocalizer.localized("首次启动时，系统可能会请求本地网络权限。"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text(AppLocalizer.localized("如果后续无法访问局域网地址，可前往系统设置重新开启权限。"))
+                Text(AppLocalizer.localized("若地址无法访问，请到系统设置检查权限。"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(AppColors.textSecondary.opacity(0.9))
                     .fixedSize(horizontal: false, vertical: true)
@@ -218,7 +218,7 @@ struct TransferHomeView: View {
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
 
-                Text(AppLocalizer.localized("请在 PC 浏览器打开上方地址。连接成功后，这里会自动切换为已连接状态。"))
+                Text(AppLocalizer.localized("请在电脑浏览器打开上方地址，连接后会自动更新状态。"))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -277,7 +277,7 @@ struct TransferHomeView: View {
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)
 
-                    Text(AppLocalizer.localized("PC 端上传的文件会显示在这里，你也可以手动导入本机文件。"))
+                    Text(AppLocalizer.localized("浏览器上传的文件会显示在这里，也可从本机导入。"))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                 }
@@ -306,7 +306,7 @@ struct TransferHomeView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
 
-                    Text(AppLocalizer.localized("可以从 App 内导入文件，或等待 PC 浏览器连接后直接上传。"))
+                    Text(AppLocalizer.localized("先从 App 导入文件，或在浏览器端上传。"))
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                         .multilineTextAlignment(.center)

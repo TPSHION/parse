@@ -8,7 +8,7 @@ struct SaveActionSheetView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            Text("选择操作方式")
+            Text(AppLocalizer.localized("选择操作方式"))
                 .font(.headline)
                 .fontWeight(.bold)
                 .foregroundColor(AppColors.textPrimary)
@@ -20,7 +20,7 @@ struct SaveActionSheetView: View {
                         HStack(spacing: 12) {
                             Image(systemName: "square.and.arrow.up")
                                 .font(.system(size: 20))
-                            Text("分享文件")
+                            Text(AppLocalizer.localized("分享文件"))
                                 .font(.system(size: 16, weight: .semibold))
                             Spacer()
                         }
@@ -38,7 +38,7 @@ struct SaveActionSheetView: View {
                         HStack(spacing: 12) {
                             Image(systemName: "photo.on.rectangle.angled")
                                 .font(.system(size: 20))
-                            Text("保存到相册")
+                            Text(AppLocalizer.localized("保存到相册"))
                                 .font(.system(size: 16, weight: .semibold))
                             Spacer()
                         }
@@ -55,7 +55,7 @@ struct SaveActionSheetView: View {
                     HStack(spacing: 12) {
                         Image(systemName: "folder")
                             .font(.system(size: 20))
-                        Text("保存为文件")
+                        Text(AppLocalizer.localized("保存为文件"))
                             .font(.system(size: 16, weight: .semibold))
                         Spacer()
                     }
@@ -73,9 +73,9 @@ struct SaveActionSheetView: View {
                             Image(systemName: "wifi")
                                 .font(.system(size: 20))
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("局域网页下载")
+                                Text(AppLocalizer.localized("网页下载"))
                                     .font(.system(size: 16, weight: .semibold))
-                                Text("开启传输服务后，可在 PC 网页的结果页直接下载")
+                                Text(AppLocalizer.localized("开启传输后，可在网页结果页下载"))
                                     .font(.system(size: 12, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
                             }

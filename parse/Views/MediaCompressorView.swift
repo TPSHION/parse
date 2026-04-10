@@ -3,6 +3,8 @@ import PhotosUI
 import UniformTypeIdentifiers
 
 struct MediaCompressorView: View {
+    @Environment(RouterManager.self) private var router
+    @Environment(TabRouter.self) private var tabRouter
     @StateObject private var viewModel = MediaCompressorViewModel()
     @State private var isFileImporterPresented = false
     @State private var selectedLibraryItems: [PhotosPickerItem] = []
@@ -38,7 +40,7 @@ struct MediaCompressorView: View {
                 importingOverlay
             }
         }
-        .navigationTitle("数据压缩")
+        .navigationTitle(AppLocalizer.localized("数据压缩"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbarBackground(AppColors.background, for: .navigationBar)
@@ -47,7 +49,7 @@ struct MediaCompressorView: View {
             if !viewModel.items.isEmpty {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { viewModel.clearAll() }) {
-                        Text("清空")
+                        Text(AppLocalizer.localized("清空"))
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.white)
                     }
@@ -114,8 +116,8 @@ struct MediaCompressorView: View {
                 },
                 onOpenTransferGuide: {
                     isSaveActionSheetPresented = false
-                    saveMessage = AppLocalizer.localized("无需再次保存文件。请到「传输」页启动服务，然后在 PC 浏览器打开局域网地址，在网页的“结果”页下载当前压缩结果。")
-                    showSaveAlert = true
+                    router.popToRoot()
+                    tabRouter.select(.transfer)
                 }
             )
             .presentationDetents([.medium, .large])
@@ -135,7 +137,7 @@ struct MediaCompressorView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("数据压缩")
+                    Text(AppLocalizer.localized("数据压缩"))
                         .font(.system(size: 24, weight: .heavy))
                         .foregroundColor(AppColors.textPrimary)
                 }
@@ -144,11 +146,11 @@ struct MediaCompressorView: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("压缩强度")
+                Text(AppLocalizer.localized("压缩强度"))
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(AppColors.textSecondary)
 
-                Picker("压缩强度", selection: $viewModel.compressionLevel) {
+                Picker(AppLocalizer.localized("压缩强度"), selection: $viewModel.compressionLevel) {
                     ForEach(MediaCompressionLevel.allCases) { level in
                         Text(level.localizedTitle).tag(level)
                     }
@@ -210,13 +212,13 @@ struct MediaCompressorView: View {
                     .font(.system(size: 34, weight: .bold))
                     .foregroundColor(AppColors.accentBlue)
 
-                Text("导入媒体文件开始压缩")
+                Text(AppLocalizer.localized("导入媒体文件开始压缩"))
                     .font(.system(size: 20, weight: .heavy))
                     .foregroundColor(AppColors.textPrimary)
 
                 VStack(spacing: 12) {
                     PhotosPicker(selection: $selectedLibraryItems, matching: .any(of: [.images, .videos]), photoLibrary: .shared()) {
-                        Text("从相册导入")
+                        Text(AppLocalizer.localized("从相册导入"))
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -230,7 +232,7 @@ struct MediaCompressorView: View {
                     Button {
                         isFileImporterPresented = true
                     } label: {
-                        Text("从文件导入")
+                        Text(AppLocalizer.localized("从文件导入"))
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -241,7 +243,7 @@ struct MediaCompressorView: View {
                     .disabled(!viewModel.canImport)
                 }
 
-                Text("相册支持图片和视频，音频请从文件导入。")
+                Text(AppLocalizer.localized("相册支持图片和视频，音频请从文件导入。"))
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
             }
@@ -251,11 +253,11 @@ struct MediaCompressorView: View {
         } else {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    Text("压缩队列")
+                    Text(AppLocalizer.localized("压缩队列"))
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(AppColors.textPrimary)
                     Spacer()
-                    Text("\(viewModel.totalCount) 项")
+                    Text(AppLocalizer.formatted("%lld 项", viewModel.totalCount))
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(AppColors.textSecondary)
                 }
@@ -368,7 +370,7 @@ struct MediaCompressorView: View {
                     .scaleEffect(1.5)
                     .tint(.white)
 
-                Text("正在导入媒体文件...")
+                        Text(AppLocalizer.localized("正在导入媒体文件..."))
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(.white)
             }
@@ -470,13 +472,13 @@ private struct MediaCompressionItemRow: View {
     private var statusBlock: some View {
         switch item.status {
         case .pending:
-            Text("等待压缩")
+            Text(AppLocalizer.localized("等待压缩"))
                 .font(.system(size: 12, weight: .bold))
                 .foregroundColor(AppColors.accentBlue)
         case .compressing:
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text("压缩中")
+                    Text(AppLocalizer.localized("压缩中"))
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(AppColors.accentOrange)
                     Spacer()
@@ -498,12 +500,12 @@ private struct MediaCompressionItemRow: View {
             }
         case .success:
             VStack(alignment: .leading, spacing: 4) {
-                Text("压缩完成")
+                Text(AppLocalizer.localized("压缩完成"))
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(AppColors.accentGreen)
 
                 if let compressedSizeText = item.compressedSizeText {
-                    Text("压缩后 \(compressedSizeText) · 节省 \(item.savedPercentageText ?? "--")")
+                    Text(AppLocalizer.formatted("压缩后 %@ · 节省 %@", compressedSizeText, item.savedPercentageText ?? "--"))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                 }
