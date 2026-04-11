@@ -74,12 +74,12 @@ enum TransferPhotoLibraryService {
         Task {
             let status = await ensureReadPermission()
             guard isAuthorized(status) else {
-                completion(errorResponse(statusCode: 403, message: "Photo access not granted"))
+                completion(errorResponse(statusCode: 403, code: "photo_access_not_granted"))
                 return
             }
 
             guard let asset = asset(with: identifier, kind: kind) else {
-                completion(errorResponse(statusCode: 404, message: "Asset not found"))
+                completion(errorResponse(statusCode: 404, code: "asset_not_found"))
                 return
             }
 
@@ -96,7 +96,7 @@ enum TransferPhotoLibraryService {
                 options: options
             ) { image, _ in
                 guard let image, let data = image.jpegData(compressionQuality: 0.82) else {
-                    completion(errorResponse(statusCode: 500, message: "Failed to render thumbnail"))
+                    completion(errorResponse(statusCode: 500, code: "thumbnail_render_failed"))
                     return
                 }
                 let response = GCDWebServerDataResponse(data: data, contentType: "image/jpeg")
@@ -113,18 +113,18 @@ enum TransferPhotoLibraryService {
         Task {
             let status = await ensureReadPermission()
             guard isAuthorized(status) else {
-                completion(errorResponse(statusCode: 403, message: "Photo access not granted"))
+                completion(errorResponse(statusCode: 403, code: "photo_access_not_granted"))
                 return
             }
 
             guard let asset = asset(with: identifier, kind: kind) else {
-                completion(errorResponse(statusCode: 404, message: "Asset not found"))
+                completion(errorResponse(statusCode: 404, code: "asset_not_found"))
                 return
             }
 
             let resources = PHAssetResource.assetResources(for: asset)
             guard let resource = preferredResource(from: resources, for: kind) ?? resources.first else {
-                completion(errorResponse(statusCode: 404, message: "Asset resource not found"))
+                completion(errorResponse(statusCode: 404, code: "asset_resource_not_found"))
                 return
             }
 
@@ -138,7 +138,7 @@ enum TransferPhotoLibraryService {
 
             PHAssetResourceManager.default().writeData(for: resource, toFile: tempURL, options: options) { error in
                 if let error {
-                    completion(errorResponse(statusCode: 500, message: error.localizedDescription))
+                    completion(errorResponse(statusCode: 500, code: "asset_download_failed", message: error.localizedDescription))
                     return
                 }
                 completion(GCDWebServerFileResponse(file: tempURL.path, isAttachment: true))
@@ -190,8 +190,13 @@ enum TransferPhotoLibraryService {
         }
     }
 
-    private static func errorResponse(statusCode: Int, message: String) -> GCDWebServerDataResponse {
-        let data = (try? JSONSerialization.data(withJSONObject: ["error": message], options: [])) ?? Data("{}".utf8)
+    private static func errorResponse(statusCode: Int, code: String, message: String? = nil) -> GCDWebServerDataResponse {
+        var payload: [String: Any] = ["errorCode": code]
+        if let message, !message.isEmpty {
+            payload["error"] = message
+        }
+
+        let data = (try? JSONSerialization.data(withJSONObject: payload, options: [])) ?? Data("{}".utf8)
         let response = GCDWebServerDataResponse(data: data, contentType: "application/json; charset=utf-8")
         response.statusCode = statusCode
         return response

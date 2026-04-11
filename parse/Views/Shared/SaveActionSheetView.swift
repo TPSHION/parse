@@ -5,6 +5,7 @@ struct SaveActionSheetView: View {
     let onSaveToAlbum: (() -> Void)? // 设为可选，如果为 nil 则不显示“保存到相册”选项
     let onSaveToFile: () -> Void
     let onOpenTransferGuide: (() -> Void)?
+    @State private var isShareSheetPresented = false
     
     var body: some View {
         VStack(spacing: 20) {
@@ -16,7 +17,9 @@ struct SaveActionSheetView: View {
             
             VStack(spacing: 12) {
                 if !shareableURLs.isEmpty {
-                    ShareLink(items: shareableURLs) {
+                    Button {
+                        isShareSheetPresented = true
+                    } label: {
                         HStack(spacing: 12) {
                             Image(systemName: "square.and.arrow.up")
                                 .font(.system(size: 20))
@@ -93,6 +96,9 @@ struct SaveActionSheetView: View {
             .padding(.horizontal, 20)
             
             Spacer()
+        }
+        .sheet(isPresented: $isShareSheetPresented) {
+            ActivityShareSheet(items: shareableURLs)
         }
     }
 }

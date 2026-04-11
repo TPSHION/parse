@@ -12,6 +12,7 @@ import UniformTypeIdentifiers
 struct ImageConverterView: View {
     @Environment(RouterManager.self) private var router
     @Environment(TabRouter.self) private var tabRouter
+    @Environment(PurchaseManager.self) private var purchaseManager
     @StateObject private var viewModel = ConverterViewModel()
     @State private var selectedPhotos: [PhotosPickerItem] = []
     @State private var isFileImporterPresented = false
@@ -21,6 +22,7 @@ struct ImageConverterView: View {
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
     @State private var remoteImportPreview: RemoteImageImportPreview?
+    @State private var isShowingPaywall = false
     
     var body: some View {
         let isBusy = viewModel.isConverting || viewModel.isImporting
@@ -196,6 +198,9 @@ struct ImageConverterView: View {
                 Text(message)
             }
         }
+        .fullScreenCover(isPresented: $isShowingPaywall) {
+            TrialPaywallView(allowsDismissal: true)
+        }
     }
     
     private var summaryPanel: some View {
@@ -346,7 +351,13 @@ struct ImageConverterView: View {
             HStack(spacing: 8) {
                 Button(action: {
                     Task {
-                        await viewModel.handlePrimaryAction()
+                        if viewModel.isConverting {
+                            await viewModel.handlePrimaryAction()
+                        } else if await purchaseManager.canUseCoreFeatures() {
+                            await viewModel.handlePrimaryAction()
+                        } else {
+                            isShowingPaywall = true
+                        }
                     }
                 }) {
                     HStack(spacing: 4) {

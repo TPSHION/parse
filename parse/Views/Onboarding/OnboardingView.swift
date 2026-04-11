@@ -42,7 +42,7 @@ struct OnboardingView: View {
 
                 TabView(selection: $currentPage) {
                     ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
-                        OnboardingPageView(page: page)
+                        OnboardingPageView(page: page, language: appLanguage)
                             .padding(.horizontal, 24)
                             .tag(index)
                     }
@@ -60,7 +60,7 @@ struct OnboardingView: View {
         HStack {
             Spacer()
 
-            OnboardingLanguageSwitcher(selectedLanguage: appLanguage) { language in
+            AppLanguageSwitcher(selectedLanguage: appLanguage) { language in
                 appLanguageRawValue = language.rawValue
             }
         }
@@ -123,17 +123,7 @@ struct OnboardingView: View {
                 .animation(.easeInOut(duration: 0.2), value: currentPage)
             }
         }
-        .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .fill(Color.black.opacity(0.4))
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 32, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
+        .padding(.vertical, 8)
         .animation(.easeInOut(duration: 0.3), value: currentPage)
     }
 
@@ -154,6 +144,7 @@ struct OnboardingView: View {
 
 private struct OnboardingPageView: View {
     let page: OnboardingPage
+    let language: AppLanguage
     @State private var isAnimating = false
 
     var body: some View {
@@ -218,7 +209,7 @@ private struct OnboardingPageView: View {
             }
 
             VStack(spacing: 16) {
-                Text(AppLocalizer.localized(page.eyebrowKey))
+                Text(AppLocalizer.localized(page.eyebrowKey, language: language))
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(page.accentColor)
                     .padding(.horizontal, 14)
@@ -229,13 +220,13 @@ private struct OnboardingPageView: View {
                         Capsule().strokeBorder(page.accentColor.opacity(0.3), lineWidth: 1)
                     )
 
-                Text(AppLocalizer.localized(page.titleKey))
+                Text(AppLocalizer.localized(page.titleKey, language: language))
                     .font(.system(size: 30, weight: .heavy))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text(AppLocalizer.localized(page.descriptionKey))
+                Text(AppLocalizer.localized(page.descriptionKey, language: language))
                     .font(.system(size: 15, weight: .regular))
                     .foregroundColor(AppColors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -260,44 +251,4 @@ private struct OnboardingPage {
 
 #Preview {
     OnboardingView(hasCompletedOnboarding: .constant(false))
-}
-
-private struct OnboardingLanguageSwitcher: View {
-    let selectedLanguage: AppLanguage
-    let onSelect: (AppLanguage) -> Void
-
-    var body: some View {
-        Menu {
-            ForEach(AppLanguage.allCases) { language in
-                Button {
-                    onSelect(language)
-                } label: {
-                    HStack {
-                        Text(language.displayName)
-
-                        if language == selectedLanguage {
-                            Image(systemName: "checkmark")
-                        }
-                    }
-                }
-            }
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: "globe")
-                    .font(.system(size: 12, weight: .semibold))
-
-                Text(selectedLanguage.shortLabel)
-                    .font(.system(size: 12, weight: .bold))
-            }
-            .foregroundColor(.white)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color.white.opacity(0.05))
-            .overlay(
-                Capsule()
-                    .strokeBorder(.white.opacity(0.08), lineWidth: 1)
-            )
-            .clipShape(Capsule())
-        }
-    }
 }

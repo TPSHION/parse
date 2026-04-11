@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 struct MediaCompressorView: View {
     @Environment(RouterManager.self) private var router
     @Environment(TabRouter.self) private var tabRouter
+    @Environment(PurchaseManager.self) private var purchaseManager
     @StateObject private var viewModel = MediaCompressorViewModel()
     @State private var isFileImporterPresented = false
     @State private var selectedLibraryItems: [PhotosPickerItem] = []
@@ -13,6 +14,7 @@ struct MediaCompressorView: View {
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
     @State private var selectedSaveItemIDs: Set<UUID> = []
+    @State private var isShowingPaywall = false
 
     var body: some View {
         let isBusy = viewModel.isCompressing || viewModel.isImporting
@@ -130,6 +132,9 @@ struct MediaCompressorView: View {
             if let message = saveMessage {
                 Text(message)
             }
+        }
+        .fullScreenCover(isPresented: $isShowingPaywall) {
+            TrialPaywallView(allowsDismissal: true)
         }
     }
 
@@ -310,7 +315,11 @@ struct MediaCompressorView: View {
 
             Button(action: {
                 Task {
-                    await viewModel.startCompression()
+                    if await purchaseManager.canUseCoreFeatures() {
+                        await viewModel.startCompression()
+                    } else {
+                        isShowingPaywall = true
+                    }
                 }
             }) {
                 HStack(spacing: 6) {

@@ -11,6 +11,11 @@ final class PurchaseManager {
     private static let localUnlockKey = "purchase_local_unlock"
     private static let lifetimeProductID = "cn.tpshion.parse.lifetime"
     private static let trialDuration: TimeInterval = 15 * 24 * 60 * 60
+    #if DEBUG
+    private static let debugExpireTrialArgument = "-debug-expire-trial"
+    private static let debugResetTrialArgument = "-debug-reset-trial"
+    private static let debugIgnoreEntitlementsArgument = "-debug-ignore-purchase-entitlements"
+    #endif
 
     private(set) var lifetimeProduct: Product?
     private(set) var hasUnlockedLifetime: Bool
@@ -87,9 +92,12 @@ final class PurchaseManager {
     }
 
     func prepareIfNeeded() async {
-        guard !hasPrepared else { return }
-        await loadProduct()
-        hasPrepared = true
+        if !hasPrepared {
+            await loadProduct()
+            hasPrepared = true
+        }
+
+        await refreshEntitlements()
     }
 
     func purchaseLifetime() async {
@@ -153,6 +161,11 @@ final class PurchaseManager {
         lastErrorMessage = nil
     }
 
+    func canUseCoreFeatures() async -> Bool {
+        await prepareIfNeeded()
+        return hasActiveAccess
+    }
+
     private func loadProduct() async {
         do {
             lifetimeProduct = try await Product.products(for: [Self.lifetimeProductID]).first
@@ -162,21 +175,27 @@ final class PurchaseManager {
     }
 
     private func refreshEntitlements() async {
-        var isUnlocked = UserDefaults.standard.bool(forKey: Self.localUnlockKey)
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains(Self.debugIgnoreEntitlementsArgument) {
+            persistUnlock(false)
+            hasUnlockedLifetime = false
+            return
+        }
+        #endif
+
+        var isUnlocked = false
 
         for await result in Transaction.currentEntitlements {
             guard case .verified(let transaction) = result else { continue }
 
-            if transaction.productID == Self.lifetimeProductID {
+            if transaction.productID == Self.lifetimeProductID,
+               transaction.revocationDate == nil {
                 isUnlocked = true
                 break
             }
         }
 
-        if isUnlocked {
-            persistUnlock(true)
-        }
-
+        persistUnlock(isUnlocked)
         hasUnlockedLifetime = isUnlocked
     }
 
@@ -186,6 +205,21 @@ final class PurchaseManager {
 
     private static func loadOrCreateTrialStartDate() -> Date {
         let defaults = UserDefaults.standard
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains(debugResetTrialArgument) {
+            let now = Date()
+            defaults.set(now, forKey: trialStartKey)
+            defaults.set(false, forKey: localUnlockKey)
+            return now
+        }
+
+        if ProcessInfo.processInfo.arguments.contains(debugExpireTrialArgument) {
+            let expiredDate = Date().addingTimeInterval(-(trialDuration + 60))
+            defaults.set(expiredDate, forKey: trialStartKey)
+            defaults.set(false, forKey: localUnlockKey)
+            return expiredDate
+        }
+        #endif
 
         if let storedDate = defaults.object(forKey: trialStartKey) as? Date {
             return storedDate

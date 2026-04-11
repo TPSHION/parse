@@ -2,8 +2,10 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct PDFConverterView: View {
+    @Environment(PurchaseManager.self) private var purchaseManager
     @StateObject private var viewModel = PDFConverterViewModel()
     @State private var isFileImporterPresented = false
+    @State private var isShowingPaywall = false
     
     var body: some View {
         ZStack {
@@ -63,6 +65,9 @@ struct PDFConverterView: View {
             allowsMultipleSelection: true
         ) { result in
             viewModel.handleFileImportResult(result)
+        }
+        .fullScreenCover(isPresented: $isShowingPaywall) {
+            TrialPaywallView(allowsDismissal: true)
         }
     }
     
@@ -178,7 +183,11 @@ struct PDFConverterView: View {
             
             Button(action: {
                 Task {
-                    await viewModel.startConversion()
+                    if await purchaseManager.canUseCoreFeatures() {
+                        await viewModel.startConversion()
+                    } else {
+                        isShowingPaywall = true
+                    }
                 }
             }) {
                 HStack(spacing: 6) {

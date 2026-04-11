@@ -4,12 +4,14 @@ import UniformTypeIdentifiers
 struct AudioConverterView: View {
     @Environment(RouterManager.self) private var router
     @Environment(TabRouter.self) private var tabRouter
+    @Environment(PurchaseManager.self) private var purchaseManager
     @StateObject private var viewModel = AudioConverterViewModel()
     @State private var isFileImporterPresented = false
     @State private var isFileExporterPresented = false
     @State private var isSaveActionSheetPresented = false
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
+    @State private var isShowingPaywall = false
     
     private var isBusy: Bool {
         viewModel.isConverting || viewModel.isImporting
@@ -116,6 +118,9 @@ struct AudioConverterView: View {
             if let message = saveMessage {
                 Text(message)
             }
+        }
+        .fullScreenCover(isPresented: $isShowingPaywall) {
+            TrialPaywallView(allowsDismissal: true)
         }
     }
     
@@ -249,7 +254,11 @@ struct AudioConverterView: View {
             
             Button(action: {
                 Task {
-                    await viewModel.startConversion()
+                    if await purchaseManager.canUseCoreFeatures() {
+                        await viewModel.startConversion()
+                    } else {
+                        isShowingPaywall = true
+                    }
                 }
             }) {
                 HStack(spacing: 6) {

@@ -327,7 +327,7 @@ final class LocalTransferService: NSObject, ObservableObject {
                 let filename = request.query?["name"],
                 let fileURL = TransferResultArchiveService.resultFileURL(categoryRawValue: category, filename: filename)
             else {
-                return Self.errorResponse(statusCode: 404, message: "Result file not found")
+                return Self.errorResponse(statusCode: 404, code: "result_file_not_found")
             }
 
             return GCDWebServerFileResponse(file: fileURL.path, isAttachment: true)
@@ -340,7 +340,7 @@ final class LocalTransferService: NSObject, ObservableObject {
                 let filename = request.query?["name"],
                 let fileURL = TransferResultArchiveService.resultFileURL(categoryRawValue: category, filename: filename)
             else {
-                return Self.errorResponse(statusCode: 404, message: "Result stream not found")
+                return Self.errorResponse(statusCode: 404, code: "result_stream_not_found")
             }
 
             if request.hasByteRange() {
@@ -355,13 +355,13 @@ final class LocalTransferService: NSObject, ObservableObject {
                 let category = request.query?["category"],
                 let filename = request.query?["name"]
             else {
-                completion(Self.errorResponse(statusCode: 404, message: "Result thumbnail not found"))
+                completion(Self.errorResponse(statusCode: 404, code: "result_thumbnail_not_found"))
                 return
             }
 
             Task {
                 guard let thumbnail = await TransferResultArchiveService.thumbnailData(categoryRawValue: category, filename: filename) else {
-                    completion(Self.errorResponse(statusCode: 404, message: "Result thumbnail not found"))
+                    completion(Self.errorResponse(statusCode: 404, code: "result_thumbnail_not_found"))
                     return
                 }
 
@@ -377,14 +377,14 @@ final class LocalTransferService: NSObject, ObservableObject {
                 let category = request.query?["category"],
                 let filename = request.query?["name"]
             else {
-                return Self.errorResponse(statusCode: 400, message: "Invalid result deletion request")
+                return Self.errorResponse(statusCode: 400, code: "invalid_result_deletion_request")
             }
 
             do {
                 try TransferResultArchiveService.deleteResult(categoryRawValue: category, filename: filename)
                 return Self.jsonResponse(["success": true])
             } catch {
-                return Self.errorResponse(statusCode: 500, message: error.localizedDescription)
+                return Self.errorResponse(statusCode: 500, code: "delete_result_failed", message: error.localizedDescription)
             }
         }
 
@@ -395,7 +395,7 @@ final class LocalTransferService: NSObject, ObservableObject {
                 let rawKind = request.query?["kind"],
                 let kind = TransferLibraryKind(rawValue: rawKind)
             else {
-                completion(Self.errorResponse(statusCode: 400, message: "Invalid asset request"))
+                completion(Self.errorResponse(statusCode: 400, code: "invalid_asset_request"))
                 return
             }
             TransferPhotoLibraryService.makeThumbnailResponse(identifier: identifier, kind: kind, completion: completion)
@@ -408,7 +408,7 @@ final class LocalTransferService: NSObject, ObservableObject {
                 let rawKind = request.query?["kind"],
                 let kind = TransferLibraryKind(rawValue: rawKind)
             else {
-                completion(Self.errorResponse(statusCode: 400, message: "Invalid asset request"))
+                completion(Self.errorResponse(statusCode: 400, code: "invalid_asset_request"))
                 return
             }
             TransferPhotoLibraryService.makeDownloadResponse(identifier: identifier, kind: kind, completion: completion)
@@ -429,7 +429,7 @@ final class LocalTransferService: NSObject, ObservableObject {
                 let fileURL = Self.sharedFileURL(for: filename, in: sharedDirectoryURL),
                 FileManager.default.fileExists(atPath: fileURL.path)
             else {
-                return Self.errorResponse(statusCode: 404, message: "File not found")
+                return Self.errorResponse(statusCode: 404, code: "shared_file_not_found")
             }
 
             if request.hasByteRange() {
@@ -440,7 +440,7 @@ final class LocalTransferService: NSObject, ObservableObject {
 
         server.addHandler(forMethod: "POST", path: "/api/upload", request: GCDWebServerMultiPartFormRequest.self) { [weak self] request in
             guard let request = request as? GCDWebServerMultiPartFormRequest else {
-                return Self.errorResponse(statusCode: 400, message: "Invalid upload request")
+                return Self.errorResponse(statusCode: 400, code: "invalid_upload_request")
             }
             markClientActivity(request)
 
@@ -460,7 +460,7 @@ final class LocalTransferService: NSObject, ObservableObject {
                 let fileURL = Self.sharedFileURL(for: filename, in: sharedDirectoryURL),
                 FileManager.default.fileExists(atPath: fileURL.path)
             else {
-                return Self.errorResponse(statusCode: 404, message: "File not found")
+                return Self.errorResponse(statusCode: 404, code: "shared_file_not_found")
             }
 
             do {
@@ -470,7 +470,7 @@ final class LocalTransferService: NSObject, ObservableObject {
                 }
                 return Self.jsonResponse(["success": true, "name": fileURL.lastPathComponent])
             } catch {
-                return Self.errorResponse(statusCode: 500, message: error.localizedDescription)
+                return Self.errorResponse(statusCode: 500, code: "delete_shared_file_failed", message: error.localizedDescription)
             }
         }
 
@@ -818,8 +818,12 @@ final class LocalTransferService: NSObject, ObservableObject {
         return response ?? GCDWebServerDataResponse()
     }
 
-    private static func errorResponse(statusCode: Int, message: String) -> GCDWebServerDataResponse {
-        jsonResponse(["error": message], statusCode: statusCode)
+    private static func errorResponse(statusCode: Int, code: String, message: String? = nil) -> GCDWebServerDataResponse {
+        var payload: [String: Any] = ["errorCode": code]
+        if let message, !message.isEmpty {
+            payload["error"] = message
+        }
+        return jsonResponse(payload, statusCode: statusCode)
     }
 
     private static func webResourcePath(named name: String, withExtension ext: String) -> String? {

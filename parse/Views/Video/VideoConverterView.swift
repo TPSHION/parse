@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 struct VideoConverterView: View {
     @Environment(RouterManager.self) private var router
     @Environment(TabRouter.self) private var tabRouter
+    @Environment(PurchaseManager.self) private var purchaseManager
     @StateObject private var viewModel = VideoConverterViewModel()
     @State private var selectedVideos: [PhotosPickerItem] = []
     @State private var isFileImporterPresented = false
@@ -12,6 +13,7 @@ struct VideoConverterView: View {
     @State private var isSaveActionSheetPresented = false
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
+    @State private var isShowingPaywall = false
 
     private var importContentTypes: [UTType] {
         var types: [UTType] = [.movie, .video]
@@ -155,6 +157,9 @@ struct VideoConverterView: View {
             .presentationDetents([.height(356)])
             .presentationDragIndicator(.visible)
             .presentationBackground(AppColors.background)
+        }
+        .fullScreenCover(isPresented: $isShowingPaywall) {
+            TrialPaywallView(allowsDismissal: true)
         }
         .alert("保存结果", isPresented: $showSaveAlert) {
             Button("确定", role: .cancel) {}
@@ -330,7 +335,13 @@ struct VideoConverterView: View {
             
             Button(action: {
                 Task {
-                    await viewModel.handlePrimaryAction()
+                    if viewModel.isConverting {
+                        await viewModel.handlePrimaryAction()
+                    } else if await purchaseManager.canUseCoreFeatures() {
+                        await viewModel.handlePrimaryAction()
+                    } else {
+                        isShowingPaywall = true
+                    }
                 }
             }) {
                 HStack(spacing: 6) {

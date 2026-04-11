@@ -50,7 +50,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
                 return .english
             }
         }
-        return .simplifiedChinese
+        return .english
     }
 
     nonisolated static func effective(from rawValue: String?) -> AppLanguage {
@@ -63,9 +63,7 @@ enum AppLocalizer {
         AppLanguage.effective(from: UserDefaults.standard.string(forKey: AppLanguage.storageKey))
     }
 
-    nonisolated static func localized(_ key: String) -> String {
-        let language = currentLanguage
-
+    nonisolated static func localized(_ key: String, language: AppLanguage) -> String {
         guard language != .simplifiedChinese else {
             return key
         }
@@ -78,6 +76,10 @@ enum AppLocalizer {
         }
 
         return bundle.localizedString(forKey: key, value: key, table: nil)
+    }
+
+    nonisolated static func localized(_ key: String) -> String {
+        localized(key, language: currentLanguage)
     }
 
     nonisolated static func formatted(_ key: String, _ arguments: CVarArg...) -> String {

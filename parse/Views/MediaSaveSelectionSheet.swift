@@ -6,6 +6,7 @@ struct MediaSaveSelectionSheet: View {
     let onSaveToAlbum: () -> Void
     let onSaveToFile: () -> Void
     let onOpenTransferGuide: () -> Void
+    @State private var isShareSheetPresented = false
 
     private var selectedCount: Int {
         items.filter { selectedItemIDs.contains($0.id) }.count
@@ -31,6 +32,9 @@ struct MediaSaveSelectionSheet: View {
         }
         .padding(20)
         .background(AppColors.background.ignoresSafeArea())
+        .sheet(isPresented: $isShareSheetPresented) {
+            ActivityShareSheet(items: selectedShareableURLs)
+        }
     }
 
     private var header: some View {
@@ -97,7 +101,9 @@ struct MediaSaveSelectionSheet: View {
                         foreground: AppColors.textSecondary.opacity(0.5)
                     )
                 } else {
-                    ShareLink(items: selectedShareableURLs) {
+                    Button {
+                        isShareSheetPresented = true
+                    } label: {
                         actionButton(
                             icon: "square.and.arrow.up",
                             title: AppLocalizer.localized("分享文件"),

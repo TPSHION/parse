@@ -170,6 +170,20 @@ const translations = {
     delete_file_title: "删除共享文件",
     delete_file_message: "确认删除 {filename} 吗？删除后将无法继续访问该文件。",
     request_failed: "请求失败 ({status})",
+    server_photo_access_not_granted: "尚未允许访问照片库，请回到 App 授权后重试。",
+    server_asset_not_found: "未找到对应的相册资源。",
+    server_asset_resource_not_found: "未找到可下载的相册资源。",
+    server_thumbnail_render_failed: "缩略图生成失败，请稍后重试。",
+    server_asset_download_failed: "资源下载失败，请稍后重试。",
+    server_result_file_not_found: "未找到对应的结果文件。",
+    server_result_stream_not_found: "未找到对应的预览资源。",
+    server_result_thumbnail_not_found: "未找到对应的结果缩略图。",
+    server_invalid_result_deletion_request: "删除结果请求无效。",
+    server_delete_result_failed: "删除结果失败，请稍后重试。",
+    server_invalid_asset_request: "资源请求无效。",
+    server_shared_file_not_found: "未找到对应的共享文件。",
+    server_invalid_upload_request: "上传请求无效。",
+    server_delete_shared_file_failed: "删除共享文件失败，请稍后重试。",
     ts_not_supported: "当前浏览器不支持 TS 内嵌播放，请直接下载该文件后播放。",
     ts_preview_failed: "TS 预览失败：{message}",
     ts_preview_default_error: "浏览器无法解码当前视频",
@@ -278,6 +292,20 @@ const translations = {
     delete_file_title: "Delete File",
     delete_file_message: "Delete {filename}? It will no longer be available here.",
     request_failed: "Request failed ({status})",
+    server_photo_access_not_granted: "Photo Library access is not granted yet. Allow it in the app and try again.",
+    server_asset_not_found: "The requested library item could not be found.",
+    server_asset_resource_not_found: "No downloadable asset resource was found.",
+    server_thumbnail_render_failed: "Failed to generate the thumbnail. Please try again.",
+    server_asset_download_failed: "Failed to download the asset. Please try again.",
+    server_result_file_not_found: "The requested result file could not be found.",
+    server_result_stream_not_found: "The requested preview stream could not be found.",
+    server_result_thumbnail_not_found: "The requested result thumbnail could not be found.",
+    server_invalid_result_deletion_request: "The result deletion request is invalid.",
+    server_delete_result_failed: "Failed to delete the result. Please try again.",
+    server_invalid_asset_request: "The asset request is invalid.",
+    server_shared_file_not_found: "The requested shared file could not be found.",
+    server_invalid_upload_request: "The upload request is invalid.",
+    server_delete_shared_file_failed: "Failed to delete the shared file. Please try again.",
     ts_not_supported: "This browser can't play TS inline. Download the file to watch it.",
     ts_preview_failed: "TS preview failed: {message}",
     ts_preview_default_error: "The browser can't decode this video",
@@ -302,6 +330,18 @@ function t(key, variables = {}) {
   const fallback = translations["zh-Hans"][key] || key;
   const template = (translations[state.language] && translations[state.language][key]) || fallback;
   return template.replace(/\{(\w+)\}/g, (_, name) => `${variables[name] ?? ""}`);
+}
+
+function localizeServerError(payload, status) {
+  const errorCode = payload?.errorCode;
+  if (errorCode) {
+    const translationKey = `server_${errorCode}`;
+    if (translations["zh-Hans"][translationKey] || translations.en[translationKey]) {
+      return t(translationKey);
+    }
+  }
+
+  return payload?.error || t("request_failed", { status });
 }
 
 function syncLanguageButtons() {
@@ -848,7 +888,7 @@ async function requestJSON(url, options = {}) {
   const payload = text ? JSON.parse(text) : {};
 
   if (!response.ok) {
-    throw new Error(payload.error || t("request_failed", { status: response.status }));
+    throw new Error(localizeServerError(payload, response.status));
   }
 
   return payload;

@@ -107,7 +107,15 @@ private struct ConversionWelcomeHeader: View {
 
                 Spacer(minLength: 0)
 
-                LanguageSwitcherMenu(selectedLanguage: selectedLanguage, onSelect: onSelectLanguage)
+                AppLanguageSwitcher(
+                    selectedLanguage: selectedLanguage,
+                    onSelect: onSelectLanguage,
+                    iconSize: 13,
+                    textSize: 13,
+                    horizontalPadding: 12,
+                    verticalPadding: 9,
+                    backgroundColor: AppColors.cardBackground.opacity(0.92)
+                )
             }
 
             Text("超级转换工具箱")
@@ -121,48 +129,6 @@ private struct ConversionWelcomeHeader: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .opacity(appearAnimation ? 1 : 0)
         .offset(y: appearAnimation ? 0 : 20)
-    }
-}
-
-private struct LanguageSwitcherMenu: View {
-    let selectedLanguage: AppLanguage
-    let onSelect: (AppLanguage) -> Void
-
-    var body: some View {
-        Menu {
-            ForEach(AppLanguage.allCases) { language in
-                Button {
-                    onSelect(language)
-                } label: {
-                    HStack {
-                        Text(language.displayName)
-
-                        if language == selectedLanguage {
-                            Image(systemName: "checkmark")
-                        }
-                    }
-                }
-            }
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: "globe")
-                    .font(.system(size: 13, weight: .semibold))
-
-                Text(selectedLanguage.shortLabel)
-                    .font(.system(size: 13, weight: .bold))
-            }
-            .foregroundColor(.white)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 9)
-            .background(
-                Capsule()
-                    .fill(AppColors.cardBackground.opacity(0.92))
-            )
-            .overlay(
-                Capsule()
-                    .strokeBorder(.white.opacity(0.08), lineWidth: 1)
-            )
-        }
     }
 }
 

@@ -14,13 +14,8 @@ struct ContentView: View {
                 OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
             }
         }
-        .fullScreenCover(
-            isPresented: Binding(
-                get: { hasCompletedOnboarding && purchaseManager.requiresPaywall },
-                set: { _ in }
-            )
-        ) {
-            TrialPaywallView()
+        .task {
+            await purchaseManager.prepareIfNeeded()
         }
     }
 }

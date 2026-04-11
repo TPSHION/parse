@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct TrialPaywallView: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(PurchaseManager.self) private var purchaseManager
+    var allowsDismissal = false
 
     var body: some View {
         ZStack {
@@ -9,6 +11,10 @@ struct TrialPaywallView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 24) {
+                    if allowsDismissal {
+                        dismissButtonRow
+                    }
+
                     headerSection
                     featureSection
                     pricingSection
@@ -26,13 +32,36 @@ struct TrialPaywallView: View {
                     actionSection
                 }
                 .padding(24)
-                .padding(.top, 24)
+                .padding(.top, allowsDismissal ? 0 : 24)
                 .padding(.bottom, 40)
             }
         }
-        .interactiveDismissDisabled(true)
+        .interactiveDismissDisabled(!allowsDismissal)
         .task {
             await purchaseManager.prepareIfNeeded()
+        }
+        .onChange(of: purchaseManager.hasActiveAccess) { _, hasAccess in
+            if allowsDismissal && hasAccess {
+                dismiss()
+            }
+        }
+    }
+
+    private var dismissButtonRow: some View {
+        HStack {
+            Spacer()
+
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white.opacity(0.9))
+                    .frame(width: 36, height: 36)
+                    .background(AppColors.cardBackground.opacity(0.92))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
         }
     }
 
