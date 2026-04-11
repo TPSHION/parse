@@ -53,6 +53,13 @@ body::before {
   gap: 14px;
 }
 
+.workspace-shell {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 14px;
+}
+
 .topbar,
 .sidebar,
 .content,
@@ -346,6 +353,120 @@ body::before {
 
 .content-view.is-active {
   display: block;
+}
+
+.pairing-screen {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.pairing-screen-shell {
+  width: min(760px, 100%);
+  display: grid;
+  gap: 22px;
+}
+
+.pairing-screen-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.pairing-screen-copy {
+  max-width: 540px;
+}
+
+.pairing-screen-brand {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  font-family: "Avenir Next Condensed", "DIN Condensed", "PingFang SC", sans-serif;
+}
+
+.pairing-screen-head h1 {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 0.95;
+  font-family: "Avenir Next Condensed", "DIN Condensed", "PingFang SC", sans-serif;
+}
+
+.pairing-screen-card {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid rgba(45, 156, 219, 0.2);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(45, 156, 219, 0.14), transparent 34%),
+    linear-gradient(135deg, rgba(45, 156, 219, 0.08), rgba(55, 178, 108, 0.04)),
+    var(--panel-strong);
+  box-shadow: var(--shadow);
+}
+
+.pairing-screen-form {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+
+.pairing-screen-form h2 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  line-height: 1;
+  font-family: "Avenir Next Condensed", "DIN Condensed", "PingFang SC", sans-serif;
+}
+
+.pairing-form,
+.pairing-screen-form .pairing-field,
+.pairing-screen-form .pairing-submit-button {
+  max-width: 360px;
+}
+
+.pairing-form {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.pairing-field {
+  display: grid;
+  gap: 6px;
+  min-width: min(220px, 100%);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.pairing-field input {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(28, 49, 86, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+}
+
+.pairing-field input:focus {
+  outline: 2px solid rgba(45, 156, 219, 0.18);
+  outline-offset: 1px;
+}
+
+.pairing-status {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
 }
 
 .section-header {
@@ -1076,6 +1197,15 @@ body::before {
   .content {
     padding: 14px;
     padding-bottom: 78px;
+  }
+
+  .pairing-screen-head {
+    flex-direction: column;
+  }
+
+  .pairing-screen-form .pairing-field,
+  .pairing-screen-form .pairing-submit-button {
+    width: 100%;
   }
 
   .topbar-compact-main,

@@ -1,5 +1,5 @@
 const state = {
-  activeView: "images",
+  activeView: "transfer",
   meta: null,
   files: [],
   images: [],
@@ -12,14 +12,25 @@ const state = {
   language: normalizeLanguage(window.__PARSE_APP_LANGUAGE__ || "zh-Hans"),
   languageOverridden: false,
   topbarExpanded: !window.matchMedia("(max-width: 720px)").matches,
+  accessCode: "",
+  isPaired: false,
+  hasLoadedImages: false,
+  hasLoadedVideos: false,
+  hasLoadedResults: false,
+  hasLoadedTransfer: false,
 };
 
 const elements = {
   menuItems: Array.from(document.querySelectorAll(".menu-item")),
   viewPanels: Array.from(document.querySelectorAll("[data-view-panel]")),
   langButtons: Array.from(document.querySelectorAll("[data-lang-option]")),
+  pairingScreen: document.getElementById("pairing-screen"),
+  workspaceShell: document.getElementById("workspace-shell"),
   topbar: document.querySelector(".topbar"),
   topbarToggleButton: document.getElementById("topbar-toggle-button"),
+  pairingCodeInput: document.getElementById("pairing-code-input"),
+  pairingSubmitButton: document.getElementById("pairing-submit-button"),
+  pairingStatus: document.getElementById("pairing-status"),
   connectionDot: document.getElementById("connection-dot"),
   connectionStateText: document.getElementById("connection-state-text"),
   shareAddress: document.getElementById("share-address"),
@@ -71,6 +82,18 @@ const elements = {
 const translations = {
   "zh-Hans": {
     page_title: "Parse Transfer",
+    pairing_kicker: "安全配对",
+    pairing_title: "请输入 App 中显示的 6 位配对码",
+    pairing_subtitle: "完成一次配对后，才能浏览手机中的照片、处理结果和共享文件。",
+    pairing_code_label: "配对码",
+    pairing_code_placeholder: "123 456",
+    pairing_submit: "连接设备",
+    pairing_success: "配对成功，已解锁当前设备。",
+    pairing_failed: "配对失败：{message}",
+    pairing_required_status: "请输入 App 中显示的 6 位配对码后再继续。",
+    pairing_required_content: "请输入 App 中显示的 6 位配对码后再浏览此内容。",
+    images_prompt: "点击“刷新图片”后，才会请求照片权限并加载图片列表。",
+    videos_prompt: "点击“刷新视频”后，才会请求照片权限并加载视频列表。",
     topbar_connection_status: "连接状态",
     connection_connecting: "连接中",
     connection_connected: "已连接",
@@ -181,6 +204,8 @@ const translations = {
     server_invalid_result_deletion_request: "删除结果请求无效。",
     server_delete_result_failed: "删除结果失败，请稍后重试。",
     server_invalid_asset_request: "资源请求无效。",
+    server_pairing_required: "请输入 App 中显示的配对码后再访问此内容。",
+    server_invalid_pairing_code: "配对码无效，请核对后重试。",
     server_shared_file_not_found: "未找到对应的共享文件。",
     server_invalid_upload_request: "上传请求无效。",
     server_delete_shared_file_failed: "删除共享文件失败，请稍后重试。",
@@ -193,6 +218,18 @@ const translations = {
   },
   en: {
     page_title: "Parse Transfer",
+    pairing_kicker: "Secure Pairing",
+    pairing_title: "Enter the 6-digit code shown in the app",
+    pairing_subtitle: "Pair once on this page before browsing photos, results, or shared files on your phone.",
+    pairing_code_label: "Pairing Code",
+    pairing_code_placeholder: "123 456",
+    pairing_submit: "Pair Device",
+    pairing_success: "Paired successfully.",
+    pairing_failed: "Pairing failed: {message}",
+    pairing_required_status: "Enter the code shown in the app before continuing.",
+    pairing_required_content: "Enter the code shown in the app before loading this content.",
+    images_prompt: "Tap Refresh Photos to request photo access and load your photo library.",
+    videos_prompt: "Tap Refresh Videos to request photo access and load your video library.",
     topbar_connection_status: "Status",
     connection_connecting: "Connecting",
     connection_connected: "Connected",
@@ -303,6 +340,8 @@ const translations = {
     server_invalid_result_deletion_request: "The result deletion request is invalid.",
     server_delete_result_failed: "Failed to delete the result. Please try again.",
     server_invalid_asset_request: "The asset request is invalid.",
+    server_pairing_required: "Enter the pairing code shown in the app before accessing this content.",
+    server_invalid_pairing_code: "That pairing code is invalid. Please try again.",
     server_shared_file_not_found: "The requested shared file could not be found.",
     server_invalid_upload_request: "The upload request is invalid.",
     server_delete_shared_file_failed: "Failed to delete the shared file. Please try again.",
@@ -350,6 +389,26 @@ function syncLanguageButtons() {
   });
 }
 
+function normalizedAccessCode(value) {
+  return `${value || ""}`.replace(/\D/g, "").slice(0, state.meta?.pairingCodeLength || 6);
+}
+
+function authorizedURL(path) {
+  const code = normalizedAccessCode(state.accessCode);
+  if (!code) {
+    return path;
+  }
+
+  const url = new URL(path, window.location.origin);
+  url.searchParams.set("code", code);
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
+function requestHeaders(headers = {}) {
+  const code = normalizedAccessCode(state.accessCode);
+  return code ? { ...headers, "X-Parse-Access-Code": code } : headers;
+}
+
 function applyStaticTranslations() {
   document.documentElement.lang = state.language === "en" ? "en" : "zh-CN";
   document.title = t("page_title");
@@ -383,6 +442,7 @@ function applyLanguage(language, { fromUser = true } = {}) {
   if (state.meta) {
     renderMeta();
   }
+  updatePairingUI();
   renderMediaGrid("images");
   renderMediaGrid("videos");
   renderFiles();
@@ -397,9 +457,13 @@ async function bootstrap() {
   applyStaticTranslations();
   wireEvents();
   syncTopbarMode();
-  switchView("images");
+  switchView(state.activeView);
   await refreshMeta();
-  await Promise.all([refreshImages(), refreshVideos(), refreshResults(), refreshTransfer()]);
+  updatePairingUI();
+  renderMediaGrid("images");
+  renderMediaGrid("videos");
+  renderFiles();
+  renderResults();
 }
 
 function wireEvents() {
@@ -423,6 +487,20 @@ function wireEvents() {
     syncTopbarMode();
   });
 
+  elements.pairingCodeInput?.addEventListener("input", (event) => {
+    const code = normalizedAccessCode(event.target.value);
+    event.target.value = formatPairingInput(code);
+  });
+
+  elements.pairingCodeInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      submitPairingCode();
+    }
+  });
+
+  elements.pairingSubmitButton?.addEventListener("click", submitPairingCode);
+
   const handleCopyAddress = async () => {
     if (!state.meta?.address) return;
     await navigator.clipboard.writeText(state.meta.address);
@@ -433,6 +511,8 @@ function wireEvents() {
   elements.sidebarCopyAddressButton?.addEventListener("click", handleCopyAddress);
 
   const handleDisconnect = async () => {
+    if (!ensurePaired()) return;
+
     const confirmed = await confirmAction({
       title: t("disconnect_title"),
       message: t("disconnect_message"),
@@ -490,7 +570,6 @@ function wireEvents() {
       elements.dropzone.classList.remove("dragover");
     });
   });
-
 }
 
 function switchView(view) {
@@ -501,6 +580,14 @@ function switchView(view) {
   elements.viewPanels.forEach((panel) => {
     panel.classList.toggle("is-active", panel.dataset.viewPanel === view);
   });
+
+  if (state.isPaired) {
+    if (view === "results" && !state.hasLoadedResults) {
+      refreshResults().catch(() => {});
+    } else if (view === "transfer" && !state.hasLoadedTransfer) {
+      refreshTransfer().catch(() => {});
+    }
+  }
 }
 
 async function refreshMeta() {
@@ -510,27 +597,33 @@ async function refreshMeta() {
     applyLanguage(meta.appLanguage, { fromUser: false });
   }
   renderMeta();
+  updatePairingUI();
 }
 
 async function refreshImages() {
+  if (!ensurePaired()) return;
   setStatus(t("fetching_images"));
-  const payload = await requestJSON("/api/library/images");
+  const payload = await requestJSON("/api/library/images?prompt=1");
   state.images = payload.items || [];
   state.photoAuthorization = payload.authorization;
+  state.hasLoadedImages = true;
   renderMediaGrid("images");
   setStatus(t("images_refreshed"));
 }
 
 async function refreshVideos() {
+  if (!ensurePaired()) return;
   setStatus(t("fetching_videos"));
-  const payload = await requestJSON("/api/library/videos");
+  const payload = await requestJSON("/api/library/videos?prompt=1");
   state.videos = payload.items || [];
   state.videoAuthorization = payload.authorization;
+  state.hasLoadedVideos = true;
   renderMediaGrid("videos");
   setStatus(t("videos_refreshed"));
 }
 
 async function refreshTransfer() {
+  if (!ensurePaired()) return;
   setStatus(t("syncing_transfer"));
   const [meta, files] = await Promise.all([requestJSON("/api/meta"), requestJSON("/api/files")]);
   state.meta = meta;
@@ -538,17 +631,86 @@ async function refreshTransfer() {
     applyLanguage(meta.appLanguage, { fromUser: false });
   }
   state.files = files.items || [];
+  state.hasLoadedTransfer = true;
   renderMeta();
   renderFiles();
   setStatus(t("transfer_refreshed"));
 }
 
 async function refreshResults() {
+  if (!ensurePaired()) return;
   setStatus(t("syncing_results"));
   const payload = await requestJSON("/api/results");
   state.results = payload.sections || [];
+  state.hasLoadedResults = true;
   renderResults();
   setStatus(t("results_refreshed"));
+}
+
+function formatPairingInput(value) {
+  const code = normalizedAccessCode(value);
+  return code.length > 3 ? `${code.slice(0, 3)} ${code.slice(3)}` : code;
+}
+
+function ensurePaired() {
+  if (state.isPaired) {
+    return true;
+  }
+
+  updatePairingUI();
+  elements.pairingCodeInput?.focus();
+  setStatus(t("pairing_required_status"), true);
+  showToast(t("pairing_required_status"), true);
+  return false;
+}
+
+function updatePairingUI() {
+  const needsPairing = !!state.meta?.pairingRequired && !state.isPaired;
+  elements.pairingScreen?.classList.toggle("hidden", !needsPairing);
+  elements.workspaceShell?.classList.toggle("hidden", needsPairing);
+
+  if (needsPairing) {
+    elements.pairingStatus.textContent = t("pairing_required_status");
+    elements.pairingStatus.classList.remove("hidden");
+  }
+
+  if (needsPairing && elements.pairingCodeInput) {
+    elements.pairingCodeInput.value = formatPairingInput(elements.pairingCodeInput.value);
+  }
+}
+
+async function submitPairingCode() {
+  const code = normalizedAccessCode(elements.pairingCodeInput?.value);
+  if (!code) {
+    setStatus(t("pairing_required_status"), true);
+    showToast(t("pairing_required_status"), true);
+    elements.pairingCodeInput?.focus();
+    return;
+  }
+
+  try {
+    await requestJSON("/api/pair", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
+    state.accessCode = code;
+    state.isPaired = true;
+    updatePairingUI();
+    elements.pairingStatus.classList.add("hidden");
+    setStatus(t("pairing_success"));
+    showToast(t("pairing_success"));
+    await Promise.all([refreshResults(), refreshTransfer()]);
+  } catch (error) {
+    state.accessCode = "";
+    state.isPaired = false;
+    updatePairingUI();
+    elements.pairingStatus.textContent = t("pairing_failed", { message: error.message });
+    elements.pairingStatus.classList.remove("hidden");
+    setStatus(t("pairing_failed", { message: error.message }), true);
+    showToast(t("pairing_failed", { message: error.message }), true);
+    elements.pairingCodeInput?.focus();
+  }
 }
 
 function renderMeta() {
@@ -602,6 +764,18 @@ function renderMediaGrid(kind) {
 
   grid.innerHTML = "";
 
+  if (!state.isPaired) {
+    empty.textContent = t("pairing_required_content");
+    empty.classList.remove("hidden");
+    return;
+  }
+
+  if ((isImage && !state.hasLoadedImages) || (!isImage && !state.hasLoadedVideos)) {
+    empty.textContent = isImage ? t("images_prompt") : t("videos_prompt");
+    empty.classList.remove("hidden");
+    return;
+  }
+
   if (authorization === "denied" || authorization === "restricted") {
     empty.textContent = t("photo_access_denied");
     empty.classList.remove("hidden");
@@ -624,14 +798,14 @@ function renderMediaGrid(kind) {
     const meta = fragment.querySelector(".media-meta");
     const download = fragment.querySelector(".download-button");
 
-    image.src = item.thumbnailURL;
+    image.src = authorizedURL(item.thumbnailURL);
     image.alt = item.name;
     badge.textContent = isImage ? t("media_badge_image") : t("media_badge_video");
     name.textContent = item.name;
     meta.textContent = isImage
       ? `${formatDate(item.createdAt)}`
       : `${formatDate(item.createdAt)} · ${formatDuration(item.duration || 0)}`;
-    download.href = item.downloadURL;
+    download.href = authorizedURL(item.downloadURL);
 
     grid.appendChild(fragment);
   });
@@ -639,6 +813,18 @@ function renderMediaGrid(kind) {
 
 function renderFiles() {
   elements.fileGrid.innerHTML = "";
+
+  if (!state.isPaired) {
+    elements.transferEmpty.textContent = t("pairing_required_content");
+    elements.transferEmpty.classList.remove("hidden");
+    return;
+  }
+
+  if (!state.hasLoadedTransfer) {
+    elements.transferEmpty.textContent = t("transfer_empty");
+    elements.transferEmpty.classList.remove("hidden");
+    return;
+  }
 
   if (!state.files.length) {
     elements.transferEmpty.textContent = t("transfer_empty");
@@ -660,7 +846,7 @@ function renderFiles() {
     name.textContent = file.name;
     ext.textContent = file.extension || "file";
     meta.textContent = `${formatBytes(file.bytes)} · ${formatDate(file.modifiedAt)}`;
-    download.href = `/api/download?name=${encodeURIComponent(file.name)}`;
+    download.href = authorizedURL(`/api/download?name=${encodeURIComponent(file.name)}`);
     remove.addEventListener("click", () => deleteFile(file.name, card));
 
     elements.fileGrid.appendChild(fragment);
@@ -675,6 +861,18 @@ function renderResults() {
     items: filterAndSortResultItems(section.items || []),
   }));
   const hasItems = sections.some((section) => section.items.length > 0);
+
+  if (!state.isPaired) {
+    elements.resultsEmpty.textContent = t("pairing_required_content");
+    elements.resultsEmpty.classList.remove("hidden");
+    return;
+  }
+
+  if (!state.hasLoadedResults) {
+    elements.resultsEmpty.textContent = t("results_empty_default");
+    elements.resultsEmpty.classList.remove("hidden");
+    return;
+  }
 
   if (!hasItems) {
     elements.resultsEmpty.textContent = state.resultsQuery
@@ -720,7 +918,7 @@ function renderResults() {
           <div class="result-actions">
             <span class="result-count">${localizedSectionTitle}</span>
             ${renderResultPreviewButton(section.key, item)}
-            <a class="download-button result-download" href="${item.downloadURL}" target="_blank" rel="noopener">${t("download")}</a>
+            <a class="download-button result-download" href="${authorizedURL(item.downloadURL)}" target="_blank" rel="noopener">${t("download")}</a>
             <button class="delete-button result-delete-button" type="button">${t("delete")}</button>
           </div>
         `;
@@ -759,7 +957,7 @@ function filterAndSortResultItems(items) {
 
 function renderResultPreview(item) {
   if (item.previewKind === "image" || item.previewKind === "video") {
-    return `<img class="result-thumb" src="${item.thumbnailURL}" alt="${escapeHTML(item.name)}">`;
+    return `<img class="result-thumb" src="${authorizedURL(item.thumbnailURL)}" alt="${escapeHTML(item.name)}">`;
   }
 
   return `<div class="result-thumb is-placeholder">${escapeHTML(extensionLabel(item.name))}</div>`;
@@ -798,6 +996,7 @@ async function deleteResult(category, filename, row) {
 
 async function uploadFiles(files) {
   switchView("transfer");
+  if (!ensurePaired()) return;
   for (const file of files) {
     await uploadSingleFile(file);
   }
@@ -821,6 +1020,15 @@ function uploadSingleFile(file) {
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "/api/upload", true);
+    const accessCode = normalizedAccessCode(state.accessCode);
+    if (!accessCode) {
+      setStatus(t("pairing_required_status"), true);
+      showToast(t("pairing_required_status"), true);
+      item.remove();
+      resolve();
+      return;
+    }
+    xhr.setRequestHeader("X-Parse-Access-Code", accessCode);
 
     xhr.upload.onprogress = (event) => {
       if (!event.lengthComputable) return;
@@ -883,11 +1091,35 @@ async function deleteFile(filename, card) {
 }
 
 async function requestJSON(url, options = {}) {
-  const response = await fetch(url, options);
+  const response = await fetch(url, {
+    ...options,
+    headers: requestHeaders(options.headers || {}),
+  });
   const text = await response.text();
   const payload = text ? JSON.parse(text) : {};
 
   if (!response.ok) {
+    if (response.status === 401 && payload?.errorCode === "pairing_required") {
+      state.accessCode = "";
+      state.isPaired = false;
+      state.hasLoadedImages = false;
+      state.hasLoadedVideos = false;
+      state.hasLoadedResults = false;
+      state.hasLoadedTransfer = false;
+      if (state.meta) {
+        state.meta = {
+          ...state.meta,
+          fileCount: 0,
+          totalBytes: 0,
+        };
+        renderMeta();
+      }
+      updatePairingUI();
+      renderMediaGrid("images");
+      renderMediaGrid("videos");
+      renderFiles();
+      renderResults();
+    }
     throw new Error(localizeServerError(payload, response.status));
   }
 
@@ -972,7 +1204,7 @@ function closeDialog(result) {
 }
 
 async function openResultPreview(category, item) {
-  const streamURL = `/api/results/stream?category=${encodeURIComponent(category)}&name=${encodeURIComponent(item.name)}`;
+  const streamURL = authorizedURL(`/api/results/stream?category=${encodeURIComponent(category)}&name=${encodeURIComponent(item.name)}`);
   const extension = (item.name.split(".").pop() || "").toLowerCase();
 
   closePreview();

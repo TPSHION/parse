@@ -23,8 +23,8 @@ enum TransferLibraryKind: String {
 }
 
 enum TransferPhotoLibraryService {
-    static func fetchLibraryPayload(for kind: TransferLibraryKind) async -> [String: Any] {
-        let status = await ensureReadPermission()
+    static func fetchLibraryPayload(for kind: TransferLibraryKind, promptIfNeeded: Bool) async -> [String: Any] {
+        let status = await readPermissionStatus(promptIfNeeded: promptIfNeeded)
         guard isAuthorized(status) else {
             return [
                 "authorization": authorizationText(for: status),
@@ -72,7 +72,7 @@ enum TransferPhotoLibraryService {
         completion: @escaping (GCDWebServerResponse?) -> Void
     ) {
         Task {
-            let status = await ensureReadPermission()
+            let status = await readPermissionStatus(promptIfNeeded: false)
             guard isAuthorized(status) else {
                 completion(errorResponse(statusCode: 403, code: "photo_access_not_granted"))
                 return
@@ -111,7 +111,7 @@ enum TransferPhotoLibraryService {
         completion: @escaping (GCDWebServerResponse?) -> Void
     ) {
         Task {
-            let status = await ensureReadPermission()
+            let status = await readPermissionStatus(promptIfNeeded: false)
             guard isAuthorized(status) else {
                 completion(errorResponse(statusCode: 403, code: "photo_access_not_granted"))
                 return
@@ -146,9 +146,9 @@ enum TransferPhotoLibraryService {
         }
     }
 
-    private static func ensureReadPermission() async -> PHAuthorizationStatus {
+    private static func readPermissionStatus(promptIfNeeded: Bool) async -> PHAuthorizationStatus {
         let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-        if status == .notDetermined {
+        if promptIfNeeded, status == .notDetermined {
             return await PHPhotoLibrary.requestAuthorization(for: .readWrite)
         }
         return status

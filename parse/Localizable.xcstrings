@@ -1176,7 +1176,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Start the service to get a browser address."
+            "value": "Once started, the app generates an address you can open in a browser."
           }
         }
       }
@@ -1308,6 +1308,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Address Copied"
+          }
+        }
+      }
+    },
+    "配对码": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing Code"
           }
         }
       }
@@ -3094,6 +3105,17 @@
         }
       }
     },
+    "网页首次访问需输入此 6 位配对码。": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter this 6-digit pairing code the first time the webpage connects."
+          }
+        }
+      }
+    },
     "识别中": {
       "localizations": {
         "en": {
@@ -3166,6 +3188,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open the address above in a desktop browser. Status updates automatically after connection."
+          }
+        }
+      }
+    },
+    "请在电脑浏览器打开上方地址，并输入本机显示的配对码。": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open the address above in a desktop browser, then enter the pairing code shown on this device."
           }
         }
       }

@@ -14,6 +14,7 @@ final class LocalTransferService: NSObject, ObservableObject {
     @Published private(set) var lastErrorMessage: String?
     @Published private(set) var loopbackCheckMessage = AppLocalizer.localized("未检测")
     @Published private(set) var lanCheckMessage = AppLocalizer.localized("未检测")
+    @Published private(set) var accessCode = ""
 
     let sharedDirectoryURL: URL
 
@@ -28,6 +29,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         qos: .userInitiated
     )
     private let permissionServiceType = "_preflight_check._tcp"
+    private static let accessCodeLength = 6
 
     private static let webResourceDirectory = "Web/Transfer"
 
@@ -68,6 +70,20 @@ final class LocalTransferService: NSObject, ObservableObject {
             return AppLocalizer.localized("同网设备可在浏览器打开上方地址。")
         }
         return AppLocalizer.localized("启动后会生成访问地址，可在浏览器直接打开。")
+    }
+
+    var accessCodeText: String {
+        let normalizedCode = accessCode.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedCode.isEmpty else {
+            return AppLocalizer.localized("等待启动")
+        }
+
+        guard normalizedCode.count == Self.accessCodeLength else {
+            return normalizedCode
+        }
+
+        let midpoint = normalizedCode.index(normalizedCode.startIndex, offsetBy: Self.accessCodeLength / 2)
+        return "\(normalizedCode[..<midpoint]) \(normalizedCode[midpoint...])"
     }
 
     var filesCountText: String {
@@ -138,6 +154,7 @@ final class LocalTransferService: NSObject, ObservableObject {
 
         prepareSharedDirectoryIfNeeded()
         requestLocalNetworkPermissionIfNeeded()
+        accessCode = Self.makeAccessCode()
 
         guard let webServer = makeWebServer() else { return }
 
@@ -158,6 +175,7 @@ final class LocalTransferService: NSObject, ObservableObject {
             lastErrorMessage = AppLocalizer.localized("传输服务启动失败，请检查网络后重试。")
             loopbackCheckMessage = AppLocalizer.localized("启动失败")
             lanCheckMessage = AppLocalizer.localized("启动失败")
+            accessCode = ""
         }
     }
 
@@ -174,6 +192,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         permissionListener = nil
         isClientConnected = false
         serverURL = nil
+        accessCode = ""
 
         // GCDWebServer.stop() blocks while its internal sockets cancel, so keep it
         // off the main actor to avoid Thread Performance Checker QoS inversion warnings.
@@ -258,12 +277,19 @@ final class LocalTransferService: NSObject, ObservableObject {
 
         let sharedDirectoryURL = sharedDirectoryURL
         let deviceName = UIDevice.current.name
+        let currentAccessCode = accessCode
         let markClientActivity: (GCDWebServerRequest) -> Void = { [weak self] request in
             self?.scheduleClientActivityRegistration(for: request.remoteAddressString)
         }
+        let requireAuthorization: (GCDWebServerRequest) -> GCDWebServerResponse? = { request in
+            guard Self.isAuthorized(request, accessCode: currentAccessCode) else {
+                return Self.errorResponse(statusCode: 401, code: "pairing_required")
+            }
+            markClientActivity(request)
+            return nil
+        }
 
         server.addHandler(forMethod: "GET", path: "/", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
             return Self.htmlResponse(
                 filePath: indexPath,
                 appLanguageCode: AppLocalizer.currentLanguage.rawValue
@@ -271,57 +297,93 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "GET", path: "/styles.css", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
             return GCDWebServerFileResponse(file: stylesPath)
         }
 
         server.addHandler(forMethod: "GET", path: "/app.js", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
             return GCDWebServerFileResponse(file: scriptPath)
         }
 
         server.addHandler(forMethod: "GET", path: "/mpegts.js", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
             return GCDWebServerFileResponse(file: mpegtsPath)
         }
 
         server.addHandler(forMethod: "GET", path: "/api/meta", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
+            let isAuthorizedClient = Self.isAuthorized(request, accessCode: currentAccessCode)
+            if isAuthorizedClient {
+                markClientActivity(request)
+            }
             let payload = Self.metaPayload(
                 sharedDirectoryURL: sharedDirectoryURL,
                 deviceName: deviceName,
                 host: request.headers["Host"] ?? request.localAddressString,
                 isConnected: self.isClientConnected,
-                appLanguageCode: AppLocalizer.currentLanguage.rawValue
+                appLanguageCode: AppLocalizer.currentLanguage.rawValue,
+                includeFileSummary: isAuthorizedClient
             )
             return Self.jsonResponse(payload)
         }
 
-        server.addHandler(forMethod: "GET", path: "/api/library/images", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
+        server.addHandler(forMethod: "POST", path: "/api/pair", request: GCDWebServerDataRequest.self) { request in
+            guard
+                let request = request as? GCDWebServerDataRequest,
+                !request.data.isEmpty,
+                let object = try? JSONSerialization.jsonObject(with: request.data, options: []),
+                let payload = object as? [String: Any],
+                let code = payload["code"] as? String,
+                Self.normalizedAccessCode(from: code) == currentAccessCode
+            else {
+                return Self.errorResponse(statusCode: 401, code: "invalid_pairing_code")
+            }
+
             markClientActivity(request)
+            return Self.jsonResponse(["success": true])
+        }
+
+        server.addHandler(forMethod: "GET", path: "/api/library/images", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
+            guard requireAuthorization(request) == nil else {
+                completion(Self.errorResponse(statusCode: 401, code: "pairing_required"))
+                return
+            }
+
             Task {
-                let payload = await TransferPhotoLibraryService.fetchLibraryPayload(for: .image)
+                let payload = await TransferPhotoLibraryService.fetchLibraryPayload(
+                    for: .image,
+                    promptIfNeeded: request.query?["prompt"] == "1"
+                )
                 completion(Self.jsonResponse(payload))
             }
         })
 
         server.addHandler(forMethod: "GET", path: "/api/library/videos", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
-            markClientActivity(request)
+            guard requireAuthorization(request) == nil else {
+                completion(Self.errorResponse(statusCode: 401, code: "pairing_required"))
+                return
+            }
+
             Task {
-                let payload = await TransferPhotoLibraryService.fetchLibraryPayload(for: .video)
+                let payload = await TransferPhotoLibraryService.fetchLibraryPayload(
+                    for: .video,
+                    promptIfNeeded: request.query?["prompt"] == "1"
+                )
                 completion(Self.jsonResponse(payload))
             }
         })
 
         server.addHandler(forMethod: "GET", path: "/api/results", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
+            if let response = requireAuthorization(request) {
+                return response
+            }
             return Self.jsonResponse([
                 "sections": TransferResultArchiveService.allPayload()
             ])
         }
 
         server.addHandler(forMethod: "GET", path: "/api/results/download", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
+            if let response = requireAuthorization(request) {
+                return response
+            }
+
             guard
                 let category = request.query?["category"],
                 let filename = request.query?["name"],
@@ -334,7 +396,10 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "GET", path: "/api/results/stream", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
+            if let response = requireAuthorization(request) {
+                return response
+            }
+
             guard
                 let category = request.query?["category"],
                 let filename = request.query?["name"],
@@ -350,7 +415,11 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "GET", path: "/api/results/thumbnail", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
-            markClientActivity(request)
+            guard requireAuthorization(request) == nil else {
+                completion(Self.errorResponse(statusCode: 401, code: "pairing_required"))
+                return
+            }
+
             guard
                 let category = request.query?["category"],
                 let filename = request.query?["name"]
@@ -372,7 +441,10 @@ final class LocalTransferService: NSObject, ObservableObject {
         })
 
         server.addHandler(forMethod: "DELETE", path: "/api/results", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
+            if let response = requireAuthorization(request) {
+                return response
+            }
+
             guard
                 let category = request.query?["category"],
                 let filename = request.query?["name"]
@@ -389,7 +461,11 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "GET", path: "/api/library/thumbnail", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
-            markClientActivity(request)
+            guard requireAuthorization(request) == nil else {
+                completion(Self.errorResponse(statusCode: 401, code: "pairing_required"))
+                return
+            }
+
             guard
                 let identifier = request.query?["id"],
                 let rawKind = request.query?["kind"],
@@ -402,7 +478,11 @@ final class LocalTransferService: NSObject, ObservableObject {
         })
 
         server.addHandler(forMethod: "GET", path: "/api/library/download", request: GCDWebServerRequest.self, asyncProcessBlock: { request, completion in
-            markClientActivity(request)
+            guard requireAuthorization(request) == nil else {
+                completion(Self.errorResponse(statusCode: 401, code: "pairing_required"))
+                return
+            }
+
             guard
                 let identifier = request.query?["id"],
                 let rawKind = request.query?["kind"],
@@ -415,7 +495,9 @@ final class LocalTransferService: NSObject, ObservableObject {
         })
 
         server.addHandler(forMethod: "GET", path: "/api/files", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
+            if let response = requireAuthorization(request) {
+                return response
+            }
             let payload: [String: Any] = [
                 "items": Self.webFileItems(from: sharedDirectoryURL)
             ]
@@ -423,7 +505,10 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "GET", path: "/api/download", request: GCDWebServerRequest.self) { request in
-            markClientActivity(request)
+            if let response = requireAuthorization(request) {
+                return response
+            }
+
             guard
                 let filename = request.query?["name"],
                 let fileURL = Self.sharedFileURL(for: filename, in: sharedDirectoryURL),
@@ -442,7 +527,9 @@ final class LocalTransferService: NSObject, ObservableObject {
             guard let request = request as? GCDWebServerMultiPartFormRequest else {
                 return Self.errorResponse(statusCode: 400, code: "invalid_upload_request")
             }
-            markClientActivity(request)
+            if let response = requireAuthorization(request) {
+                return response
+            }
 
             let result = Self.handleUpload(request: request, sharedDirectoryURL: sharedDirectoryURL)
             if result["uploadedCount"] as? Int ?? 0 > 0 {
@@ -454,7 +541,10 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "DELETE", path: "/api/files", request: GCDWebServerRequest.self) { [weak self] request in
-            markClientActivity(request)
+            if let response = requireAuthorization(request) {
+                return response
+            }
+
             guard
                 let filename = request.query?["name"],
                 let fileURL = Self.sharedFileURL(for: filename, in: sharedDirectoryURL),
@@ -475,7 +565,10 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
 
         server.addHandler(forMethod: "POST", path: "/api/disconnect", request: GCDWebServerDataRequest.self) { [weak self] request in
-            markClientActivity(request)
+            if let response = requireAuthorization(request) {
+                return response
+            }
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 self?.stopServer()
             }
@@ -670,18 +763,21 @@ final class LocalTransferService: NSObject, ObservableObject {
         deviceName: String,
         host: String,
         isConnected: Bool,
-        appLanguageCode: String
+        appLanguageCode: String,
+        includeFileSummary: Bool
     ) -> [String: Any] {
         let items = readSharedFiles(from: sharedDirectoryURL)
-        let totalBytes = items.reduce(Int64(0)) { $0 + $1.fileSize }
+        let totalBytes = includeFileSummary ? items.reduce(Int64(0)) { $0 + $1.fileSize } : 0
         return [
             "deviceName": deviceName,
             "address": "http://\(host)/",
             "note": "Keep the app in the foreground for more stable transfers.",
-            "fileCount": items.count,
+            "fileCount": includeFileSummary ? items.count : 0,
             "totalBytes": totalBytes,
             "connectionState": isConnected ? "connected" : "idle",
-            "appLanguage": appLanguageCode
+            "appLanguage": appLanguageCode,
+            "pairingRequired": true,
+            "pairingCodeLength": accessCodeLength
         ]
     }
 
@@ -797,6 +893,26 @@ final class LocalTransferService: NSObject, ObservableObject {
             "failed": failed,
             "failedCount": failed.count
         ]
+    }
+
+    private static func makeAccessCode() -> String {
+        String(format: "%06d", Int.random(in: 0...999_999))
+    }
+
+    private static func normalizedAccessCode(from value: String?) -> String {
+        (value ?? "").filter(\.isNumber)
+    }
+
+    private static func isAuthorized(_ request: GCDWebServerRequest, accessCode: String) -> Bool {
+        guard !accessCode.isEmpty else { return false }
+
+        let headerCode = normalizedAccessCode(from: request.headers["X-Parse-Access-Code"])
+        if headerCode == accessCode {
+            return true
+        }
+
+        let queryCode = normalizedAccessCode(from: request.query?["code"])
+        return queryCode == accessCode
     }
 
     private static func jsonResponse(_ object: Any, statusCode: Int = 200) -> GCDWebServerDataResponse {

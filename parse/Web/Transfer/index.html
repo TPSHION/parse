@@ -11,193 +11,226 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar">
-      <div class="topbar-compact">
-        <div class="topbar-compact-main">
-          <span class="status-dot" id="connection-dot"></span>
-          <div>
-            <p class="topbar-label" data-i18n="topbar_connection_status">连接状态</p>
-            <strong id="connection-state-text" data-i18n="connection_connecting">连接中</strong>
+    <section id="pairing-screen" class="pairing-screen">
+      <div class="pairing-screen-shell">
+        <div class="pairing-screen-head">
+          <div class="pairing-screen-copy">
+            <p class="pairing-screen-brand">Parse Transfer</p>
           </div>
-        </div>
-        <div class="topbar-compact-actions">
           <div class="lang-switch">
             <button class="lang-button" type="button" data-lang-option="zh-Hans">中</button>
             <button class="lang-button" type="button" data-lang-option="en">EN</button>
           </div>
-          <button id="topbar-toggle-button" class="soft-button topbar-toggle-button" type="button" aria-expanded="false">
-            展开
-          </button>
+        </div>
+
+        <div class="pairing-screen-card">
+          <div class="pairing-screen-form">
+            <div>
+              <p class="section-kicker" data-i18n="pairing_kicker">安全配对</p>
+              <h2 data-i18n="pairing_code_label">配对码</h2>
+            </div>
+
+            <label class="pairing-field">
+              <span data-i18n="pairing_code_label">配对码</span>
+              <input id="pairing-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" data-i18n-placeholder="pairing_code_placeholder" placeholder="123 456">
+            </label>
+
+            <button id="pairing-submit-button" class="primary-button pairing-submit-button" type="button" data-i18n="pairing_submit">连接设备</button>
+            <p id="pairing-status" class="pairing-status" data-i18n="pairing_required_status">请输入 App 中显示的 6 位配对码后再继续。</p>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="topbar-details">
-        <div class="topbar-address">
-          <p class="topbar-label" data-i18n="topbar_address">连接地址</p>
-          <strong id="share-address">--</strong>
+    <div id="workspace-shell" class="workspace-shell hidden">
+      <header class="topbar">
+        <div class="topbar-compact">
+          <div class="topbar-compact-main">
+            <span class="status-dot" id="connection-dot"></span>
+            <div>
+              <p class="topbar-label" data-i18n="topbar_connection_status">连接状态</p>
+              <strong id="connection-state-text" data-i18n="connection_connecting">连接中</strong>
+            </div>
+          </div>
+          <div class="topbar-compact-actions">
+            <div class="lang-switch">
+              <button class="lang-button" type="button" data-lang-option="zh-Hans">中</button>
+              <button class="lang-button" type="button" data-lang-option="en">EN</button>
+            </div>
+            <button id="topbar-toggle-button" class="soft-button topbar-toggle-button" type="button" aria-expanded="false">
+              展开
+            </button>
+          </div>
         </div>
 
-        <div class="topbar-actions">
-          <button id="copy-address-button" class="soft-button" type="button" data-i18n="copy_address">复制地址</button>
-          <button id="disconnect-button" class="danger-button" type="button" data-i18n="disconnect">断开连接</button>
+        <div class="topbar-details">
+          <div class="topbar-address">
+            <p class="topbar-label" data-i18n="topbar_address">连接地址</p>
+            <strong id="share-address">--</strong>
+          </div>
+
+          <div class="topbar-actions">
+            <button id="copy-address-button" class="soft-button" type="button" data-i18n="copy_address">复制地址</button>
+            <button id="disconnect-button" class="danger-button" type="button" data-i18n="disconnect">断开连接</button>
+          </div>
         </div>
+      </header>
+
+      <div class="workspace">
+        <aside class="sidebar">
+          <div class="brand-card">
+            <div class="brand-copy">
+              <h1>Parse</h1>
+            </div>
+            <div class="lang-switch sidebar-lang-switch">
+              <button class="lang-button" type="button" data-lang-option="zh-Hans">中</button>
+              <button class="lang-button" type="button" data-lang-option="en">EN</button>
+            </div>
+          </div>
+
+          <section class="sidebar-status">
+            <div class="sidebar-status-row">
+              <span class="status-dot" id="sidebar-connection-dot"></span>
+              <div>
+                <p class="sidebar-note-title" data-i18n="topbar_connection_status">连接状态</p>
+                <strong id="sidebar-connection-state-text" data-i18n="connection_connecting">连接中</strong>
+              </div>
+            </div>
+            <div class="sidebar-status-block">
+              <p class="sidebar-note-title" data-i18n="topbar_address">连接地址</p>
+              <strong id="sidebar-share-address">--</strong>
+            </div>
+            <div class="sidebar-status-actions">
+              <button id="sidebar-copy-address-button" class="soft-button" type="button" data-i18n="copy_address">复制地址</button>
+              <button id="sidebar-disconnect-button" class="danger-button" type="button" data-i18n="disconnect">断开连接</button>
+            </div>
+          </section>
+
+          <nav class="menu">
+            <button class="menu-item is-active" data-view="images" type="button">
+              <span class="menu-icon">▣</span>
+              <span data-i18n="menu_images">图片</span>
+            </button>
+            <button class="menu-item" data-view="videos" type="button">
+              <span class="menu-icon">▶</span>
+              <span data-i18n="menu_videos">视频</span>
+            </button>
+            <button class="menu-item" data-view="results" type="button">
+              <span class="menu-icon">◎</span>
+              <span data-i18n="menu_results">结果</span>
+            </button>
+            <button class="menu-item" data-view="transfer" type="button">
+              <span class="menu-icon">⇅</span>
+              <span data-i18n="menu_transfer">传输</span>
+            </button>
+          </nav>
+
+          <div class="sidebar-note">
+            <p class="sidebar-note-title" data-i18n="visit_tip_title">访问提示</p>
+            <p data-i18n="visit_tip_body">保持手机端 App 处于前台，可获得更稳定的网页传输体验。</p>
+          </div>
+        </aside>
+
+        <main class="content">
+          <section class="content-view is-active" data-view-panel="images">
+            <div class="section-header">
+              <div>
+                <p class="section-kicker" data-i18n="kicker_photos">Photos</p>
+                <h2 data-i18n="images_title">手机相册图片</h2>
+                <p class="section-subtitle" data-i18n="images_subtitle">展示 iPhone 相册中的图片内容，点击卡片右侧按钮可直接下载原文件。</p>
+              </div>
+              <button id="refresh-images-button" class="soft-button" type="button" data-i18n="refresh_images">刷新图片</button>
+            </div>
+            <div id="images-empty" class="empty-state hidden"></div>
+            <div id="images-grid" class="media-grid"></div>
+          </section>
+
+          <section class="content-view" data-view-panel="videos">
+            <div class="section-header">
+              <div>
+                <p class="section-kicker" data-i18n="kicker_videos">Videos</p>
+                <h2 data-i18n="videos_title">手机相册视频</h2>
+                <p class="section-subtitle" data-i18n="videos_subtitle">展示相册中的视频条目，并支持从浏览器直接拉取原始视频文件。</p>
+              </div>
+              <button id="refresh-videos-button" class="soft-button" type="button" data-i18n="refresh_videos">刷新视频</button>
+            </div>
+            <div id="videos-empty" class="empty-state hidden"></div>
+            <div id="videos-grid" class="media-grid"></div>
+          </section>
+
+          <section class="content-view" data-view-panel="results">
+            <div class="section-header">
+              <div>
+                <p class="section-kicker" data-i18n="kicker_results">Results</p>
+                <h2 data-i18n="results_title">处理结果</h2>
+                <p class="section-subtitle" data-i18n="results_subtitle">集中展示格式转换和压缩后的结果文件，方便在 PC 端统一下载。</p>
+              </div>
+              <div class="results-toolbar-actions">
+                <button id="refresh-results-button" class="soft-button" type="button" data-i18n="refresh_results">刷新结果</button>
+              </div>
+            </div>
+            <div class="results-toolbar">
+              <label class="results-search">
+                <span data-i18n="search_label">搜索</span>
+                <input id="results-search-input" type="search" data-i18n-placeholder="results_search_placeholder" placeholder="按文件名搜索结果">
+              </label>
+              <label class="results-sort">
+                <span data-i18n="sort_label">排序</span>
+                <select id="results-sort-select">
+                  <option value="time_desc" data-i18n="sort_latest">最新优先</option>
+                  <option value="time_asc" data-i18n="sort_oldest">最早优先</option>
+                </select>
+              </label>
+            </div>
+            <div id="results-empty" class="empty-state hidden"></div>
+            <div id="results-stack" class="results-stack"></div>
+          </section>
+
+          <section class="content-view" data-view-panel="transfer">
+            <div class="section-header">
+              <div>
+                <p class="section-kicker" data-i18n="kicker_transfer">Transfer</p>
+                <h2 data-i18n="transfer_title">共享传输中心</h2>
+                <p class="section-subtitle" data-i18n="transfer_subtitle">上传文件到共享目录，或从共享目录下载、删除已有文件。</p>
+              </div>
+              <button id="refresh-transfer-button" class="soft-button" type="button" data-i18n="refresh_transfer">刷新传输</button>
+            </div>
+
+            <div class="transfer-layout">
+              <section class="panel upload-panel">
+                <div class="dropzone" id="dropzone">
+                  <input id="file-input" type="file" multiple hidden>
+                  <div class="dropzone-icon">+</div>
+                  <h3 data-i18n="dropzone_title">拖拽上传到共享目录</h3>
+                  <p data-i18n="dropzone_subtitle">支持从桌面拖拽文件，或者点击按钮选择文件上传。</p>
+                  <button id="pick-files-button" class="primary-button" type="button" data-i18n="pick_files">选择文件</button>
+                </div>
+                <div id="upload-list" class="upload-list"></div>
+              </section>
+
+              <aside class="panel transfer-summary">
+                <div class="summary-card">
+                  <span class="summary-label" data-i18n="summary_file_count">共享文件数量</span>
+                  <strong id="file-count">0</strong>
+                </div>
+                <div class="summary-card">
+                  <span class="summary-label" data-i18n="summary_total_size">共享总大小</span>
+                  <strong id="total-size">0 B</strong>
+                </div>
+                <div class="summary-card accent">
+                  <span class="summary-label" data-i18n="summary_device">当前设备</span>
+                  <strong id="device-name">Parse</strong>
+                </div>
+              </aside>
+            </div>
+
+            <div id="transfer-empty" class="empty-state hidden"></div>
+            <div id="file-grid" class="file-grid"></div>
+          </section>
+
+          <footer class="footer-status" id="status-banner" data-i18n="status_connected">页面已连接到本地传输服务。</footer>
+        </main>
       </div>
-    </header>
-
-    <div class="workspace">
-      <aside class="sidebar">
-        <div class="brand-card">
-          <div class="brand-copy">
-            <h1>Parse</h1>
-          </div>
-          <div class="lang-switch sidebar-lang-switch">
-            <button class="lang-button" type="button" data-lang-option="zh-Hans">中</button>
-            <button class="lang-button" type="button" data-lang-option="en">EN</button>
-          </div>
-        </div>
-
-        <section class="sidebar-status">
-          <div class="sidebar-status-row">
-            <span class="status-dot" id="sidebar-connection-dot"></span>
-            <div>
-              <p class="sidebar-note-title" data-i18n="topbar_connection_status">连接状态</p>
-              <strong id="sidebar-connection-state-text" data-i18n="connection_connecting">连接中</strong>
-            </div>
-          </div>
-          <div class="sidebar-status-block">
-            <p class="sidebar-note-title" data-i18n="topbar_address">连接地址</p>
-            <strong id="sidebar-share-address">--</strong>
-          </div>
-          <div class="sidebar-status-actions">
-            <button id="sidebar-copy-address-button" class="soft-button" type="button" data-i18n="copy_address">复制地址</button>
-            <button id="sidebar-disconnect-button" class="danger-button" type="button" data-i18n="disconnect">断开连接</button>
-          </div>
-        </section>
-
-        <nav class="menu">
-          <button class="menu-item is-active" data-view="images" type="button">
-            <span class="menu-icon">▣</span>
-            <span data-i18n="menu_images">图片</span>
-          </button>
-          <button class="menu-item" data-view="videos" type="button">
-            <span class="menu-icon">▶</span>
-            <span data-i18n="menu_videos">视频</span>
-          </button>
-          <button class="menu-item" data-view="results" type="button">
-            <span class="menu-icon">◎</span>
-            <span data-i18n="menu_results">结果</span>
-          </button>
-          <button class="menu-item" data-view="transfer" type="button">
-            <span class="menu-icon">⇅</span>
-            <span data-i18n="menu_transfer">传输</span>
-          </button>
-        </nav>
-
-        <div class="sidebar-note">
-          <p class="sidebar-note-title" data-i18n="visit_tip_title">访问提示</p>
-          <p data-i18n="visit_tip_body">保持手机端 App 处于前台，可获得更稳定的网页传输体验。</p>
-        </div>
-      </aside>
-
-      <main class="content">
-        <section class="content-view is-active" data-view-panel="images">
-          <div class="section-header">
-            <div>
-              <p class="section-kicker" data-i18n="kicker_photos">Photos</p>
-              <h2 data-i18n="images_title">手机相册图片</h2>
-              <p class="section-subtitle" data-i18n="images_subtitle">展示 iPhone 相册中的图片内容，点击卡片右侧按钮可直接下载原文件。</p>
-            </div>
-            <button id="refresh-images-button" class="soft-button" type="button" data-i18n="refresh_images">刷新图片</button>
-          </div>
-          <div id="images-empty" class="empty-state hidden"></div>
-          <div id="images-grid" class="media-grid"></div>
-        </section>
-
-        <section class="content-view" data-view-panel="videos">
-          <div class="section-header">
-            <div>
-              <p class="section-kicker" data-i18n="kicker_videos">Videos</p>
-              <h2 data-i18n="videos_title">手机相册视频</h2>
-              <p class="section-subtitle" data-i18n="videos_subtitle">展示相册中的视频条目，并支持从浏览器直接拉取原始视频文件。</p>
-            </div>
-            <button id="refresh-videos-button" class="soft-button" type="button" data-i18n="refresh_videos">刷新视频</button>
-          </div>
-          <div id="videos-empty" class="empty-state hidden"></div>
-          <div id="videos-grid" class="media-grid"></div>
-        </section>
-
-        <section class="content-view" data-view-panel="results">
-          <div class="section-header">
-            <div>
-              <p class="section-kicker" data-i18n="kicker_results">Results</p>
-              <h2 data-i18n="results_title">处理结果</h2>
-              <p class="section-subtitle" data-i18n="results_subtitle">集中展示格式转换和压缩后的结果文件，方便在 PC 端统一下载。</p>
-            </div>
-            <div class="results-toolbar-actions">
-              <button id="refresh-results-button" class="soft-button" type="button" data-i18n="refresh_results">刷新结果</button>
-            </div>
-          </div>
-          <div class="results-toolbar">
-            <label class="results-search">
-              <span data-i18n="search_label">搜索</span>
-              <input id="results-search-input" type="search" data-i18n-placeholder="results_search_placeholder" placeholder="按文件名搜索结果">
-            </label>
-            <label class="results-sort">
-              <span data-i18n="sort_label">排序</span>
-              <select id="results-sort-select">
-                <option value="time_desc" data-i18n="sort_latest">最新优先</option>
-                <option value="time_asc" data-i18n="sort_oldest">最早优先</option>
-              </select>
-            </label>
-          </div>
-          <div id="results-empty" class="empty-state hidden"></div>
-          <div id="results-stack" class="results-stack"></div>
-        </section>
-
-        <section class="content-view" data-view-panel="transfer">
-          <div class="section-header">
-            <div>
-              <p class="section-kicker" data-i18n="kicker_transfer">Transfer</p>
-              <h2 data-i18n="transfer_title">共享传输中心</h2>
-              <p class="section-subtitle" data-i18n="transfer_subtitle">上传文件到共享目录，或从共享目录下载、删除已有文件。</p>
-            </div>
-            <button id="refresh-transfer-button" class="soft-button" type="button" data-i18n="refresh_transfer">刷新传输</button>
-          </div>
-
-          <div class="transfer-layout">
-            <section class="panel upload-panel">
-              <div class="dropzone" id="dropzone">
-                <input id="file-input" type="file" multiple hidden>
-                <div class="dropzone-icon">+</div>
-                <h3 data-i18n="dropzone_title">拖拽上传到共享目录</h3>
-                <p data-i18n="dropzone_subtitle">支持从桌面拖拽文件，或者点击按钮选择文件上传。</p>
-                <button id="pick-files-button" class="primary-button" type="button" data-i18n="pick_files">选择文件</button>
-              </div>
-              <div id="upload-list" class="upload-list"></div>
-            </section>
-
-            <aside class="panel transfer-summary">
-              <div class="summary-card">
-                <span class="summary-label" data-i18n="summary_file_count">共享文件数量</span>
-                <strong id="file-count">0</strong>
-              </div>
-              <div class="summary-card">
-                <span class="summary-label" data-i18n="summary_total_size">共享总大小</span>
-                <strong id="total-size">0 B</strong>
-              </div>
-              <div class="summary-card accent">
-                <span class="summary-label" data-i18n="summary_device">当前设备</span>
-                <strong id="device-name">Parse</strong>
-              </div>
-            </aside>
-          </div>
-
-          <div id="transfer-empty" class="empty-state hidden"></div>
-          <div id="file-grid" class="file-grid"></div>
-        </section>
-
-        <footer class="footer-status" id="status-banner" data-i18n="status_connected">页面已连接到本地传输服务。</footer>
-      </main>
     </div>
   </div>
 

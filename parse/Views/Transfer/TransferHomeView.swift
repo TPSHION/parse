@@ -199,6 +199,23 @@ struct TransferHomeView: View {
                     .textSelection(.enabled)
                     .lineLimit(2)
             }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(AppLocalizer.localized("配对码"))
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(AppColors.textSecondary)
+                    .textCase(.uppercase)
+                    .tracking(1.2)
+
+                Text(service.accessCodeText)
+                    .font(.system(.title3, design: .monospaced).weight(.heavy))
+                    .foregroundColor(.white)
+
+                Text(AppLocalizer.localized("网页首次访问需输入此 6 位配对码。"))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(AppColors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding(16)
         .background(AppColors.cardBackground.opacity(0.92))
@@ -218,7 +235,7 @@ struct TransferHomeView: View {
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
 
-                Text(AppLocalizer.localized("请在电脑浏览器打开上方地址，连接后会自动更新状态。"))
+                Text(AppLocalizer.localized("请在电脑浏览器打开上方地址，并输入本机显示的配对码。"))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
                     .multilineTextAlignment(.center)
