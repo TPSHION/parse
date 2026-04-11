@@ -3203,6 +3203,17 @@
         }
       }
     },
+    "请确保手机与访问设备连接到同一个 Wi‑Fi，否则将无法建立传输连接。": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make sure the phone and the other device are connected to the same Wi-Fi network, or the transfer connection will fail."
+          }
+        }
+      }
+    },
     "请输入图片链接地址": {
       "localizations": {
         "en": {

@@ -104,6 +104,11 @@ struct TransferHomeView: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
+                Text(AppLocalizer.localized("请确保手机与访问设备连接到同一个 Wi‑Fi，否则将无法建立传输连接。"))
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(AppColors.accentOrange)
+                    .fixedSize(horizontal: false, vertical: true)
+
                 Text(AppLocalizer.localized("首次启动时，系统可能会请求本地网络权限。"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
@@ -238,6 +243,12 @@ struct TransferHomeView: View {
                 Text(AppLocalizer.localized("请在电脑浏览器打开上方地址，并输入本机显示的配对码。"))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(AppLocalizer.localized("请确保手机与访问设备连接到同一个 Wi‑Fi，否则将无法建立传输连接。"))
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(AppColors.accentOrange)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }

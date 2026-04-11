@@ -2,7 +2,6 @@ import Foundation
 import Combine
 @preconcurrency import GCDWebServer
 import Darwin
-import Network
 import UIKit
 
 @MainActor
@@ -20,15 +19,17 @@ final class LocalTransferService: NSObject, ObservableObject {
 
     private var webServer: GCDWebServer?
     private let port: UInt = 8080
-    private var permissionProbeConnection: NWConnection?
-    private var permissionBrowser: NWBrowser?
-    private var permissionListener: NWListener?
     private var isStoppingServer = false
     private let serverStopQueue = DispatchQueue(
         label: "cn.tpshion.parse.transfer.server-stop",
         qos: .userInitiated
     )
-    private let permissionServiceType = "_preflight_check._tcp"
+    // GCDWebServer still uses the legacy dispatch priority API internally.
+    // `2` maps to the library's documented "high" priority instead of default.
+    private let webServerOptions: [String: Any] = [
+        GCDWebServerOption_Port: 8080,
+        GCDWebServerOption_DispatchQueuePriority: NSNumber(value: 2)
+    ]
     private static let accessCodeLength = 6
 
     private static let webResourceDirectory = "Web/Transfer"
@@ -153,7 +154,6 @@ final class LocalTransferService: NSObject, ObservableObject {
         guard !isRunning, !isStoppingServer else { return }
 
         prepareSharedDirectoryIfNeeded()
-        requestLocalNetworkPermissionIfNeeded()
         accessCode = Self.makeAccessCode()
 
         guard let webServer = makeWebServer() else { return }
@@ -162,7 +162,8 @@ final class LocalTransferService: NSObject, ObservableObject {
         loopbackCheckMessage = AppLocalizer.localized("检测中...")
         lanCheckMessage = AppLocalizer.localized("检测中...")
 
-        if webServer.start(withPort: port, bonjourName: "") {
+        do {
+            try webServer.start(options: webServerOptions)
             self.webServer = webServer
             isRunning = true
             isClientConnected = false
@@ -171,7 +172,8 @@ final class LocalTransferService: NSObject, ObservableObject {
             Task {
                 await runConnectivityChecks()
             }
-        } else {
+        } catch {
+            NSLog("LocalTransferService failed to start server: %@", error.localizedDescription)
             lastErrorMessage = AppLocalizer.localized("传输服务启动失败，请检查网络后重试。")
             loopbackCheckMessage = AppLocalizer.localized("启动失败")
             lanCheckMessage = AppLocalizer.localized("启动失败")
@@ -184,12 +186,6 @@ final class LocalTransferService: NSObject, ObservableObject {
 
         self.webServer = nil
         isStoppingServer = true
-        permissionProbeConnection?.cancel()
-        permissionProbeConnection = nil
-        permissionBrowser?.cancel()
-        permissionBrowser = nil
-        permissionListener?.cancel()
-        permissionListener = nil
         isClientConnected = false
         serverURL = nil
         accessCode = ""
@@ -274,6 +270,7 @@ final class LocalTransferService: NSObject, ObservableObject {
 
         let server = GCDWebServer()
         server.delegate = self
+        let faviconPath = Self.webResourcePath(named: "favicon", withExtension: "ico")
 
         let sharedDirectoryURL = sharedDirectoryURL
         let deviceName = UIDevice.current.name
@@ -306,6 +303,12 @@ final class LocalTransferService: NSObject, ObservableObject {
 
         server.addHandler(forMethod: "GET", path: "/mpegts.js", request: GCDWebServerRequest.self) { request in
             return GCDWebServerFileResponse(file: mpegtsPath)
+        }
+
+        if let faviconPath {
+            server.addHandler(forMethod: "GET", path: "/favicon.ico", request: GCDWebServerRequest.self) { request in
+                return GCDWebServerFileResponse(file: faviconPath)
+            }
         }
 
         server.addHandler(forMethod: "GET", path: "/api/meta", request: GCDWebServerRequest.self) { request in
@@ -593,89 +596,6 @@ final class LocalTransferService: NSObject, ObservableObject {
         if loopbackCheckMessage.hasPrefix(AppLocalizer.localized("失败")),
            lanCheckMessage.hasPrefix(AppLocalizer.localized("失败")) {
             lastErrorMessage = AppLocalizer.localized("服务已启动，但自检失败。可先用本机 Safari 打开 127.0.0.1 地址确认服务是否正常。")
-        }
-    }
-
-    private func requestLocalNetworkPermissionIfNeeded() {
-        startBonjourPermissionProbe()
-
-        let host = NWEndpoint.Host(localIPv4Address ?? "255.255.255.255")
-        guard let port = NWEndpoint.Port(rawValue: 9) else {
-            return
-        }
-        let parameters = NWParameters.udp
-
-        let connection = NWConnection(host: host, port: port, using: parameters)
-        permissionProbeConnection = connection
-        connection.stateUpdateHandler = { [weak self] state in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                switch state {
-                case .ready, .failed, .waiting, .cancelled:
-                    self.permissionProbeConnection?.cancel()
-                    self.permissionProbeConnection = nil
-                default:
-                    break
-                }
-            }
-        }
-        connection.start(queue: .main)
-        connection.send(content: Data([0x01]), completion: .contentProcessed { _ in })
-    }
-
-    private func startBonjourPermissionProbe() {
-        guard permissionBrowser == nil, permissionListener == nil else { return }
-
-        do {
-            let listener = try NWListener(using: .tcp)
-            listener.service = NWListener.Service(name: UUID().uuidString, type: permissionServiceType)
-            listener.newConnectionHandler = { connection in
-                connection.cancel()
-            }
-
-            listener.stateUpdateHandler = { [weak self] state in
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    if case .failed = state {
-                        self.permissionListener?.cancel()
-                        self.permissionListener = nil
-                    }
-                }
-            }
-
-            let parameters = NWParameters()
-            parameters.includePeerToPeer = true
-            let browser = NWBrowser(for: .bonjour(type: permissionServiceType, domain: nil), using: parameters)
-            browser.stateUpdateHandler = { [weak self] state in
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    switch state {
-                    case .failed, .waiting, .cancelled:
-                        self.permissionBrowser?.cancel()
-                        self.permissionBrowser = nil
-                    default:
-                        break
-                    }
-                }
-            }
-            browser.browseResultsChangedHandler = { [weak self] results, _ in
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    if !results.isEmpty {
-                        self.permissionBrowser?.cancel()
-                        self.permissionBrowser = nil
-                        self.permissionListener?.cancel()
-                        self.permissionListener = nil
-                    }
-                }
-            }
-
-            permissionListener = listener
-            permissionBrowser = browser
-            listener.start(queue: .main)
-            browser.start(queue: .main)
-        } catch {
-            lastErrorMessage = AppLocalizer.formatted("本地网络权限探测初始化失败：%@", error.localizedDescription)
         }
     }
 

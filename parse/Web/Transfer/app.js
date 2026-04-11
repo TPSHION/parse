@@ -9,7 +9,7 @@ const state = {
   resultsSort: "time_desc",
   photoAuthorization: "not_determined",
   videoAuthorization: "not_determined",
-  language: normalizeLanguage(window.__PARSE_APP_LANGUAGE__ || "zh-Hans"),
+  language: normalizeLanguage(window.__PARSE_APP_LANGUAGE_CODE__ || "zh-Hans"),
   languageOverridden: false,
   topbarExpanded: !window.matchMedia("(max-width: 720px)").matches,
   accessCode: "",

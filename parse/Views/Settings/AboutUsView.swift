@@ -6,11 +6,16 @@ struct AboutUsView: View {
             VStack(spacing: 32) {
                 // App Icon & Version
                 VStack(spacing: 16) {
-                    Image(systemName: "app.fill")
+                    Image("logo")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 80, height: 80)
-                        .foregroundColor(AppColors.accentBlue)
+                        .frame(width: 88, height: 88)
+                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                        )
+                        .shadow(color: AppColors.accentBlue.opacity(0.18), radius: 18, y: 10)
                         .padding(.top, 40)
                     
                     Text("Parse")
