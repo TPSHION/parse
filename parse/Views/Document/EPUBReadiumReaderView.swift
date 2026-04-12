@@ -37,6 +37,13 @@ struct EPUBReadiumReaderView: View {
                     }
                 }
 
+                if !chromeVisible, session != nil {
+                    compactChapterOverlay(topInset: statusBarInset(fallback: proxy.safeAreaInsets.top))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                        .ignoresSafeArea(edges: .top)
+                        .transition(.opacity)
+                }
+
                 if chromeVisible, session != nil {
                     ZStack {
                         readerChrome(topInset: statusBarInset(fallback: proxy.safeAreaInsets.top))
@@ -53,7 +60,7 @@ struct EPUBReadiumReaderView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .toolbar(.hidden, for: .navigationBar)
-        .statusBarHidden(!chromeVisible && session != nil)
+        .statusBarHidden(session != nil)
         .animation(.easeInOut(duration: 0.22), value: chromeVisible)
         .animation(.easeInOut(duration: 0.2), value: activePanel)
         .task(id: item.id) {
@@ -76,6 +83,43 @@ struct EPUBReadiumReaderView: View {
                 .foregroundColor(.white.opacity(0.92))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func compactChapterOverlay(topInset: CGFloat) -> some View {
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+            HStack(spacing: 0) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(compactOverlayTextColor)
+                        .frame(width: 12, height: 24, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                Text(compactChapterTitle)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(compactOverlayTextColor)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+
+                Spacer(minLength: 0)
+
+                Text(compactOverlayTimeString(for: context.date))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(compactOverlayTextColor)
+                    .monospacedDigit()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, compactOverlayTopPadding(for: topInset) + 3)
+            .padding(.bottom, 6)
+            .background(
+                compactOverlayBackgroundColor
+                    .ignoresSafeArea(edges: .top)
+            )
+        }
     }
 
     private func readerChrome(topInset: CGFloat) -> some View {
@@ -389,7 +433,7 @@ struct EPUBReadiumReaderView: View {
                     systemName: "list.bullet",
                     isActive: activePanel == .tableOfContents,
                     foregroundColor: readerOverlayPrimaryText,
-                    backgroundColor: activePanel == .tableOfContents ? readerAccentSurface : readerOverlaySecondarySurface
+                    backgroundColor: readerOverlaySecondarySurface
                 ) {
                     togglePanel(.tableOfContents)
                 }
@@ -399,7 +443,7 @@ struct EPUBReadiumReaderView: View {
                     systemName: "textformat.size",
                     isActive: activePanel == .appearance,
                     foregroundColor: readerOverlayPrimaryText,
-                    backgroundColor: activePanel == .appearance ? readerAccentSurface : readerOverlaySecondarySurface
+                    backgroundColor: readerOverlaySecondarySurface
                 ) {
                     togglePanel(.appearance)
                 }
@@ -443,7 +487,7 @@ struct EPUBReadiumReaderView: View {
                 systemName: "list.bullet",
                 isActive: activePanel == .tableOfContents,
                 foregroundColor: readerOverlayPrimaryText,
-                backgroundColor: activePanel == .tableOfContents ? readerAccentSurface : readerOverlaySecondarySurface
+                backgroundColor: readerOverlaySecondarySurface
             ) {
                 togglePanel(.tableOfContents)
             }
@@ -451,8 +495,9 @@ struct EPUBReadiumReaderView: View {
             ReaderActionButton(
                 title: AppLocalizer.localized("样式"),
                 systemName: "textformat.size",
+                isActive: activePanel == .appearance,
                 foregroundColor: readerOverlayPrimaryText,
-                backgroundColor: activePanel == .appearance ? readerAccentSurface : readerOverlaySecondarySurface
+                backgroundColor: readerOverlaySecondarySurface
             ) {
                 togglePanel(.appearance)
             }
@@ -474,6 +519,43 @@ struct EPUBReadiumReaderView: View {
         }
         let percent = max(1, Int((totalProgression * 100).rounded()))
         return "\(percent)%"
+    }
+
+    private var compactChapterTitle: String {
+        currentTOCTitle ?? item.title
+    }
+
+    private var compactOverlayTextColor: SwiftUI.Color {
+        currentThemeOption.compactOverlayTextColor
+    }
+
+    private var compactOverlayBackgroundColor: SwiftUI.Color {
+        currentThemeOption.compactOverlayBackgroundColor
+    }
+
+    private var compactOverlayDividerColor: SwiftUI.Color {
+        currentThemeOption.compactOverlayDividerColor
+    }
+
+    private var currentTOCTitle: String? {
+        guard let session, let locatorHref = currentLocator?.href else { return nil }
+        let normalizedLocator = normalizeResourcePath(String(describing: locatorHref))
+        guard !normalizedLocator.isEmpty else { return nil }
+
+        if let exact = session.tocEntries.first(where: {
+            normalizeResourcePath(String(describing: $0.link.href)) == normalizedLocator
+        }) {
+            return exact.title
+        }
+
+        if let prefix = session.tocEntries.first(where: {
+            let entryPath = normalizeResourcePath(String(describing: $0.link.href))
+            return !entryPath.isEmpty && normalizedLocator.hasPrefix(entryPath)
+        }) {
+            return prefix.title
+        }
+
+        return nil
     }
 
     private var fontSizeLabel: String {
@@ -518,12 +600,43 @@ struct EPUBReadiumReaderView: View {
     }
 
     private func statusBarInset(fallback: CGFloat) -> CGFloat {
+        let windowInset = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first(where: \.isKeyWindow)?
+            .safeAreaInsets.top ?? 0
+        if windowInset > 0 {
+            return windowInset
+        }
+
         let sceneInset = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .first?
             .statusBarManager?
             .statusBarFrame.height ?? 0
         return sceneInset > 0 ? sceneInset : fallback
+    }
+
+    private func normalizeResourcePath(_ href: String) -> String {
+        var value = href.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let fragmentIndex = value.firstIndex(of: "#") {
+            value = String(value[..<fragmentIndex])
+        }
+        if let queryIndex = value.firstIndex(of: "?") {
+            value = String(value[..<queryIndex])
+        }
+        return value.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+    }
+
+    private func compactOverlayTopPadding(for topInset: CGFloat) -> CGFloat {
+        if topInset >= 44 {
+            return min(max(topInset - 4, 40), 46)
+        }
+        return max(topInset + 12, 16)
+    }
+
+    private func compactOverlayTimeString(for date: Date) -> String {
+        date.formatted(.dateTime.hour().minute())
     }
 
     private var readerOverlaySurface: SwiftUI.Color {
@@ -735,6 +848,43 @@ private enum ReaderThemeOption: String, CaseIterable, Identifiable {
             return SwiftUI.Color(hex: "#E9D9B6")
         }
     }
+
+    var compactOverlayBackgroundColor: SwiftUI.Color {
+        switch self {
+        case .dark:
+            return SwiftUI.Color(hex: "#05070C")
+        case .light:
+            return SwiftUI.Color(hex: "#F7F7F2")
+        case .mint:
+            return SwiftUI.Color(hex: "#E8F5EE")
+        case .cream:
+            return SwiftUI.Color(hex: "#F6EEDB")
+        }
+    }
+
+    var compactOverlayTextColor: SwiftUI.Color {
+        switch self {
+        case .dark:
+            return SwiftUI.Color.white.opacity(0.7)
+        case .light:
+            return SwiftUI.Color(hex: "#1F2937").opacity(0.62)
+        case .mint:
+            return SwiftUI.Color(hex: "#23352B").opacity(0.58)
+        case .cream:
+            return SwiftUI.Color(hex: "#4A4032").opacity(0.58)
+        }
+    }
+
+    var compactOverlayDividerColor: SwiftUI.Color {
+        switch self {
+        case .dark:
+            return SwiftUI.Color.white.opacity(0.08)
+        case .light:
+            return SwiftUI.Color.black.opacity(0.08)
+        case .mint, .cream:
+            return compactOverlayTextColor.opacity(0.18)
+        }
+    }
 }
 
 private struct ReaderActionButton: View {
@@ -755,7 +905,7 @@ private struct ReaderActionButton: View {
                     .font(.system(size: 13, weight: .semibold))
                     .lineLimit(1)
             }
-            .foregroundColor(foregroundColor)
+            .foregroundColor(isActive ? AppColors.accentBlue : foregroundColor)
             .frame(maxWidth: .infinity, minHeight: 44)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -775,15 +925,15 @@ private struct ReaderModeButton: View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.white.opacity(isSelected ? 0.96 : 0.72))
+                .foregroundColor(.white.opacity(isSelected ? 0.98 : 0.72))
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(isSelected ? AppColors.accentBlue.opacity(0.16) : Color.white.opacity(0.04))
+                        .fill(isSelected ? Color(hex: "#1C2740") : Color.white.opacity(0.04))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(isSelected ? AppColors.accentBlue.opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1)
+                        .stroke(isSelected ? AppColors.accentBlue.opacity(0.78) : Color.white.opacity(0.06), lineWidth: 1)
                 )
         }
         .buttonStyle(.plain)
@@ -853,15 +1003,21 @@ private struct ReadiumNavigatorContainer: UIViewControllerRepresentable {
         }
 
         func navigator(_ navigator: VisualNavigator, didTapAt point: CGPoint) {
-            onToggleChrome()
+            DispatchQueue.main.async {
+                self.onToggleChrome()
+            }
         }
 
         func navigator(_ navigator: Navigator, locationDidChange locator: Locator) {
-            onLocationChange(locator)
+            DispatchQueue.main.async {
+                self.onLocationChange(locator)
+            }
         }
 
         func navigator(_ navigator: Navigator, presentError error: NavigatorError) {
-            onPresentError(String(describing: error))
+            DispatchQueue.main.async {
+                self.onPresentError(String(describing: error))
+            }
         }
     }
 }

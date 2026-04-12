@@ -1,6 +1,11 @@
 import Foundation
 import ReadiumShared
 
+struct TXTReaderProgress: Codable, Equatable {
+    var chapterIndex: Int
+    var chapterProgress: Double
+}
+
 struct ReaderStyleSettings: Equatable {
     var fontSize: Double
     var letterSpacing: Double
@@ -19,6 +24,7 @@ struct ReaderStyleSettings: Equatable {
 
 enum EbookReaderPreferencesStore {
     private static let locatorPrefix = "ebook.reader.locator."
+    private static let txtProgressPrefix = "ebook.reader.txtProgress."
     private static let fontSizeKey = "ebook.reader.fontSize"
     private static let letterSpacingKey = "ebook.reader.letterSpacing"
     private static let lineHeightKey = "ebook.reader.lineHeight"
@@ -53,5 +59,17 @@ enum EbookReaderPreferencesStore {
 
     static func saveLocator(_ locator: Locator, for itemID: UUID) {
         UserDefaults.standard.set(locator.jsonString, forKey: locatorPrefix + itemID.uuidString)
+    }
+
+    static func loadTXTProgress(for itemID: UUID) -> TXTReaderProgress? {
+        guard let data = UserDefaults.standard.data(forKey: txtProgressPrefix + itemID.uuidString) else {
+            return nil
+        }
+        return try? JSONDecoder().decode(TXTReaderProgress.self, from: data)
+    }
+
+    static func saveTXTProgress(_ progress: TXTReaderProgress, for itemID: UUID) {
+        guard let data = try? JSONEncoder().encode(progress) else { return }
+        UserDefaults.standard.set(data, forKey: txtProgressPrefix + itemID.uuidString)
     }
 }

@@ -223,6 +223,17 @@
         }
       }
     },
+    "正文" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Content"
+          }
+        }
+      }
+    },
     "字间距" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -285,6 +296,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Default"
+          }
+        }
+      }
+    },
+    "无法读取该 TXT 文件" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to read this TXT file"
+          }
+        }
+      }
+    },
+    "当前 TXT 文件内容为空" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This TXT file is empty"
           }
         }
       }
