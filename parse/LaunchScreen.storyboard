@@ -16,7 +16,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="LaunchLogoImageView">
-                                <rect key="frame" x="114.66666666666667" y="214" width="164" height="164"/>
+                                <rect key="frame" x="114.66666666666669" y="214" width="164" height="164"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="164" id="LaunchLogoHeight"/>
                                     <constraint firstAttribute="width" constant="164" id="LaunchLogoWidth"/>
@@ -29,7 +29,7 @@
                             </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="LaunchScreenSafeArea"/>
-                        <color key="backgroundColor" red="0.042639993129999998" green="0.056057266889999999" blue="0.16316384079999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <color key="backgroundColor" red="0.040045760569999998" green="0.052229076620000002" blue="0.1577219963" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstItem="LaunchLogoImageView" firstAttribute="centerX" secondItem="LaunchScreenView" secondAttribute="centerX" id="LaunchLogoCenterX"/>
                             <constraint firstItem="LaunchLogoImageView" firstAttribute="top" secondItem="LaunchScreenSafeArea" secondAttribute="top" constant="96" id="LaunchLogoTop"/>

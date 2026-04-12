@@ -477,12 +477,20 @@ private struct DownloadSourceRow: View {
 private struct TXTBookContent {
     let title: String
     let chapters: [TXTBookChapter]
+    let renderedText: String
+    let chapterLayouts: [TXTBookChapterLayout]
 }
 
 private struct TXTBookChapter: Identifiable, Hashable {
     let id: Int
     let title: String
     let text: String
+}
+
+private struct TXTBookChapterLayout: Hashable {
+    let chapterIndex: Int
+    let title: String
+    let range: NSRange
 }
 
 private enum TXTReaderService {
@@ -495,7 +503,13 @@ private enum TXTReaderService {
         }
 
         let chapters = makeChapters(from: trimmed)
-        return TXTBookContent(title: fallbackTitle, chapters: chapters)
+        let renderedBook = makeRenderedBook(from: chapters)
+        return TXTBookContent(
+            title: fallbackTitle,
+            chapters: chapters,
+            renderedText: renderedBook.text,
+            chapterLayouts: renderedBook.layouts
+        )
     }
 
     nonisolated private static func readText(from url: URL) throws -> String {
@@ -567,6 +581,32 @@ private enum TXTReaderService {
         }
 
         return chapters.isEmpty ? [TXTBookChapter(id: 0, title: AppLocalizer.localized("正文"), text: text)] : chapters
+    }
+
+    nonisolated private static func makeRenderedBook(from chapters: [TXTBookChapter]) -> (text: String, layouts: [TXTBookChapterLayout]) {
+        var renderedText = ""
+        var layouts: [TXTBookChapterLayout] = []
+
+        for chapter in chapters {
+            if !renderedText.isEmpty {
+                renderedText.append("\n\n")
+            }
+
+            let start = renderedText.utf16.count
+            let chapterText = chapter.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            renderedText.append(chapterText)
+            let end = renderedText.utf16.count
+
+            layouts.append(
+                TXTBookChapterLayout(
+                    chapterIndex: chapter.id,
+                    title: chapter.title,
+                    range: NSRange(location: start, length: max(end - start, 0))
+                )
+            )
+        }
+
+        return (renderedText, layouts)
     }
 
     nonisolated private static func normalizedHeading(from line: String) -> String {
@@ -726,7 +766,7 @@ struct TXTEbookReaderView: View {
     @State private var styleSettings = EbookReaderPreferencesStore.loadStyleSettings()
     @State private var currentChapterIndex = 0
     @State private var chapterScrollProgress = 0.0
-    @State private var chapterScrollTarget = 0.0
+    @State private var scrollRequest: TXTReaderScrollRequest?
     @State private var lastSavedProgress = TXTReaderProgress(chapterIndex: 0, chapterProgress: 0)
 
     var body: some View {
@@ -737,14 +777,15 @@ struct TXTEbookReaderView: View {
                 Group {
                     if let book {
                         TXTReaderTextView(
-                            text: currentChapter(in: book).text,
+                            text: book.renderedText,
+                            chapterLayouts: book.chapterLayouts,
                             styleSettings: styleSettings,
                             theme: readerTheme,
-                            targetProgress: chapterScrollTarget,
+                            scrollRequest: scrollRequest,
                             onTap: toggleChrome,
-                            onProgressChange: handleScrollProgressChange
+                            onReadingPositionChange: handleReadingPositionChange
                         )
-                        .id("txt-\(item.id.uuidString)-\(currentChapterIndex)")
+                        .id("txt-\(item.id.uuidString)")
                         .ignoresSafeArea()
                     } else if let loadError {
                         TXTEbookErrorView(message: loadError, onRetry: loadBook)
@@ -974,7 +1015,7 @@ struct TXTEbookReaderView: View {
                             HStack(spacing: 12) {
                                 Text(chapter.title)
                                     .font(.system(size: 14, weight: index == currentChapterIndex ? .bold : .medium))
-                                    .foregroundColor(index == currentChapterIndex ? .white : Color.white.opacity(0.84))
+                                    .foregroundColor(index == currentChapterIndex ? AppColors.accentBlue : Color.white.opacity(0.84))
                                     .multilineTextAlignment(.leading)
                                     .lineLimit(2)
 
@@ -1206,7 +1247,7 @@ struct TXTEbookReaderView: View {
                     book = loadedBook
                     currentChapterIndex = safeChapter
                     chapterScrollProgress = safeProgress
-                    chapterScrollTarget = safeProgress
+                    scrollRequest = TXTReaderScrollRequest(chapterIndex: safeChapter, chapterProgress: safeProgress)
                     lastSavedProgress = TXTReaderProgress(chapterIndex: safeChapter, chapterProgress: safeProgress)
                     isLoading = false
                     chromeVisible = false
@@ -1238,16 +1279,16 @@ struct TXTEbookReaderView: View {
         }
     }
 
-    private func handleScrollProgressChange(_ progress: Double) {
-        let safeValue = min(max(progress, 0), 1)
-        chapterScrollProgress = safeValue
+    private func handleReadingPositionChange(_ position: TXTVisibleReadingPosition) {
+        currentChapterIndex = position.chapterIndex
+        chapterScrollProgress = min(max(position.chapterProgress, 0), 1)
         saveProgress(force: false)
     }
 
     private func jumpToChapter(_ index: Int) {
         currentChapterIndex = index
         chapterScrollProgress = 0
-        chapterScrollTarget = 0
+        scrollRequest = TXTReaderScrollRequest(chapterIndex: index, chapterProgress: 0)
         activePanel = nil
         chromeVisible = false
         saveProgress(force: true)
@@ -1358,17 +1399,19 @@ private struct TXTEbookErrorView: View {
 
 private struct TXTReaderTextView: UIViewRepresentable {
     let text: String
+    let chapterLayouts: [TXTBookChapterLayout]
     let styleSettings: ReaderStyleSettings
     let theme: TXTReaderThemeOption
-    let targetProgress: Double
+    let scrollRequest: TXTReaderScrollRequest?
     let onTap: () -> Void
-    let onProgressChange: (Double) -> Void
+    let onReadingPositionChange: (TXTVisibleReadingPosition) -> Void
 
     func makeUIView(context: Context) -> UITextView {
-        let textView = UITextView()
+        let textView = UITextView(usingTextLayoutManager: false)
         textView.delegate = context.coordinator
         textView.isEditable = false
         textView.isSelectable = true
+        textView.isScrollEnabled = true
         textView.showsVerticalScrollIndicator = false
         textView.showsHorizontalScrollIndicator = false
         textView.alwaysBounceVertical = true
@@ -1383,51 +1426,81 @@ private struct TXTReaderTextView: UIViewRepresentable {
         textView.addGestureRecognizer(tap)
 
         context.coordinator.onTap = onTap
-        context.coordinator.onProgressChange = onProgressChange
-        context.coordinator.configure(textView, text: text, styleSettings: styleSettings, theme: theme, targetProgress: targetProgress)
+        context.coordinator.onReadingPositionChange = onReadingPositionChange
+        context.coordinator.configure(
+            textView,
+            text: text,
+            chapterLayouts: chapterLayouts,
+            styleSettings: styleSettings,
+            theme: theme,
+            scrollRequest: scrollRequest
+        )
         return textView
     }
 
     func updateUIView(_ uiView: UITextView, context: Context) {
         context.coordinator.onTap = onTap
-        context.coordinator.onProgressChange = onProgressChange
-        context.coordinator.configure(uiView, text: text, styleSettings: styleSettings, theme: theme, targetProgress: targetProgress)
+        context.coordinator.onReadingPositionChange = onReadingPositionChange
+        context.coordinator.configure(
+            uiView,
+            text: text,
+            chapterLayouts: chapterLayouts,
+            styleSettings: styleSettings,
+            theme: theme,
+            scrollRequest: scrollRequest
+        )
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onTap: onTap, onProgressChange: onProgressChange)
+        Coordinator(
+            onTap: onTap,
+            onReadingPositionChange: onReadingPositionChange
+        )
     }
 
     final class Coordinator: NSObject, UITextViewDelegate, UIGestureRecognizerDelegate {
         var onTap: () -> Void
-        var onProgressChange: (Double) -> Void
+        var onReadingPositionChange: (TXTVisibleReadingPosition) -> Void
         private var lastText = ""
         private var lastStyle = ReaderStyleSettings.default
         private var lastTheme: TXTReaderThemeOption = .dark
-        private var appliedTargetProgress = -1.0
+        private var lastChapterLayouts: [TXTBookChapterLayout] = []
+        private var appliedScrollRequest: TXTReaderScrollRequest?
 
-        init(onTap: @escaping () -> Void, onProgressChange: @escaping (Double) -> Void) {
+        init(
+            onTap: @escaping () -> Void,
+            onReadingPositionChange: @escaping (TXTVisibleReadingPosition) -> Void
+        ) {
             self.onTap = onTap
-            self.onProgressChange = onProgressChange
+            self.onReadingPositionChange = onReadingPositionChange
         }
 
-        func configure(_ textView: UITextView, text: String, styleSettings: ReaderStyleSettings, theme: TXTReaderThemeOption, targetProgress: Double) {
+        func configure(
+            _ textView: UITextView,
+            text: String,
+            chapterLayouts: [TXTBookChapterLayout],
+            styleSettings: ReaderStyleSettings,
+            theme: TXTReaderThemeOption,
+            scrollRequest: TXTReaderScrollRequest?
+        ) {
             let textChanged = lastText != text
             let styleChanged = lastStyle != styleSettings || lastTheme != theme
+            let layoutChanged = lastChapterLayouts != chapterLayouts
+            lastChapterLayouts = chapterLayouts
 
-            if textChanged || styleChanged {
-                let currentProgress = normalizedProgress(for: textView)
+            if textChanged || styleChanged || layoutChanged {
                 textView.attributedText = attributedText(for: text, styleSettings: styleSettings, theme: theme)
                 textView.backgroundColor = theme.backgroundColor
                 textView.tintColor = UIColor(AppColors.accentBlue)
                 lastText = text
                 lastStyle = styleSettings
                 lastTheme = theme
+                appliedScrollRequest = nil
 
-                let nextProgress = textChanged ? targetProgress : currentProgress
-                apply(targetProgress: nextProgress, to: textView)
-            } else if abs(appliedTargetProgress - targetProgress) > 0.001 {
-                apply(targetProgress: targetProgress, to: textView)
+                let initialRequest = scrollRequest ?? TXTReaderScrollRequest(chapterIndex: 0, chapterProgress: 0)
+                apply(scrollRequest: initialRequest, to: textView)
+            } else if let scrollRequest, appliedScrollRequest != scrollRequest {
+                apply(scrollRequest: scrollRequest, to: textView)
             }
         }
 
@@ -1449,30 +1522,82 @@ private struct TXTReaderTextView: UIViewRepresentable {
             )
         }
 
-        private func apply(targetProgress: Double, to textView: UITextView) {
-            let clamped = min(max(targetProgress, 0), 1)
-            appliedTargetProgress = clamped
+        private func apply(scrollRequest: TXTReaderScrollRequest, to textView: UITextView) {
+            appliedScrollRequest = scrollRequest
             DispatchQueue.main.async {
-                let visibleHeight = textView.bounds.height - textView.adjustedContentInset.top - textView.adjustedContentInset.bottom
-                let maxOffset = max(textView.contentSize.height - visibleHeight, 0)
-                let targetOffsetY = maxOffset * clamped - textView.adjustedContentInset.top
-                textView.setContentOffset(CGPoint(x: 0, y: max(targetOffsetY, -textView.adjustedContentInset.top)), animated: false)
+                self.scroll(textView, to: scrollRequest)
             }
         }
 
-        private func normalizedProgress(for textView: UITextView) -> Double {
+        private func scroll(_ textView: UITextView, to request: TXTReaderScrollRequest) {
+            guard !lastChapterLayouts.isEmpty else { return }
+            let safeIndex = min(max(request.chapterIndex, 0), lastChapterLayouts.count - 1)
+            let layout = lastChapterLayouts[safeIndex]
+            let progress = min(max(request.chapterProgress, 0), 1)
+            let targetCharacter = layout.range.location + Int((Double(max(layout.range.length - 1, 0)) * progress).rounded())
+            let boundedCharacter = min(max(targetCharacter, 0), max(textView.attributedText.length - 1, 0))
+
+            textView.layoutManager.ensureLayout(for: textView.textContainer)
+            let glyphIndex = textView.layoutManager.glyphIndexForCharacter(at: boundedCharacter)
+            let glyphRect = textView.layoutManager.boundingRect(
+                forGlyphRange: NSRange(location: glyphIndex, length: 1),
+                in: textView.textContainer
+            )
+
             let visibleHeight = textView.bounds.height - textView.adjustedContentInset.top - textView.adjustedContentInset.bottom
-            let maxOffset = max(textView.contentSize.height - visibleHeight, 0)
-            guard maxOffset > 0 else { return 0 }
-            let currentOffset = min(max(textView.contentOffset.y + textView.adjustedContentInset.top, 0), maxOffset)
-            return currentOffset / maxOffset
+            let minOffsetY = -textView.adjustedContentInset.top
+            let maxOffsetY = max(textView.contentSize.height - visibleHeight, minOffsetY)
+            let targetOffsetY = min(
+                max(glyphRect.minY - textView.textContainerInset.top - 12, minOffsetY),
+                maxOffsetY
+            )
+            textView.setContentOffset(CGPoint(x: 0, y: targetOffsetY), animated: false)
+        }
+
+        private func readingPosition(for textView: UITextView) -> TXTVisibleReadingPosition {
+            guard !lastChapterLayouts.isEmpty, textView.attributedText.length > 0 else {
+                return TXTVisibleReadingPosition(chapterIndex: 0, chapterProgress: 0)
+            }
+
+            textView.layoutManager.ensureLayout(for: textView.textContainer)
+
+            let probePoint = CGPoint(
+                x: textView.textContainerInset.left + 6,
+                y: textView.contentOffset.y + textView.adjustedContentInset.top + 36
+            )
+            let containerPoint = CGPoint(
+                x: probePoint.x - textView.textContainerInset.left,
+                y: probePoint.y - textView.textContainerInset.top
+            )
+            let glyphIndex = textView.layoutManager.glyphIndex(for: containerPoint, in: textView.textContainer)
+            let characterIndex = min(
+                max(textView.layoutManager.characterIndexForGlyph(at: glyphIndex), 0),
+                max(textView.attributedText.length - 1, 0)
+            )
+
+            let chapterIndex = currentChapterIndex(for: characterIndex)
+            let layout = lastChapterLayouts[chapterIndex]
+            let progress = layout.range.length > 0
+                ? min(max(Double(characterIndex - layout.range.location) / Double(layout.range.length), 0), 1)
+                : 0
+
+            return TXTVisibleReadingPosition(chapterIndex: chapterIndex, chapterProgress: progress)
+        }
+
+        private func currentChapterIndex(for characterIndex: Int) -> Int {
+            for (index, layout) in lastChapterLayouts.enumerated().reversed() {
+                if characterIndex >= layout.range.location {
+                    return index
+                }
+            }
+            return 0
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             guard let textView = scrollView as? UITextView else { return }
-            let progress = normalizedProgress(for: textView)
+            let position = readingPosition(for: textView)
             DispatchQueue.main.async {
-                self.onProgressChange(progress)
+                self.onReadingPositionChange(position)
             }
         }
 
@@ -1487,6 +1612,23 @@ private struct TXTReaderTextView: UIViewRepresentable {
             true
         }
     }
+}
+
+private struct TXTReaderScrollRequest: Equatable {
+    let chapterIndex: Int
+    let chapterProgress: Double
+    let token: UUID
+
+    init(chapterIndex: Int, chapterProgress: Double, token: UUID = UUID()) {
+        self.chapterIndex = chapterIndex
+        self.chapterProgress = chapterProgress
+        self.token = token
+    }
+}
+
+private struct TXTVisibleReadingPosition: Equatable {
+    let chapterIndex: Int
+    let chapterProgress: Double
 }
 
 private struct TXTReaderActionButton: View {
