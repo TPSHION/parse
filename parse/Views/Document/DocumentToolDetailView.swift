@@ -74,60 +74,44 @@ struct DocumentToolDetailView: View {
                     }
                     
                     VStack(spacing: 14) {
-                        if toolType == .pdfToWord {
-                            NavigationLink(destination: PDFConverterView()) {
+                        if toolType == .imageToText || toolType == .imageToDoc {
+                            PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
                                 actionCard(
-                                    icon: "doc.text.viewfinder",
-                                    title: AppLocalizer.localized("进入 PDF 转换工具"),
-                                    detail: AppLocalizer.localized("支持转为 DOCX, TXT, MD, PNG, JPEG"),
+                                    icon: "photo.stack.fill",
+                                    title: AppLocalizer.localized("从相册导入"),
+                                    detail: AppLocalizer.localized("适合批量挑选近期拍摄或已保存的图片"),
                                     accent: AppColors.accentPurple,
                                     filled: true
                                 )
                             }
                             .buttonStyle(.plain)
-                        } else {
-                            // 针对不同的工具类型，显示不同的导入选项
-                            if toolType == .imageToText || toolType == .imageToDoc {
-                                PhotosPicker(selection: $selectedPhotos, matching: .images, photoLibrary: .shared()) {
-                                    actionCard(
-                                        icon: "photo.stack.fill",
-                                        title: AppLocalizer.localized("从相册导入"),
-                                        detail: AppLocalizer.localized("适合批量挑选近期拍摄或已保存的图片"),
-                                        accent: AppColors.accentPurple,
-                                        filled: true
-                                    )
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            
-                            if toolType == .textWebConvert {
-                                Button(action: {
-                                    // 网页转PDF/文字操作
-                                }) {
-                                    actionCard(
-                                        icon: "link",
-                                        title: AppLocalizer.localized("输入网址"),
-                                        detail: AppLocalizer.localized("直接输入网页链接提取内容或转为 PDF"),
-                                        accent: AppColors.accentPurple,
-                                        filled: true
-                                    )
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            
-                            Button(action: {
-                                isFileImporterPresented = true
-                            }) {
+                        }
+
+                        if toolType == .textWebConvert {
+                            Button(action: {}) {
                                 actionCard(
-                                    icon: "folder.fill.badge.plus",
-                                    title: AppLocalizer.localized("从文件导入"),
-                                    detail: AppLocalizer.localized("支持从 iCloud Drive 或本地目录选择文件"),
-                                    accent: toolType == .pdfToWord || toolType == .ebookConvert ? AppColors.accentPurple : AppColors.accentBlue,
-                                    filled: toolType == .pdfToWord || toolType == .ebookConvert
+                                    icon: "link",
+                                    title: AppLocalizer.localized("输入网址"),
+                                    detail: AppLocalizer.localized("直接输入网页链接提取内容"),
+                                    accent: AppColors.accentPurple,
+                                    filled: true
                                 )
                             }
                             .buttonStyle(.plain)
                         }
+
+                        Button(action: {
+                            isFileImporterPresented = true
+                        }) {
+                            actionCard(
+                                icon: "folder.fill.badge.plus",
+                                title: AppLocalizer.localized("从文件导入"),
+                                detail: AppLocalizer.localized("支持从 iCloud Drive 或本地目录选择文件"),
+                                accent: toolType == .ebookConvert ? AppColors.accentPurple : AppColors.accentBlue,
+                                filled: toolType == .ebookConvert
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(20)
@@ -194,6 +178,6 @@ struct DocumentToolDetailView: View {
 
 #Preview {
     NavigationStack {
-        DocumentToolDetailView(toolType: .pdfToWord)
+        DocumentToolDetailView(toolType: .ebookConvert)
     }
 }

@@ -5,6 +5,5 @@ enum AppRoute: Hashable {
     case videoConverter
     case audioConverter
     case mediaCompressor
-    case pdfConverter
     case documentTool(DocumentToolType)
 }

@@ -5,6 +5,7 @@ target 'parse' do
 
   pod 'ffmpeg-kit-ios-full', :podspec => 'https://raw.githubusercontent.com/luthviar/ffmpeg-kit-ios-full/main/ffmpeg-kit-ios-full.podspec'
   pod 'GCDWebServer/WebUploader', '~> 3.0'
+  pod 'ZIPFoundation', '~> 0.9.20'
 end
 
 post_install do |installer|

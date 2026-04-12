@@ -60,20 +60,12 @@ struct ConversionHomeView: View {
                         offset: 40
                     ) {
                         LazyVGrid(columns: columns, spacing: 16) {
-                            ToolRouteCard(route: .pdfConverter) {
-                                ToolGridCard(icon: "doc.text.viewfinder", title: AppLocalizer.localized("PDF 转换"), description: AppLocalizer.localized("支持转为 DOCX, TXT, MD, PNG 等"), color: AppColors.accentPurple)
-                            }
-
                             ToolRouteCard(route: .documentTool(.imageToText)) {
                                 ToolGridCard(icon: "text.viewfinder", title: AppLocalizer.localized("图片转文字"), description: AppLocalizer.localized("精准提取图片中的文字内容"), color: AppColors.accentPurple)
                             }
 
                             ToolRouteCard(route: .documentTool(.ebookConvert)) {
-                                ToolGridCard(icon: "book.closed.fill", title: AppLocalizer.localized("电子书转换"), description: AppLocalizer.localized("EPUB, MOBI 等格式完美互转"), color: AppColors.accentPurple)
-                            }
-
-                            ToolRouteCard(route: .documentTool(.textWebConvert)) {
-                                ToolGridCard(icon: "network", title: AppLocalizer.localized("网页转文档"), description: AppLocalizer.localized("输入链接一键生成 PDF"), color: AppColors.accentPurple)
+                                ToolGridCard(icon: "book.closed.fill", title: AppLocalizer.localized("电子书转换"), description: AppLocalizer.localized("EPUB 与 TXT 本地互转"), color: AppColors.accentPurple)
                             }
                         }
                     }

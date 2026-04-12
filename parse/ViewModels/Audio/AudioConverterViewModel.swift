@@ -63,10 +63,48 @@ class AudioConverterViewModel: ObservableObject {
             item.status == .success ? item.convertedURL : nil
         }
     }
+
+    var successfulItems: [AudioItem] {
+        audioItems.filter { $0.status == .success && $0.convertedURL != nil }
+    }
     
     func prepareExportDocument() {
         let successItems = audioItems.filter { $0.status == .success }
         exportDocument = successItems.isEmpty ? nil : ConvertedAudioDocument(items: successItems)
+    }
+
+    func shareableURLs(for selectedItemIDs: Set<UUID>) -> [URL] {
+        successfulItems.compactMap { item in
+            guard selectedItemIDs.contains(item.id) else { return nil }
+            return item.convertedURL
+        }
+    }
+
+    func saveExportAssets(to directoryURL: URL, selectedItemIDs: Set<UUID>) throws -> Int {
+        let selectedItems = successfulItems.filter { selectedItemIDs.contains($0.id) }
+        guard !selectedItems.isEmpty else { return 0 }
+
+        guard directoryURL.startAccessingSecurityScopedResource() else {
+            throw CocoaError(.fileWriteNoPermission)
+        }
+        defer { directoryURL.stopAccessingSecurityScopedResource() }
+
+        var usedFilenames = Set<String>()
+        var savedCount = 0
+
+        for item in selectedItems {
+            guard let sourceURL = item.convertedURL else { continue }
+            let filename = uniqueFilename(
+                baseName: item.baseName,
+                fileExtension: item.targetFormat.fileExtension,
+                usedFilenames: &usedFilenames,
+                in: directoryURL
+            )
+            try FileManager.default.copyItem(at: sourceURL, to: directoryURL.appendingPathComponent(filename))
+            savedCount += 1
+        }
+
+        return savedCount
     }
     
     func addImportedAudioFiles(_ files: [ImportedAudioFile]) {
@@ -279,5 +317,24 @@ class AudioConverterViewModel: ObservableObject {
             print("Failed to copy imported audio file: \(error.localizedDescription)")
             return nil
         }
+    }
+
+    private func uniqueFilename(
+        baseName: String,
+        fileExtension: String,
+        usedFilenames: inout Set<String>,
+        in directoryURL: URL
+    ) -> String {
+        let sanitizedBaseName = baseName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Audio" : baseName
+        var candidate = "\(sanitizedBaseName).\(fileExtension)"
+        var counter = 1
+
+        while usedFilenames.contains(candidate) || FileManager.default.fileExists(atPath: directoryURL.appendingPathComponent(candidate).path) {
+            candidate = "\(sanitizedBaseName)_\(counter).\(fileExtension)"
+            counter += 1
+        }
+
+        usedFilenames.insert(candidate)
+        return candidate
     }
 }

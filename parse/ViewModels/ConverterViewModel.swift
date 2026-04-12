@@ -65,6 +65,10 @@ class ConverterViewModel: ObservableObject {
             item.status == .success ? item.convertedFileURL : nil
         }
     }
+
+    var successfulItems: [ImageItem] {
+        imageItems.filter { $0.status == .success && $0.convertedFileURL != nil }
+    }
     
     var hasSuccessItems: Bool {
         imageItems.contains { $0.status == .success }
@@ -140,6 +144,40 @@ class ConverterViewModel: ObservableObject {
     func prepareExportDocument() {
         let successItems = imageItems.filter { $0.status == .success }
         exportDocument = successItems.isEmpty ? nil : ConvertedImagesDocument(items: successItems)
+    }
+
+    func shareableURLs(for selectedItemIDs: Set<UUID>) -> [URL] {
+        successfulItems.compactMap { item in
+            guard selectedItemIDs.contains(item.id) else { return nil }
+            return item.convertedFileURL
+        }
+    }
+
+    func saveExportAssets(to directoryURL: URL, selectedItemIDs: Set<UUID>) throws -> Int {
+        let selectedItems = successfulItems.filter { selectedItemIDs.contains($0.id) }
+        guard !selectedItems.isEmpty else { return 0 }
+
+        guard directoryURL.startAccessingSecurityScopedResource() else {
+            throw CocoaError(.fileWriteNoPermission)
+        }
+        defer { directoryURL.stopAccessingSecurityScopedResource() }
+
+        var usedFilenames = Set<String>()
+        var savedCount = 0
+
+        for item in selectedItems {
+            guard let sourceURL = item.convertedFileURL else { continue }
+            let filename = uniqueFilename(
+                baseName: item.originalName,
+                fileExtension: item.targetFormat.fileExtension,
+                usedFilenames: &usedFilenames,
+                in: directoryURL
+            )
+            try FileManager.default.copyItem(at: sourceURL, to: directoryURL.appendingPathComponent(filename))
+            savedCount += 1
+        }
+
+        return savedCount
     }
     
     func prepareRemoteImageImport(from urlString: String) async throws -> RemoteImageImportPreview {
@@ -445,7 +483,7 @@ class ConverterViewModel: ObservableObject {
         return ext.isEmpty ? "未知" : ext.uppercased()
     }
     
-    func saveToPhotoLibrary() async -> Result<Int, Error> {
+    func saveToPhotoLibrary(selectedItemIDs: Set<UUID>) async -> Result<Int, Error> {
         // 请求“仅添加”权限（如果还没有）
         let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
         
@@ -453,7 +491,7 @@ class ConverterViewModel: ObservableObject {
             return .failure(ConversionError.photoLibraryAccessDenied)
         }
         
-        let successItems = imageItems.filter { $0.status == .success && $0.convertedFileURL != nil }
+        let successItems = successfulItems.filter { selectedItemIDs.contains($0.id) }
         var savedCount = 0
         
         do {
@@ -471,6 +509,25 @@ class ConverterViewModel: ObservableObject {
         } catch {
             return .failure(error)
         }
+    }
+
+    private func uniqueFilename(
+        baseName: String,
+        fileExtension: String,
+        usedFilenames: inout Set<String>,
+        in directoryURL: URL
+    ) -> String {
+        let sanitizedBaseName = baseName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Image" : baseName
+        var candidate = "\(sanitizedBaseName).\(fileExtension)"
+        var counter = 1
+
+        while usedFilenames.contains(candidate) || FileManager.default.fileExists(atPath: directoryURL.appendingPathComponent(candidate).path) {
+            candidate = "\(sanitizedBaseName)_\(counter).\(fileExtension)"
+            counter += 1
+        }
+
+        usedFilenames.insert(candidate)
+        return candidate
     }
 }
 

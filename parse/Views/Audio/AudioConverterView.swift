@@ -7,11 +7,12 @@ struct AudioConverterView: View {
     @Environment(PurchaseManager.self) private var purchaseManager
     @StateObject private var viewModel = AudioConverterViewModel()
     @State private var isFileImporterPresented = false
-    @State private var isFileExporterPresented = false
     @State private var isSaveActionSheetPresented = false
+    @State private var isFolderPickerPresented = false
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
     @State private var isShowingPaywall = false
+    @State private var selectedSaveItemIDs: Set<UUID> = []
     
     private var isBusy: Bool {
         viewModel.isConverting || viewModel.isImporting
@@ -78,29 +79,14 @@ struct AudioConverterView: View {
         ) { result in
             viewModel.handleFileImportResult(result)
         }
-        .fileExporter(
-            isPresented: $isFileExporterPresented,
-            document: viewModel.exportDocument,
-            contentType: .folder,
-            defaultFilename: "ConvertedAudios"
-        ) { result in
-            switch result {
-            case .success(let url):
-                saveMessage = AppLocalizer.formatted("已成功保存至文件：\n%@", url.lastPathComponent)
-                showSaveAlert = true
-            case .failure(let error):
-                saveMessage = AppLocalizer.formatted("保存失败：\n%@", error.localizedDescription)
-                showSaveAlert = true
-            }
-        }
         .sheet(isPresented: $isSaveActionSheetPresented) {
-            SaveActionSheetView(
-                shareableURLs: viewModel.shareableURLs,
+            ConvertedFileSaveSelectionSheet(
+                items: saveSelectionItems,
+                selectedItemIDs: $selectedSaveItemIDs,
                 onSaveToAlbum: nil,
                 onSaveToFile: {
                     isSaveActionSheetPresented = false
-                    viewModel.prepareExportDocument()
-                    isFileExporterPresented = viewModel.exportDocument != nil
+                    isFolderPickerPresented = true
                 },
                 onOpenTransferGuide: {
                     isSaveActionSheetPresented = false
@@ -108,9 +94,26 @@ struct AudioConverterView: View {
                     tabRouter.select(.transfer)
                 }
             )
-            .presentationDetents([.height(280)])
+            .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
             .presentationBackground(AppColors.background)
+        }
+        .sheet(isPresented: $isFolderPickerPresented) {
+            FolderPicker(
+                onPick: { url in
+                    do {
+                        let savedCount = try viewModel.saveExportAssets(to: url, selectedItemIDs: selectedSaveItemIDs)
+                        saveMessage = AppLocalizer.formatted("已成功保存 %lld 个文件到所选文件夹", savedCount)
+                    } catch {
+                        saveMessage = AppLocalizer.formatted("保存失败：\n%@", error.localizedDescription)
+                    }
+                    showSaveAlert = true
+                    isFolderPickerPresented = false
+                },
+                onCancel: {
+                    isFolderPickerPresented = false
+                }
+            )
         }
         .alert("保存结果", isPresented: $showSaveAlert) {
             Button("确定", role: .cancel) {}
@@ -191,20 +194,18 @@ struct AudioConverterView: View {
                 
                 Divider().background(AppColors.secondaryBackground)
                 
-                HStack {
-                    Text("统一转换为")
-                        .font(.subheadline)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(AppLocalizer.localized("格式"))
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundColor(AppColors.textSecondary)
-                        .fontWeight(.medium)
-                    Spacer()
-                    Picker("统一转换为", selection: $viewModel.batchTargetFormat) {
+
+                    Picker(AppLocalizer.localized("格式"), selection: $viewModel.batchTargetFormat) {
                         ForEach(AudioFormat.allCases) { format in
                             Text(format.rawValue)
                                 .tag(format)
                         }
                     }
                     .pickerStyle(.segmented)
-                    .frame(maxWidth: 240)
                     .allowsHitTesting(!viewModel.isConverting)
                 }
             }
@@ -282,6 +283,7 @@ struct AudioConverterView: View {
             .disabled(!viewModel.canConvert)
             
             Button(action: {
+                selectedSaveItemIDs = Set(viewModel.successfulItems.map(\.id))
                 isSaveActionSheetPresented = true
             }) {
                 HStack(spacing: 6) {
@@ -329,6 +331,23 @@ struct AudioConverterView: View {
             .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 10)
         }
         .zIndex(100)
+    }
+
+    private var saveSelectionItems: [ConvertedFileSaveSelectionItem] {
+        viewModel.successfulItems.compactMap { item in
+            guard let fileURL = item.convertedURL else { return nil }
+            return ConvertedFileSaveSelectionItem(
+                id: item.id,
+                title: item.baseName,
+                subtitle: "\(item.originalFormat) -> \(item.targetFormat.rawValue)",
+                badgeText: item.targetFormat.rawValue,
+                previewImage: nil,
+                iconName: item.targetFormat.iconName,
+                accentColor: AppColors.accentOrange,
+                fileURL: fileURL,
+                supportsPhotoLibrarySave: false
+            )
+        }
     }
 }
 

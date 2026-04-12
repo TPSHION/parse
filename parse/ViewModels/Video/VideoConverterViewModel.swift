@@ -100,6 +100,10 @@ class VideoConverterViewModel: ObservableObject {
             item.status == .success ? item.convertedFileURL : nil
         }
     }
+
+    var successfulItems: [VideoItem] {
+        videoItems.filter { $0.status == .success && $0.convertedFileURL != nil }
+    }
     
     var hasSuccessItems: Bool {
         videoItems.contains { $0.status == .success }
@@ -171,6 +175,40 @@ class VideoConverterViewModel: ObservableObject {
     func prepareExportDocument() {
         let successItems = videoItems.filter { $0.status == .success }
         exportDocument = successItems.isEmpty ? nil : ConvertedVideosDocument(items: successItems)
+    }
+
+    func shareableURLs(for selectedItemIDs: Set<UUID>) -> [URL] {
+        successfulItems.compactMap { item in
+            guard selectedItemIDs.contains(item.id) else { return nil }
+            return item.convertedFileURL
+        }
+    }
+
+    func saveExportAssets(to directoryURL: URL, selectedItemIDs: Set<UUID>) throws -> Int {
+        let selectedItems = successfulItems.filter { selectedItemIDs.contains($0.id) }
+        guard !selectedItems.isEmpty else { return 0 }
+
+        guard directoryURL.startAccessingSecurityScopedResource() else {
+            throw CocoaError(.fileWriteNoPermission)
+        }
+        defer { directoryURL.stopAccessingSecurityScopedResource() }
+
+        var usedFilenames = Set<String>()
+        var savedCount = 0
+
+        for item in selectedItems {
+            guard let sourceURL = item.convertedFileURL else { continue }
+            let filename = uniqueFilename(
+                baseName: item.originalName,
+                fileExtension: item.targetFormat.fileExtension,
+                usedFilenames: &usedFilenames,
+                in: directoryURL
+            )
+            try FileManager.default.copyItem(at: sourceURL, to: directoryURL.appendingPathComponent(filename))
+            savedCount += 1
+        }
+
+        return savedCount
     }
     
     func handlePrimaryAction() async {
@@ -752,14 +790,14 @@ class VideoConverterViewModel: ObservableObject {
         return values?.fileSize.map(Int64.init)
     }
     
-    func saveToPhotoLibrary() async -> Result<Int, Error> {
+    func saveToPhotoLibrary(selectedItemIDs: Set<UUID>) async -> Result<Int, Error> {
         let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
         
         guard status == .authorized || status == .limited else {
             return .failure(VideoConversionError.photoLibraryAccessDenied)
         }
         
-        let successItems = videoItems.filter { $0.status == .success && $0.convertedFileURL != nil }
+        let successItems = successfulItems.filter { selectedItemIDs.contains($0.id) }
         let savableItems = successItems.filter { item in
             switch item.targetFormat {
             case .mp4, .mov, .gif:
@@ -800,6 +838,25 @@ class VideoConverterViewModel: ObservableObject {
             return VideoConversionError.photoLibrarySaveFailed
         }
         return error
+    }
+
+    private func uniqueFilename(
+        baseName: String,
+        fileExtension: String,
+        usedFilenames: inout Set<String>,
+        in directoryURL: URL
+    ) -> String {
+        let sanitizedBaseName = baseName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Video" : baseName
+        var candidate = "\(sanitizedBaseName).\(fileExtension)"
+        var counter = 1
+
+        while usedFilenames.contains(candidate) || FileManager.default.fileExists(atPath: directoryURL.appendingPathComponent(candidate).path) {
+            candidate = "\(sanitizedBaseName)_\(counter).\(fileExtension)"
+            counter += 1
+        }
+
+        usedFilenames.insert(candidate)
+        return candidate
     }
 }
 

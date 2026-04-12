@@ -140,16 +140,6 @@ struct MediaCompressorView: View {
 
     private var headerCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(AppLocalizer.localized("数据压缩"))
-                        .font(.system(size: 24, weight: .heavy))
-                        .foregroundColor(AppColors.textPrimary)
-                }
-
-                Spacer()
-            }
-
             VStack(alignment: .leading, spacing: 8) {
                 Text(AppLocalizer.localized("压缩强度"))
                     .font(.system(size: 12, weight: .bold))

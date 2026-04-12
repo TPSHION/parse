@@ -17,12 +17,13 @@ struct ImageConverterView: View {
     @State private var selectedPhotos: [PhotosPickerItem] = []
     @State private var isFileImporterPresented = false
     @State private var isLinkImportPresented = false
-    @State private var isFileExporterPresented = false
     @State private var isSaveActionSheetPresented = false
+    @State private var isFolderPickerPresented = false
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
     @State private var remoteImportPreview: RemoteImageImportPreview?
     @State private var isShowingPaywall = false
+    @State private var selectedSaveItemIDs: Set<UUID> = []
     
     var body: some View {
         let isBusy = viewModel.isConverting || viewModel.isImporting
@@ -128,28 +129,14 @@ struct ImageConverterView: View {
                 .presentationDragIndicator(.visible)
                 .presentationBackground(AppColors.background)
             }
-            .fileExporter(
-                isPresented: $isFileExporterPresented,
-                document: viewModel.exportDocument,
-                contentType: .folder,
-                defaultFilename: "ConvertedImages"
-            ) { result in
-                switch result {
-                case .success(let url):
-                    saveMessage = AppLocalizer.formatted("已成功保存至文件：\n%@", url.lastPathComponent)
-                    showSaveAlert = true
-                case .failure(let error):
-                    saveMessage = AppLocalizer.formatted("保存失败：\n%@", error.localizedDescription)
-                    showSaveAlert = true
-                }
-            }
             .sheet(isPresented: $isSaveActionSheetPresented) {
-                SaveActionSheetView(
-                    shareableURLs: viewModel.shareableURLs,
+                ConvertedFileSaveSelectionSheet(
+                    items: saveSelectionItems,
+                    selectedItemIDs: $selectedSaveItemIDs,
                     onSaveToAlbum: {
                         isSaveActionSheetPresented = false
                         Task {
-                            let result = await viewModel.saveToPhotoLibrary()
+                            let result = await viewModel.saveToPhotoLibrary(selectedItemIDs: selectedSaveItemIDs)
                             switch result {
                             case .success(let count):
                                 saveMessage = AppLocalizer.formatted("成功保存 %lld 张图片到相册", count)
@@ -162,8 +149,7 @@ struct ImageConverterView: View {
                     },
                     onSaveToFile: {
                         isSaveActionSheetPresented = false
-                        viewModel.prepareExportDocument()
-                        isFileExporterPresented = viewModel.exportDocument != nil
+                        isFolderPickerPresented = true
                     },
                     onOpenTransferGuide: {
                         isSaveActionSheetPresented = false
@@ -171,9 +157,26 @@ struct ImageConverterView: View {
                         tabRouter.select(.transfer)
                     }
                 )
-                .presentationDetents([.height(356)])
+                .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
                 .presentationBackground(AppColors.background)
+            }
+            .sheet(isPresented: $isFolderPickerPresented) {
+                FolderPicker(
+                    onPick: { url in
+                        do {
+                            let savedCount = try viewModel.saveExportAssets(to: url, selectedItemIDs: selectedSaveItemIDs)
+                            saveMessage = AppLocalizer.formatted("已成功保存 %lld 个文件到所选文件夹", savedCount)
+                        } catch {
+                            saveMessage = AppLocalizer.formatted("保存失败：\n%@", error.localizedDescription)
+                        }
+                        showSaveAlert = true
+                        isFolderPickerPresented = false
+                    },
+                    onCancel: {
+                        isFolderPickerPresented = false
+                    }
+                )
             }
             .sheet(item: $remoteImportPreview) { preview in
                 RemoteImageImportPreviewSheet(
@@ -254,26 +257,22 @@ struct ImageConverterView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             
             // 统一转换选项
-            VStack(spacing: 12) {
-                HStack {
-                    Text(AppLocalizer.localized("统一转换为"))
-                        .font(.subheadline)
-                        .foregroundColor(AppColors.textSecondary)
-                        .fontWeight(.medium)
-                    Spacer()
-                    Picker(AppLocalizer.localized("统一转换为"), selection: $viewModel.batchTargetFormat) {
-                        ForEach(ImageFormat.allCases) { format in
-                            Text(format.rawValue).tag(format)
-                        }
+            VStack(alignment: .leading, spacing: 8) {
+                Text(AppLocalizer.localized("格式"))
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(AppColors.textSecondary)
+
+                Picker(AppLocalizer.localized("格式"), selection: $viewModel.batchTargetFormat) {
+                    ForEach(ImageFormat.allCases) { format in
+                        Text(format.rawValue).tag(format)
                     }
-                    .pickerStyle(.segmented)
-                    .frame(width: 240)
-                    .allowsHitTesting(!viewModel.isConverting)
                 }
+                .pickerStyle(.segmented)
+                .allowsHitTesting(!viewModel.isConverting)
             }
-            .padding(16)
+            .padding(20)
             .background(AppColors.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         }
         .padding(.horizontal)
     }
@@ -382,6 +381,7 @@ struct ImageConverterView: View {
                 .disabled(!viewModel.canConvert)
                 
                 Button(action: {
+                    selectedSaveItemIDs = Set(viewModel.successfulItems.map(\.id))
                     isSaveActionSheetPresented = true
                 }) {
                     HStack(spacing: 4) {
@@ -416,6 +416,23 @@ struct ImageConverterView: View {
         .padding(.horizontal, 16)
         .padding(.bottom, 0)
         .allowsHitTesting(!viewModel.isImporting)
+    }
+
+    private var saveSelectionItems: [ConvertedFileSaveSelectionItem] {
+        viewModel.successfulItems.compactMap { item in
+            guard let fileURL = item.convertedFileURL else { return nil }
+            return ConvertedFileSaveSelectionItem(
+                id: item.id,
+                title: item.originalName,
+                subtitle: "\(item.originalFormat) -> \(item.targetFormat.rawValue)",
+                badgeText: item.targetFormat.rawValue,
+                previewImage: item.previewImage,
+                iconName: "photo",
+                accentColor: AppColors.accentBlue,
+                fileURL: fileURL,
+                supportsPhotoLibrarySave: true
+            )
+        }
     }
     
 }

@@ -16,10 +16,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="LaunchLogoImageView">
-                                <rect key="frame" x="132.66666666666666" y="214" width="127.99999999999997" height="128"/>
+                                <rect key="frame" x="114.66666666666667" y="214" width="164" height="164"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="128" id="LaunchLogoHeight"/>
-                                    <constraint firstAttribute="width" constant="128" id="LaunchLogoWidth"/>
+                                    <constraint firstAttribute="height" constant="164" id="LaunchLogoHeight"/>
+                                    <constraint firstAttribute="width" constant="164" id="LaunchLogoWidth"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ParseLab" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LaunchTitleLabel">

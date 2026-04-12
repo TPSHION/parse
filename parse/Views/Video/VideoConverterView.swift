@@ -9,11 +9,12 @@ struct VideoConverterView: View {
     @StateObject private var viewModel = VideoConverterViewModel()
     @State private var selectedVideos: [PhotosPickerItem] = []
     @State private var isFileImporterPresented = false
-    @State private var isFileExporterPresented = false
     @State private var isSaveActionSheetPresented = false
+    @State private var isFolderPickerPresented = false
     @State private var saveMessage: String?
     @State private var showSaveAlert = false
     @State private var isShowingPaywall = false
+    @State private var selectedSaveItemIDs: Set<UUID> = []
 
     private var importContentTypes: [UTType] {
         var types: [UTType] = [.movie, .video]
@@ -111,28 +112,14 @@ struct VideoConverterView: View {
         ) { result in
             viewModel.handleFileImportResult(result)
         }
-        .fileExporter(
-            isPresented: $isFileExporterPresented,
-            document: viewModel.exportDocument,
-            contentType: .folder,
-            defaultFilename: "ConvertedVideos"
-        ) { result in
-            switch result {
-            case .success(let url):
-                saveMessage = AppLocalizer.formatted("已成功保存至文件：\n%@", url.lastPathComponent)
-                showSaveAlert = true
-            case .failure(let error):
-                saveMessage = AppLocalizer.formatted("保存失败：\n%@", error.localizedDescription)
-                showSaveAlert = true
-            }
-        }
         .sheet(isPresented: $isSaveActionSheetPresented) {
-            SaveActionSheetView(
-                shareableURLs: viewModel.shareableURLs,
+            ConvertedFileSaveSelectionSheet(
+                items: saveSelectionItems,
+                selectedItemIDs: $selectedSaveItemIDs,
                 onSaveToAlbum: {
                     isSaveActionSheetPresented = false
                     Task {
-                        let result = await viewModel.saveToPhotoLibrary()
+                        let result = await viewModel.saveToPhotoLibrary(selectedItemIDs: selectedSaveItemIDs)
                         switch result {
                         case .success(let count):
                             saveMessage = AppLocalizer.formatted("成功保存 %lld 个视频到相册", count)
@@ -145,8 +132,7 @@ struct VideoConverterView: View {
                 },
                 onSaveToFile: {
                     isSaveActionSheetPresented = false
-                    viewModel.prepareExportDocument()
-                    isFileExporterPresented = viewModel.exportDocument != nil
+                    isFolderPickerPresented = true
                 },
                 onOpenTransferGuide: {
                     isSaveActionSheetPresented = false
@@ -154,9 +140,26 @@ struct VideoConverterView: View {
                     tabRouter.select(.transfer)
                 }
             )
-            .presentationDetents([.height(356)])
+            .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
             .presentationBackground(AppColors.background)
+        }
+        .sheet(isPresented: $isFolderPickerPresented) {
+            FolderPicker(
+                onPick: { url in
+                    do {
+                        let savedCount = try viewModel.saveExportAssets(to: url, selectedItemIDs: selectedSaveItemIDs)
+                        saveMessage = AppLocalizer.formatted("已成功保存 %lld 个文件到所选文件夹", savedCount)
+                    } catch {
+                        saveMessage = AppLocalizer.formatted("保存失败：\n%@", error.localizedDescription)
+                    }
+                    showSaveAlert = true
+                    isFolderPickerPresented = false
+                },
+                onCancel: {
+                    isFolderPickerPresented = false
+                }
+            )
         }
         .fullScreenCover(isPresented: $isShowingPaywall) {
             TrialPaywallView(allowsDismissal: true)
@@ -240,19 +243,17 @@ struct VideoConverterView: View {
                     
                     Divider().background(AppColors.secondaryBackground)
                     
-                    HStack {
-                        Text("统一转换为")
-                            .font(.subheadline)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(AppLocalizer.localized("格式"))
+                            .font(.system(size: 12, weight: .bold))
                             .foregroundColor(AppColors.textSecondary)
-                            .fontWeight(.medium)
-                        Spacer()
-                        Picker("统一转换为", selection: $viewModel.batchTargetFormat) {
+
+                        Picker(AppLocalizer.localized("格式"), selection: $viewModel.batchTargetFormat) {
                             ForEach(VideoFormat.allCases) { format in
                                 Text(format.rawValue).tag(format)
                             }
                         }
                         .pickerStyle(.segmented)
-                        .frame(width: 240)
                         .allowsHitTesting(!viewModel.isConverting)
                     }
                     
@@ -361,6 +362,7 @@ struct VideoConverterView: View {
             .disabled(!viewModel.canConvert)
             
             Button(action: {
+                selectedSaveItemIDs = Set(viewModel.successfulItems.map(\.id))
                 isSaveActionSheetPresented = true
             }) {
                 HStack(spacing: 6) {
@@ -394,6 +396,32 @@ struct VideoConverterView: View {
         .padding(.horizontal, 16)
         .padding(.bottom, 0)
         .allowsHitTesting(!viewModel.isImporting)
+    }
+
+    private var saveSelectionItems: [ConvertedFileSaveSelectionItem] {
+        viewModel.successfulItems.compactMap { item in
+            guard let fileURL = item.convertedFileURL else { return nil }
+            let supportsPhotoLibrarySave: Bool = {
+                switch item.targetFormat {
+                case .mp4, .mov, .gif:
+                    return true
+                case .ts, .avi, .mkv:
+                    return false
+                }
+            }()
+
+            return ConvertedFileSaveSelectionItem(
+                id: item.id,
+                title: item.originalName,
+                subtitle: "\(item.originalFormat) -> \(item.targetFormat.rawValue)",
+                badgeText: item.targetFormat.rawValue,
+                previewImage: item.thumbnail,
+                iconName: "film",
+                accentColor: AppColors.accentGreen,
+                fileURL: fileURL,
+                supportsPhotoLibrarySave: supportsPhotoLibrarySave
+            )
+        }
     }
     
 }

@@ -297,6 +297,10 @@ struct ResultsHomeView: View {
             return AppColors.accentOrange
         case .compression:
             return AppColors.accentPurple
+        case .textRecognition:
+            return AppColors.accentTeal
+        case .ebookConversion:
+            return AppColors.accentPurple
         }
     }
 
@@ -310,6 +314,10 @@ struct ResultsHomeView: View {
             return "waveform"
         case .compression:
             return "bolt.fill"
+        case .textRecognition:
+            return "text.viewfinder"
+        case .ebookConversion:
+            return "book.closed.fill"
         }
     }
 

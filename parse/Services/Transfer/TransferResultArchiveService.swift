@@ -9,6 +9,8 @@ enum TransferResultCategory: String, CaseIterable {
     case videoConversion = "video_conversion"
     case audioConversion = "audio_conversion"
     case compression = "compression"
+    case textRecognition = "text_recognition"
+    case ebookConversion = "ebook_conversion"
 
     nonisolated var folderName: String { rawValue }
 
@@ -22,6 +24,10 @@ enum TransferResultCategory: String, CaseIterable {
             return AppLocalizer.localized("音频转换")
         case .compression:
             return AppLocalizer.localized("压缩结果")
+        case .textRecognition:
+            return AppLocalizer.localized("文字识别")
+        case .ebookConversion:
+            return AppLocalizer.localized("电子书转换")
         }
     }
 }
@@ -69,6 +75,10 @@ enum TransferResultArchiveService {
         Task.detached(priority: .utility) {
             try? archive(url: url, category: category)
         }
+    }
+
+    nonisolated static func archiveImmediately(url: URL, category: TransferResultCategory) throws {
+        try archive(url: url, category: category)
     }
 
     nonisolated static func allPayload() -> [[String: Any]] {

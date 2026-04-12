@@ -91,65 +91,71 @@ struct MediaSaveSelectionSheet: View {
     }
 
     private var actionButtons: some View {
-        VStack(spacing: 12) {
-            Group {
-                if selectedShareableURLs.isEmpty {
-                    actionButton(
-                        icon: "square.and.arrow.up",
-                        title: AppLocalizer.localized("分享文件"),
-                        accent: AppColors.secondaryBackground.opacity(0.5),
-                        foreground: AppColors.textSecondary.opacity(0.5)
-                    )
-                } else {
-                    Button {
-                        isShareSheetPresented = true
-                    } label: {
-                        actionButton(
-                            icon: "square.and.arrow.up",
-                            title: AppLocalizer.localized("分享文件"),
-                            accent: AppColors.accentBlue,
-                            foreground: .white
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-
-            HStack(spacing: 12) {
-                Button(action: onSaveToAlbum) {
-                    actionButton(
-                        icon: "photo.on.rectangle.angled",
-                        title: AppLocalizer.localized("保存到相册"),
-                        accent: selectedPhotoLibraryEligibleCount > 0 ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5),
-                        foreground: selectedPhotoLibraryEligibleCount > 0 ? .white : AppColors.textSecondary.opacity(0.5)
-                    )
-                }
-                .buttonStyle(.plain)
-                .disabled(selectedPhotoLibraryEligibleCount == 0)
-
-                Button(action: onSaveToFile) {
-                    actionButton(
-                        icon: "folder",
-                        title: AppLocalizer.localized("保存为文件"),
-                        accent: selectedCount > 0 ? AppColors.accentOrange : AppColors.secondaryBackground.opacity(0.5),
-                        foreground: selectedCount > 0 ? .white : AppColors.textSecondary.opacity(0.5)
-                    )
-                }
-                .buttonStyle(.plain)
-                .disabled(selectedCount == 0)
-            }
-
-            Button(action: onOpenTransferGuide) {
-                actionButton(
-                    icon: "wifi",
-                    title: AppLocalizer.localized("网页下载"),
-                    accent: selectedCount > 0 ? AppColors.accentPurple : AppColors.secondaryBackground.opacity(0.5),
-                    foreground: selectedCount > 0 ? .white : AppColors.textSecondary.opacity(0.5)
-                )
-            }
-            .buttonStyle(.plain)
-            .disabled(selectedCount == 0)
+        let rows = stride(from: 0, to: actionButtonConfigs.count, by: 2).map {
+            Array(actionButtonConfigs[$0..<min($0 + 2, actionButtonConfigs.count)])
         }
+
+        return VStack(spacing: 12) {
+            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                HStack(spacing: 12) {
+                    ForEach(Array(row.enumerated()), id: \.offset) { _, config in
+                        Button(action: config.action) {
+                            actionButton(
+                                icon: config.icon,
+                                title: config.title,
+                                accent: config.accent,
+                                foreground: config.foreground
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(config.isDisabled)
+                    }
+
+                    if row.count == 1 {
+                        Color.clear
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 48)
+                    }
+                }
+            }
+        }
+    }
+
+    private var actionButtonConfigs: [MediaSaveActionButtonConfig] {
+        [
+            MediaSaveActionButtonConfig(
+                icon: "square.and.arrow.up",
+                title: AppLocalizer.localized("分享"),
+                accent: selectedShareableURLs.isEmpty ? AppColors.secondaryBackground.opacity(0.5) : AppColors.accentBlue,
+                foreground: selectedShareableURLs.isEmpty ? AppColors.textSecondary.opacity(0.5) : .white,
+                isDisabled: selectedShareableURLs.isEmpty,
+                action: { isShareSheetPresented = true }
+            ),
+            MediaSaveActionButtonConfig(
+                icon: "photo.on.rectangle.angled",
+                title: AppLocalizer.localized("相册"),
+                accent: selectedPhotoLibraryEligibleCount > 0 ? AppColors.accentGreen : AppColors.secondaryBackground.opacity(0.5),
+                foreground: selectedPhotoLibraryEligibleCount > 0 ? .white : AppColors.textSecondary.opacity(0.5),
+                isDisabled: selectedPhotoLibraryEligibleCount == 0,
+                action: onSaveToAlbum
+            ),
+            MediaSaveActionButtonConfig(
+                icon: "folder",
+                title: AppLocalizer.localized("文件夹"),
+                accent: selectedCount > 0 ? AppColors.accentOrange : AppColors.secondaryBackground.opacity(0.5),
+                foreground: selectedCount > 0 ? .white : AppColors.textSecondary.opacity(0.5),
+                isDisabled: selectedCount == 0,
+                action: onSaveToFile
+            ),
+            MediaSaveActionButtonConfig(
+                icon: "wifi",
+                title: AppLocalizer.localized("传输"),
+                accent: selectedCount > 0 ? AppColors.accentPurple : AppColors.secondaryBackground.opacity(0.5),
+                foreground: selectedCount > 0 ? .white : AppColors.textSecondary.opacity(0.5),
+                isDisabled: selectedCount == 0,
+                action: onOpenTransferGuide
+            )
+        ]
     }
 
     private func actionButton(icon: String, title: String, accent: Color, foreground: Color) -> some View {
@@ -162,6 +168,7 @@ struct MediaSaveSelectionSheet: View {
         }
         .foregroundColor(foreground)
         .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity)
         .frame(height: 48)
         .background(accent)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -174,6 +181,15 @@ struct MediaSaveSelectionSheet: View {
             selectedItemIDs.insert(id)
         }
     }
+}
+
+private struct MediaSaveActionButtonConfig {
+    let icon: String
+    let title: String
+    let accent: Color
+    let foreground: Color
+    let isDisabled: Bool
+    let action: () -> Void
 }
 
 private struct MediaSaveSelectionRow: View {

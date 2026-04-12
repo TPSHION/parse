@@ -35,10 +35,17 @@ struct parseApp: App {
                             AudioConverterView()
                         case .mediaCompressor:
                             MediaCompressorView()
-                        case .pdfConverter:
-                            PDFConverterView()
                         case .documentTool(let toolType):
-                            DocumentToolDetailView(toolType: toolType)
+                            switch toolType {
+                            case .imageToText:
+                                ImageTextRecognitionView()
+                            case .ebookConvert:
+                                EbookConverterView()
+                            case .textWebConvert:
+                                ConversionHomeView()
+                            default:
+                                DocumentToolDetailView(toolType: toolType)
+                            }
                         }
                     }
             }
