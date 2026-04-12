@@ -1,0 +1,6 @@
+framework module ReadiumShared {
+  umbrella header "ReadiumShared-umbrella.h"
+
+  export *
+  module * { export * }
+}

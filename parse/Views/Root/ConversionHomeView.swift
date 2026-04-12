@@ -65,7 +65,7 @@ struct ConversionHomeView: View {
                             }
 
                             ToolRouteCard(route: .documentTool(.ebookConvert)) {
-                                ToolGridCard(icon: "book.closed.fill", title: AppLocalizer.localized("电子书转换"), description: AppLocalizer.localized("EPUB 与 TXT 本地互转"), color: AppColors.accentPurple)
+                                ToolGridCard(icon: "book.closed.fill", title: AppLocalizer.localized("电子书"), description: AppLocalizer.localized("EPUB 与 TXT 本地互转和阅读"), color: AppColors.accentPurple)
                             }
                         }
                     }

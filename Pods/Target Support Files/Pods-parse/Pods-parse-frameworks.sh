@@ -176,7 +176,17 @@ code_sign_if_enabled() {
 }
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/DifferenceKit/DifferenceKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/GCDWebServer/GCDWebServer.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/Minizip/Minizip.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumFuzi/ReadiumFuzi.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumInternal/ReadiumInternal.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumNavigator/ReadiumNavigator.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumShared/ReadiumShared.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumStreamer/ReadiumStreamer.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumZIPFoundation/ReadiumZIPFoundation.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SwiftSoup/SwiftSoup.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ZIPFoundation/ZIPFoundation.framework"
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/ffmpeg-kit-ios-full/ffmpegkit.framework"
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/ffmpeg-kit-ios-full/libavcodec.framework"
@@ -188,7 +198,17 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/ffmpeg-kit-ios-full/libswscale.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/DifferenceKit/DifferenceKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/GCDWebServer/GCDWebServer.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/Minizip/Minizip.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumFuzi/ReadiumFuzi.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumInternal/ReadiumInternal.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumNavigator/ReadiumNavigator.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumShared/ReadiumShared.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumStreamer/ReadiumStreamer.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/ReadiumZIPFoundation/ReadiumZIPFoundation.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SwiftSoup/SwiftSoup.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ZIPFoundation/ZIPFoundation.framework"
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/ffmpeg-kit-ios-full/ffmpegkit.framework"
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/ffmpeg-kit-ios-full/libavcodec.framework"

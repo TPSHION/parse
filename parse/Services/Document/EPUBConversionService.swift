@@ -6,6 +6,11 @@ struct EPUBBookContent {
     let plainText: String
 }
 
+struct EPUBCoverAsset {
+    let data: Data
+    let fileExtension: String
+}
+
 enum EPUBConversionError: LocalizedError {
     case invalidArchive
     case missingContainer
@@ -40,25 +45,7 @@ enum EPUBConversionError: LocalizedError {
 
 enum EPUBConversionService {
     nonisolated static func extractContent(from fileURL: URL) throws -> EPUBBookContent {
-        let archive: Archive
-        do {
-            archive = try Archive(url: fileURL, accessMode: .read)
-        } catch {
-            throw EPUBConversionError.invalidArchive
-        }
-
-        guard
-            let containerData = try readData(at: "META-INF/container.xml", from: archive),
-            let rootPath = parseRootPath(from: containerData)
-        else {
-            throw EPUBConversionError.missingContainer
-        }
-
-        guard let packageData = try readData(at: rootPath, from: archive) else {
-            throw EPUBConversionError.missingPackageDocument
-        }
-
-        let package = parsePackage(from: packageData)
+        let (archive, rootPath, package) = try loadPackage(from: fileURL)
         let spinePaths = package.spine.compactMap { itemID -> String? in
             guard let manifestItem = package.manifest[itemID] else { return nil }
             return resolveArchivePath(base: rootPath, relative: manifestItem.href)
@@ -88,6 +75,47 @@ enum EPUBConversionService {
             title: package.title?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? fileURL.deletingPathExtension().lastPathComponent,
             plainText: finalText
         )
+    }
+
+    nonisolated static func extractCover(from fileURL: URL) throws -> EPUBCoverAsset? {
+        let (archive, rootPath, package) = try loadPackage(from: fileURL)
+
+        let coverItem = resolveCoverItem(in: package)
+        guard let coverItem else { return nil }
+
+        let coverPath = resolveArchivePath(base: rootPath, relative: coverItem.href)
+        guard let coverData = try readData(at: coverPath, from: archive), !coverData.isEmpty else {
+            return nil
+        }
+
+        let inferredExtension = normalizedImageExtension(
+            pathExtension: URL(fileURLWithPath: coverItem.href).pathExtension,
+            mediaType: coverItem.mediaType
+        )
+
+        return EPUBCoverAsset(data: coverData, fileExtension: inferredExtension)
+    }
+
+    nonisolated private static func loadPackage(from fileURL: URL) throws -> (Archive, String, EPUBPackageDocument) {
+        let archive: Archive
+        do {
+            archive = try Archive(url: fileURL, accessMode: .read)
+        } catch {
+            throw EPUBConversionError.invalidArchive
+        }
+
+        guard
+            let containerData = try readData(at: "META-INF/container.xml", from: archive),
+            let rootPath = parseRootPath(from: containerData)
+        else {
+            throw EPUBConversionError.missingContainer
+        }
+
+        guard let packageData = try readData(at: rootPath, from: archive) else {
+            throw EPUBConversionError.missingPackageDocument
+        }
+
+        return (archive, rootPath, parsePackage(from: packageData))
     }
 
     nonisolated private static func readData(at path: String, from archive: Archive) throws -> Data? {
@@ -298,6 +326,11 @@ enum EPUBConversionService {
         let title = firstMatch(in: xml, pattern: #"<(?:\w+:)?title[^>]*>([\s\S]*?)</(?:\w+:)?title>"#, group: 1)?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .nilIfEmpty
+        let declaredCoverID = firstMatch(
+            in: xml,
+            pattern: #"<(?:\w+:)?meta\b[^>]*\bname\s*=\s*"cover"[^>]*\bcontent\s*=\s*"([^"]+)""#,
+            group: 1
+        )?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
 
         var manifest: [String: EPUBManifestItem] = [:]
         let itemRegex = try? NSRegularExpression(
@@ -317,7 +350,11 @@ enum EPUBConversionService {
             else {
                 return
             }
-            manifest[id] = EPUBManifestItem(href: href)
+            let mediaType = firstMatch(in: attributes, pattern: #"\bmedia-type\s*=\s*"([^"]+)""#, group: 1)
+            let properties = firstMatch(in: attributes, pattern: #"\bproperties\s*=\s*"([^"]+)""#, group: 1)?
+                .split(separator: " ")
+                .map(String.init) ?? []
+            manifest[id] = EPUBManifestItem(href: href, mediaType: mediaType, properties: properties)
         }
 
         var spine: [String] = []
@@ -337,7 +374,53 @@ enum EPUBConversionService {
             spine.append(idRef)
         }
 
-        return EPUBPackageDocument(title: title, manifest: manifest, spine: spine)
+        return EPUBPackageDocument(title: title, manifest: manifest, spine: spine, declaredCoverID: declaredCoverID)
+    }
+
+    nonisolated private static func resolveCoverItem(in package: EPUBPackageDocument) -> EPUBManifestItem? {
+        if let declaredCoverID = package.declaredCoverID,
+           let item = package.manifest[declaredCoverID],
+           item.isImage {
+            return item
+        }
+
+        if let item = package.manifest.values.first(where: { $0.properties.contains("cover-image") && $0.isImage }) {
+            return item
+        }
+
+        if let item = package.manifest.first(where: { key, value in
+            value.isImage && key.localizedCaseInsensitiveContains("cover")
+        })?.value {
+            return item
+        }
+
+        if let item = package.manifest.values.first(where: {
+            $0.isImage && $0.href.localizedCaseInsensitiveContains("cover")
+        }) {
+            return item
+        }
+
+        return package.manifest.values.first(where: \.isImage)
+    }
+
+    nonisolated private static func normalizedImageExtension(pathExtension: String, mediaType: String?) -> String {
+        let normalizedPathExtension = pathExtension.lowercased()
+        if ["png", "jpg", "jpeg", "webp", "gif"].contains(normalizedPathExtension) {
+            return normalizedPathExtension == "jpg" ? "jpeg" : normalizedPathExtension
+        }
+
+        switch mediaType?.lowercased() {
+        case "image/png":
+            return "png"
+        case "image/jpeg", "image/jpg":
+            return "jpeg"
+        case "image/webp":
+            return "webp"
+        case "image/gif":
+            return "gif"
+        default:
+            return "jpeg"
+        }
     }
 
     nonisolated private static func firstMatch(in source: String, pattern: String, group: Int) -> String? {
@@ -357,12 +440,19 @@ enum EPUBConversionService {
 
 private struct EPUBManifestItem {
     let href: String
+    let mediaType: String?
+    let properties: [String]
+
+    nonisolated var isImage: Bool {
+        mediaType?.lowercased().hasPrefix("image/") == true
+    }
 }
 
 private struct EPUBPackageDocument {
     var title: String?
     var manifest: [String: EPUBManifestItem]
     var spine: [String]
+    var declaredCoverID: String?
 }
 
 private extension String {

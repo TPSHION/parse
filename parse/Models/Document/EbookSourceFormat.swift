@@ -1,15 +1,15 @@
 import Foundation
 import UniformTypeIdentifiers
 
-enum EbookSourceFormat: String, CaseIterable, Identifiable {
+enum EbookSourceFormat: String, CaseIterable, Identifiable, Codable {
     case epub = "EPUB"
     case txt = "TXT"
 
-    var id: String { rawValue }
+    nonisolated var id: String { rawValue }
 
-    var shortLabel: String { rawValue }
+    nonisolated var shortLabel: String { rawValue }
 
-    var fileExtension: String {
+    nonisolated var fileExtension: String {
         switch self {
         case .epub:
             return "epub"
@@ -18,11 +18,11 @@ enum EbookSourceFormat: String, CaseIterable, Identifiable {
         }
     }
 
-    var contentType: UTType {
+    nonisolated var contentType: UTType {
         UTType(filenameExtension: fileExtension) ?? .data
     }
 
-    static func resolve(from url: URL) -> EbookSourceFormat? {
+    nonisolated static func resolve(from url: URL) -> EbookSourceFormat? {
         let ext = url.pathExtension.lowercased()
         return Self.allCases.first { $0.fileExtension == ext }
     }

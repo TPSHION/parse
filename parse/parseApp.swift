@@ -40,7 +40,7 @@ struct parseApp: App {
                             case .imageToText:
                                 ImageTextRecognitionView()
                             case .ebookConvert:
-                                EbookConverterView()
+                                EbookLibraryView()
                             case .textWebConvert:
                                 ConversionHomeView()
                             default:

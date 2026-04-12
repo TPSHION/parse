@@ -50,7 +50,7 @@ struct EbookConverterView: View {
                 loadingOverlay(title: AppLocalizer.localized("电子书处理中"))
             }
         }
-        .navigationTitle(AppLocalizer.localized("电子书转换"))
+        .navigationTitle(AppLocalizer.localized("电子书格式转换"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbarBackground(AppColors.background, for: .navigationBar)
@@ -128,7 +128,7 @@ struct EbookConverterView: View {
                 }
             )
         }
-        .alert(AppLocalizer.localized("电子书转换"), isPresented: $showAlert) {
+        .alert(AppLocalizer.localized("电子书格式转换"), isPresented: $showAlert) {
             Button(AppLocalizer.localized("确定"), role: .cancel) {}
         } message: {
             Text(alertMessage ?? "")
@@ -174,11 +174,11 @@ struct EbookConverterView: View {
                             Spacer()
 
                             VStack(alignment: .leading, spacing: 8) {
-                                Text(AppLocalizer.localized("电子书转换"))
+                                Text(AppLocalizer.localized("电子书格式转换"))
                                     .font(.system(size: 28, weight: .heavy))
                                     .foregroundColor(AppColors.textPrimary)
 
-                                Text(AppLocalizer.localized("导入 EPUB 或 TXT 文件，进行本地互转。"))
+                                Text(AppLocalizer.localized("支持 EPUB 与 TXT 的格式转换和阅读。"))
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -199,13 +199,14 @@ struct EbookConverterView: View {
                 } label: {
                     actionCard(
                         icon: "book.closed.fill",
-                        title: AppLocalizer.localized("导入电子书文件"),
+                        title: AppLocalizer.localized("电子书格式转换"),
                         detail: AppLocalizer.localized("支持从 iCloud Drive 或本地目录选择 EPUB、TXT 文件"),
                         accent: AppColors.accentPurple,
                         filled: true
                     )
                 }
                 .buttonStyle(.plain)
+
             }
             .padding(20)
         }

@@ -3,7 +3,7 @@ import Foundation
 enum DocumentToolType: String, CaseIterable, Identifiable {
     case imageToText = "图片转文字"
     case imageToDoc = "图片转文档"
-    case ebookConvert = "电子书转换"
+    case ebookConvert = "电子书"
     case textWebConvert = "文本/网页转换"
     
     var id: String { self.rawValue }
@@ -12,7 +12,7 @@ enum DocumentToolType: String, CaseIterable, Identifiable {
         switch self {
         case .imageToText: return AppLocalizer.localized("图片转文字")
         case .imageToDoc: return AppLocalizer.localized("图片转文档")
-        case .ebookConvert: return AppLocalizer.localized("电子书转换")
+        case .ebookConvert: return AppLocalizer.localized("电子书")
         case .textWebConvert: return AppLocalizer.localized("文本/网页转换")
         }
     }
@@ -30,7 +30,7 @@ enum DocumentToolType: String, CaseIterable, Identifiable {
         switch self {
         case .imageToText: return AppLocalizer.localized("提取图片中的文字内容 (OCR)")
         case .imageToDoc: return AppLocalizer.localized("将图片整理为可导出的文档内容")
-        case .ebookConvert: return AppLocalizer.localized("EPUB 与 TXT 电子书格式互转")
+        case .ebookConvert: return AppLocalizer.localized("支持 EPUB 与 TXT 的格式转换和阅读")
         case .textWebConvert: return AppLocalizer.localized("纯文本、富文本与网页格式互转")
         }
     }
