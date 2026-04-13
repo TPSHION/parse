@@ -11,8 +11,6 @@ final class LocalTransferService: NSObject, ObservableObject {
     @Published private(set) var serverURL: URL?
     @Published private(set) var isClientConnected = false
     @Published private(set) var lastErrorMessage: String?
-    @Published private(set) var loopbackCheckMessage = AppLocalizer.localized("未检测")
-    @Published private(set) var lanCheckMessage = AppLocalizer.localized("未检测")
     @Published private(set) var accessCode = ""
 
     let sharedDirectoryURL: URL
@@ -62,10 +60,6 @@ final class LocalTransferService: NSObject, ObservableObject {
         return serverURL
     }
 
-    var loopbackURL: URL? {
-        URL(string: "http://127.0.0.1:\(port)/")
-    }
-
     var shareHintText: String {
         if isRunning {
             return AppLocalizer.localized("同网设备可在浏览器打开上方地址。")
@@ -104,6 +98,10 @@ final class LocalTransferService: NSObject, ObservableObject {
 
     private func registerClientActivityIfNeeded(for remoteAddress: String?) {
         guard isExternalClientRequest(remoteAddress: remoteAddress) else { return }
+        markClientConnected()
+    }
+
+    private func markClientConnected() {
         if !isClientConnected {
             isClientConnected = true
         }
@@ -112,6 +110,12 @@ final class LocalTransferService: NSObject, ObservableObject {
     private nonisolated func scheduleClientActivityRegistration(for remoteAddress: String?) {
         Task { @MainActor [weak self] in
             self?.registerClientActivityIfNeeded(for: remoteAddress)
+        }
+    }
+
+    private nonisolated func scheduleClientConnected() {
+        Task { @MainActor [weak self] in
+            self?.markClientConnected()
         }
     }
 
@@ -159,8 +163,6 @@ final class LocalTransferService: NSObject, ObservableObject {
         guard let webServer = makeWebServer() else { return }
 
         lastErrorMessage = nil
-        loopbackCheckMessage = AppLocalizer.localized("检测中...")
-        lanCheckMessage = AppLocalizer.localized("检测中...")
 
         do {
             try webServer.start(options: webServerOptions)
@@ -169,14 +171,9 @@ final class LocalTransferService: NSObject, ObservableObject {
             isClientConnected = false
             serverURL = webServer.serverURL
             refreshFiles()
-            Task {
-                await runConnectivityChecks()
-            }
         } catch {
             NSLog("LocalTransferService failed to start server: %@", error.localizedDescription)
             lastErrorMessage = AppLocalizer.localized("传输服务启动失败，请检查网络后重试。")
-            loopbackCheckMessage = AppLocalizer.localized("启动失败")
-            lanCheckMessage = AppLocalizer.localized("启动失败")
             accessCode = ""
         }
     }
@@ -204,13 +201,6 @@ final class LocalTransferService: NSObject, ObservableObject {
 
     func toggleServer() {
         isRunning ? stopServer() : startServer()
-    }
-
-    func refreshConnectivityChecks() {
-        guard isRunning else { return }
-        Task {
-            await runConnectivityChecks()
-        }
     }
 
     func importFiles(from urls: [URL]) {
@@ -339,7 +329,7 @@ final class LocalTransferService: NSObject, ObservableObject {
                 return Self.errorResponse(statusCode: 401, code: "invalid_pairing_code")
             }
 
-            markClientActivity(request)
+            self.scheduleClientConnected()
             return Self.jsonResponse(["success": true])
         }
 
@@ -589,37 +579,7 @@ final class LocalTransferService: NSObject, ObservableObject {
         }
     }
 
-    private func runConnectivityChecks() async {
-        loopbackCheckMessage = await checkMessage(for: loopbackURL, label: AppLocalizer.localized("本机地址"))
-        lanCheckMessage = await checkMessage(for: accessibleURL, label: AppLocalizer.localized("局域网地址"))
-
-        if loopbackCheckMessage.hasPrefix(AppLocalizer.localized("失败")),
-           lanCheckMessage.hasPrefix(AppLocalizer.localized("失败")) {
-            lastErrorMessage = AppLocalizer.localized("服务已启动，但自检失败。可先用本机 Safari 打开 127.0.0.1 地址确认服务是否正常。")
-        }
-    }
-
-    private func checkMessage(for url: URL?, label: String) async -> String {
-        guard let url else {
-            return AppLocalizer.formatted("%@：%@", label, AppLocalizer.localized("无可用地址"))
-        }
-
-        do {
-            var request = URLRequest(url: url)
-            request.timeoutInterval = 3
-            let configuration = URLSessionConfiguration.ephemeral
-            configuration.waitsForConnectivity = false
-            let session = URLSession(configuration: configuration)
-            let (_, response) = try await session.data(for: request)
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-            return AppLocalizer.formatted("%@：HTTP %d", label, statusCode)
-        } catch {
-            return AppLocalizer.formatted("%@：失败（%@）", label, error.localizedDescription)
-        }
-    }
-
     private var localIPv4Address: String? {
-        var address: String?
         var interfacePointer: UnsafeMutablePointer<ifaddrs>?
 
         guard getifaddrs(&interfacePointer) == 0, let firstInterface = interfacePointer else {
@@ -629,19 +589,8 @@ final class LocalTransferService: NSObject, ObservableObject {
             freeifaddrs(interfacePointer)
         }
 
-        let preferredInterfaceNames = ["en0", "en1", "en2", "bridge100"]
+        var bestCandidate: (address: String, score: Int)?
 
-        for name in preferredInterfaceNames {
-            address = ipv4Address(for: name, startingAt: firstInterface)
-            if address != nil {
-                return address
-            }
-        }
-
-        return nil
-    }
-
-    private func ipv4Address(for interfaceName: String, startingAt firstInterface: UnsafeMutablePointer<ifaddrs>) -> String? {
         for pointer in sequence(first: firstInterface, next: { $0.pointee.ifa_next }) {
             let interface = pointer.pointee
             let flags = Int32(interface.ifa_flags)
@@ -656,26 +605,87 @@ final class LocalTransferService: NSObject, ObservableObject {
             }
 
             let name = String(cString: interface.ifa_name)
-            guard name == interfaceName else { continue }
-
-            var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-            var address = interface.ifa_addr.pointee
-            let result = getnameinfo(
-                &address,
-                socklen_t(interface.ifa_addr.pointee.sa_len),
-                &hostname,
-                socklen_t(hostname.count),
-                nil,
-                0,
-                NI_NUMERICHOST
-            )
-
-            if result == 0 {
-                return String(cString: hostname)
+            guard let address = Self.ipv4Address(from: interface.ifa_addr.pointee) else {
+                continue
             }
+            guard !address.hasPrefix("169.254.") else {
+                continue
+            }
+
+            let score = Self.scoreForIPv4Address(address, interfaceName: name)
+            if let currentBest = bestCandidate, currentBest.score >= score {
+                continue
+            }
+
+            bestCandidate = (address, score)
         }
 
-        return nil
+        return bestCandidate?.address
+    }
+
+    private static func ipv4Address(from socketAddress: sockaddr) -> String? {
+        var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+        var address = socketAddress
+        let result = getnameinfo(
+            &address,
+            socklen_t(socketAddress.sa_len),
+            &hostname,
+            socklen_t(hostname.count),
+            nil,
+            0,
+            NI_NUMERICHOST
+        )
+
+        guard result == 0 else {
+            return nil
+        }
+
+        return String(cString: hostname)
+    }
+
+    private static func scoreForIPv4Address(_ address: String, interfaceName: String) -> Int {
+        var score = 0
+
+        if isPrivateIPv4(address) {
+            score += 100
+        }
+
+        if address == "172.20.10.1" {
+            score += 80
+        }
+
+        switch interfaceName {
+        case let name where name.hasPrefix("bridge"):
+            score += 60
+        case "en0":
+            score += 50
+        case let name where name.hasPrefix("en"):
+            score += 40
+        case let name where name.hasPrefix("ap"):
+            score += 35
+        case let name where name.hasPrefix("pdp_ip"):
+            score += 5
+        default:
+            break
+        }
+
+        return score
+    }
+
+    private static func isPrivateIPv4(_ address: String) -> Bool {
+        let segments = address.split(separator: ".").compactMap { Int($0) }
+        guard segments.count == 4 else { return false }
+
+        switch (segments[0], segments[1]) {
+        case (10, _):
+            return true
+        case (172, 16...31):
+            return true
+        case (192, 168):
+            return true
+        default:
+            return false
+        }
     }
 
     private static func metaPayload(

@@ -4904,6 +4904,28 @@
           }
         }
       }
+    },
+    "二维码连接" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR Connection"
+          }
+        }
+      }
+    },
+    "用另一台设备扫码打开传输页面，连接成功后会自动关闭。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan this code with another device to open the transfer page. It will close automatically once connected."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

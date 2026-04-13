@@ -1,11 +1,13 @@
 import SwiftUI
 import UniformTypeIdentifiers
 import UIKit
+import CoreImage.CIFilterBuiltins
 
 struct TransferHomeView: View {
     @StateObject private var service = LocalTransferService()
     @State private var isFileImporterPresented = false
     @State private var showCopiedConfirmation = false
+    @State private var isQRCodePresented = false
 
     var body: some View {
         ZStack {
@@ -31,6 +33,11 @@ struct TransferHomeView: View {
             }
         }
         .toolbar(.hidden, for: .navigationBar)
+        .onChange(of: service.isClientConnected) { _, isConnected in
+            if isConnected {
+                isQRCodePresented = false
+            }
+        }
         .fileImporter(
             isPresented: $isFileImporterPresented,
             allowedContentTypes: [.item],
@@ -64,6 +71,15 @@ struct TransferHomeView: View {
             }
         } message: {
             Text(service.lastErrorMessage ?? "")
+        }
+        .sheet(isPresented: $isQRCodePresented) {
+            TransferQRCodeSheet(
+                address: service.accessAddressText,
+                accessCode: service.accessCodeText
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(AppColors.background)
         }
     }
 
@@ -179,6 +195,13 @@ struct TransferHomeView: View {
                 .buttonStyle(.plain)
 
                 Button {
+                    isQRCodePresented = true
+                } label: {
+                    compactIconButton(icon: "qrcode")
+                }
+                .buttonStyle(.plain)
+
+                Button {
                     openAppSettings()
                 } label: {
                     compactIconButton(icon: "gearshape.fill")
@@ -253,39 +276,16 @@ struct TransferHomeView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            VStack(alignment: .leading, spacing: 10) {
-                inlineInfoRow(
-                    title: AppLocalizer.localized("本机自检"),
-                    value: service.loopbackCheckMessage
-                )
-                inlineInfoRow(
-                    title: AppLocalizer.localized("局域网自检"),
-                    value: service.lanCheckMessage
+            Button {
+                isFileImporterPresented = true
+            } label: {
+                actionChip(
+                    icon: "plus.circle.fill",
+                    title: AppLocalizer.localized("导入文件"),
+                    accent: AppColors.accentGreen
                 )
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            HStack(spacing: 12) {
-                Button(action: service.refreshConnectivityChecks) {
-                    actionChip(
-                        icon: "wave.3.right.circle.fill",
-                        title: AppLocalizer.localized("重新检测"),
-                        accent: AppColors.accentPurple
-                    )
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    isFileImporterPresented = true
-                } label: {
-                    actionChip(
-                        icon: "plus.circle.fill",
-                        title: AppLocalizer.localized("导入文件"),
-                        accent: AppColors.accentGreen
-                    )
-                }
-                .buttonStyle(.plain)
-            }
+            .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity)
         .padding(20)
@@ -369,21 +369,6 @@ struct TransferHomeView: View {
             .padding(.vertical, 7)
             .background(color.opacity(0.12))
             .clipShape(Capsule())
-    }
-
-    private func inlineInfoRow(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(AppColors.textSecondary)
-                .textCase(.uppercase)
-                .tracking(1.1)
-
-            Text(value)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(.white)
-                .fixedSize(horizontal: false, vertical: true)
-        }
     }
 
     private func actionChip(icon: String, title: String, accent: Color) -> some View {
@@ -491,5 +476,102 @@ private struct WaitingConnectionIndicator: View {
                 animateOuterRing = true
             }
         }
+    }
+}
+
+private struct TransferQRCodeSheet: View {
+    let address: String
+    let accessCode: String
+
+    private let context = CIContext()
+    private let filter = CIFilter.qrCodeGenerator()
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text(AppLocalizer.localized("二维码连接"))
+                .font(.system(size: 22, weight: .heavy))
+                .foregroundColor(.white)
+
+            Text(AppLocalizer.localized("用另一台设备扫码打开传输页面，连接成功后会自动关闭。"))
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(AppColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            qrCodeCard
+
+            VStack(alignment: .leading, spacing: 12) {
+                infoRow(title: AppLocalizer.localized("访问地址"), value: address)
+                infoRow(title: AppLocalizer.localized("配对码"), value: accessCode)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Spacer(minLength: 0)
+        }
+        .padding(24)
+        .background(AppColors.background)
+    }
+
+    private var qrCodeCard: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(Color.white)
+
+            if let qrImage = qrCodeImage(from: address) {
+                Image(uiImage: qrImage)
+                    .interpolation(.none)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(24)
+            } else {
+                VStack(spacing: 10) {
+                    Image(systemName: "qrcode")
+                        .font(.system(size: 42, weight: .semibold))
+                        .foregroundColor(.black.opacity(0.72))
+
+                    Text(address)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.black.opacity(0.72))
+                        .multilineTextAlignment(.center)
+                }
+                .padding(24)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .aspectRatio(1, contentMode: .fit)
+    }
+
+    private func infoRow(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(AppColors.textSecondary)
+                .textCase(.uppercase)
+                .tracking(1.2)
+
+            Text(value)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.white)
+                .textSelection(.enabled)
+        }
+    }
+
+    private func qrCodeImage(from value: String) -> UIImage? {
+        let data = Data(value.utf8)
+        filter.setValue(data, forKey: "inputMessage")
+        filter.setValue("M", forKey: "inputCorrectionLevel")
+
+        guard let outputImage = filter.outputImage else {
+            return nil
+        }
+
+        let transform = CGAffineTransform(scaleX: 12, y: 12)
+        let scaledImage = outputImage.transformed(by: transform)
+
+        guard let cgImage = context.createCGImage(scaledImage, from: scaledImage.extent) else {
+            return nil
+        }
+
+        return UIImage(cgImage: cgImage)
     }
 }
