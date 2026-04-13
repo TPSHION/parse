@@ -4266,6 +4266,138 @@
           }
         }
       }
+    },
+    "下载失败，请检查链接是否可访问" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download failed. Please check whether the link is accessible."
+          }
+        }
+      }
+    },
+    "下载并导入" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download and Import"
+          }
+        }
+      }
+    },
+    "下载链接" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Link"
+          }
+        }
+      }
+    },
+    "仅支持下载 EPUB 或 TXT 电子书文件" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only EPUB or TXT ebook files are supported."
+          }
+        }
+      }
+    },
+    "粘贴电子书文件链接" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste an ebook file link"
+          }
+        }
+      }
+    },
+    "请输入有效的下载链接" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid download link."
+          }
+        }
+      }
+    },
+    "输入可直接访问的 EPUB 或 TXT 文件链接，下载后会自动导入到书架。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste a direct EPUB or TXT file link and it will be downloaded into your bookshelf."
+          }
+        }
+      }
+    },
+    "下载中" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading"
+          }
+        }
+      }
+    },
+    "已暂停" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
+          }
+        }
+      }
+    },
+    "继续下载" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume Download"
+          }
+        }
+      }
+    },
+    "暂停下载" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause Download"
+          }
+        }
+      }
+    },
+    "取消下载" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel Download"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

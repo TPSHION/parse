@@ -15,6 +15,7 @@ struct EPUBReadiumReaderView: View {
     @State private var activePanel: ReaderOverlayPanel?
     @State private var currentLocator: Locator?
     @State private var styleSettings = EbookReaderPreferencesStore.loadStyleSettings()
+    @State private var loadTask: Task<Void, Never>?
 
     var body: some View {
         GeometryReader { proxy in
@@ -66,21 +67,41 @@ struct EPUBReadiumReaderView: View {
         .task(id: item.id) {
             loadPublication()
         }
+        .onDisappear {
+            loadTask?.cancel()
+            loadTask = nil
+        }
     }
 
     private var readerBackground: some View {
-        Color.black.ignoresSafeArea()
+        currentThemeOption.compactOverlayBackgroundColor.ignoresSafeArea()
     }
 
     private var readerLoadingView: some View {
         VStack(spacing: 14) {
             ProgressView()
                 .scaleEffect(1.2)
-                .tint(.white)
+                .tint(currentThemeOption.loadingIndicatorColor)
 
             Text(AppLocalizer.localized("正在处理电子书..."))
                 .font(.system(size: 15, weight: .medium))
-                .foregroundColor(.white.opacity(0.92))
+                .foregroundColor(currentThemeOption.loadingTextColor)
+
+            Button {
+                cancelLoadingAndDismiss()
+            } label: {
+                Text(AppLocalizer.localized("取消"))
+                    .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(currentThemeOption.loadingTextColor)
+                .padding(.horizontal, 14)
+                .frame(height: 38)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(currentThemeOption.compactOverlayTextColor.opacity(currentThemeOption == .dark ? 0.12 : 0.08))
+                )
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 2)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -678,6 +699,7 @@ struct EPUBReadiumReaderView: View {
             return
         }
 
+        loadTask?.cancel()
         isLoading = true
         loadError = nil
         session = nil
@@ -687,7 +709,7 @@ struct EPUBReadiumReaderView: View {
         let savedLocator = EbookReaderPreferencesStore.loadLocator(for: item.id)
         let currentStyleSettings = styleSettings
 
-        Task {
+        loadTask = Task {
             do {
                 let createdSession = try await EPUBReadiumReaderSession.make(
                     fileURL: fileURL,
@@ -695,20 +717,34 @@ struct EPUBReadiumReaderView: View {
                     initialLocator: savedLocator,
                     styleSettings: currentStyleSettings
                 )
+                guard !Task.isCancelled else { return }
                 await MainActor.run {
                     session = createdSession
                     currentLocator = createdSession.navigator.currentLocation ?? savedLocator
                     isLoading = false
                     chromeVisible = false
+                    loadTask = nil
+                }
+            } catch is CancellationError {
+                await MainActor.run {
+                    loadTask = nil
                 }
             } catch {
+                guard !Task.isCancelled else { return }
                 await MainActor.run {
                     loadError = error.localizedDescription
                     isLoading = false
                     chromeVisible = true
+                    loadTask = nil
                 }
             }
         }
+    }
+
+    private func cancelLoadingAndDismiss() {
+        loadTask?.cancel()
+        loadTask = nil
+        dismiss()
     }
 
     private func toggleChrome() {
@@ -883,6 +919,32 @@ private enum ReaderThemeOption: String, CaseIterable, Identifiable {
             return SwiftUI.Color.black.opacity(0.08)
         case .mint, .cream:
             return compactOverlayTextColor.opacity(0.18)
+        }
+    }
+
+    var loadingTextColor: SwiftUI.Color {
+        switch self {
+        case .dark:
+            return SwiftUI.Color.white.opacity(0.9)
+        case .light:
+            return SwiftUI.Color(hex: "#1F2937").opacity(0.82)
+        case .mint:
+            return SwiftUI.Color(hex: "#23352B").opacity(0.82)
+        case .cream:
+            return SwiftUI.Color(hex: "#4A4032").opacity(0.82)
+        }
+    }
+
+    var loadingIndicatorColor: SwiftUI.Color {
+        switch self {
+        case .dark:
+            return SwiftUI.Color.white.opacity(0.88)
+        case .light:
+            return SwiftUI.Color(hex: "#4B5563")
+        case .mint:
+            return SwiftUI.Color(hex: "#2F6B4F")
+        case .cream:
+            return SwiftUI.Color(hex: "#7A5B2E")
         }
     }
 }

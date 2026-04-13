@@ -1,4 +1,5 @@
 import Foundation
+import UniformTypeIdentifiers
 
 struct EbookLibraryItem: Codable, Identifiable, Hashable {
     let id: UUID
@@ -26,53 +27,32 @@ enum EbookLibraryService {
     }
 
     nonisolated static func importItems(from urls: [URL]) throws -> [EbookLibraryItem] {
-        guard !urls.isEmpty else { return loadItems() }
+        try importItems(from: urls, usingSecurityScopedAccess: true)
+    }
 
-        let directory = try libraryDirectory()
-        var items = loadItems()
+    nonisolated static func importDownloadedFile(at localURL: URL) throws -> [EbookLibraryItem] {
+        try importItems(from: [localURL], usingSecurityScopedAccess: false)
+    }
 
-        for url in urls {
-            guard let sourceFormat = EbookSourceFormat.resolve(from: url) else { continue }
-            guard url.startAccessingSecurityScopedResource() else { continue }
-            defer { url.stopAccessingSecurityScopedResource() }
-
-            let baseName = sanitizedFilename(url.deletingPathExtension().lastPathComponent)
-            let filename = uniqueFilename(
-                baseName: baseName,
-                fileExtension: sourceFormat.fileExtension,
-                in: directory
-            )
-            let destinationURL = directory.appendingPathComponent(filename)
-
-            if FileManager.default.fileExists(atPath: destinationURL.path) {
-                try FileManager.default.removeItem(at: destinationURL)
-            }
-            try FileManager.default.copyItem(at: url, to: destinationURL)
-
-            let itemID = UUID()
-            let title = resolvedTitle(for: destinationURL, sourceFormat: sourceFormat)
-            let coverFilename = try extractAndStoreCoverIfNeeded(
-                for: destinationURL,
-                itemID: itemID,
-                sourceFormat: sourceFormat,
-                in: directory
-            )
-            let values = try destinationURL.resourceValues(forKeys: [.fileSizeKey])
-            items.append(
-                EbookLibraryItem(
-                    id: itemID,
-                    title: title,
-                    storedFilename: filename,
-                    coverFilename: coverFilename,
-                    sourceFormat: sourceFormat,
-                    importedAt: Date(),
-                    fileSize: Int64(values.fileSize ?? 0)
-                )
+    nonisolated static func resolvedDownloadFileInfo(for remoteURL: URL, response: URLResponse) throws -> (filename: String, sourceFormat: EbookSourceFormat) {
+        if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+            throw NSError(
+                domain: "EbookLibraryService",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: AppLocalizer.localized("下载失败，请检查链接是否可访问")]
             )
         }
 
-        try save(items)
-        return loadItems()
+        guard let sourceFormat = resolveSourceFormat(for: remoteURL, response: response) else {
+            throw NSError(
+                domain: "EbookLibraryService",
+                code: -2,
+                userInfo: [NSLocalizedDescriptionKey: AppLocalizer.localized("仅支持下载 EPUB 或 TXT 电子书文件")]
+            )
+        }
+
+        let filename = suggestedFilename(for: remoteURL, response: response, sourceFormat: sourceFormat)
+        return (filename, sourceFormat)
     }
 
     nonisolated static func remove(_ item: EbookLibraryItem) throws -> [EbookLibraryItem] {
@@ -147,6 +127,64 @@ enum EbookLibraryService {
         try data.write(to: manifestURL(), options: .atomic)
     }
 
+    nonisolated private static func importItems(from urls: [URL], usingSecurityScopedAccess: Bool) throws -> [EbookLibraryItem] {
+        guard !urls.isEmpty else { return loadItems() }
+
+        let directory = try libraryDirectory()
+        var items = loadItems()
+
+        for url in urls {
+            guard let sourceFormat = EbookSourceFormat.resolve(from: url) else { continue }
+
+            let needsStopAccessing = usingSecurityScopedAccess ? url.startAccessingSecurityScopedResource() : false
+            if usingSecurityScopedAccess, !needsStopAccessing {
+                continue
+            }
+            defer {
+                if needsStopAccessing {
+                    url.stopAccessingSecurityScopedResource()
+                }
+            }
+
+            let baseName = sanitizedFilename(url.deletingPathExtension().lastPathComponent)
+            let filename = uniqueFilename(
+                baseName: baseName,
+                fileExtension: sourceFormat.fileExtension,
+                in: directory
+            )
+            let destinationURL = directory.appendingPathComponent(filename)
+
+            if FileManager.default.fileExists(atPath: destinationURL.path) {
+                try FileManager.default.removeItem(at: destinationURL)
+            }
+            try FileManager.default.copyItem(at: url, to: destinationURL)
+
+            let itemID = UUID()
+            let title = resolvedTitle(for: destinationURL, sourceFormat: sourceFormat)
+            let coverFilename = try extractAndStoreCoverIfNeeded(
+                for: destinationURL,
+                itemID: itemID,
+                sourceFormat: sourceFormat,
+                in: directory
+            )
+            let values = try destinationURL.resourceValues(forKeys: [.fileSizeKey])
+            items.append(
+                EbookLibraryItem(
+                    id: itemID,
+                    title: title,
+                    storedFilename: filename,
+                    coverFilename: coverFilename,
+                    sourceFormat: sourceFormat,
+                    importedAt: Date(),
+                    fileSize: Int64(values.fileSize ?? 0)
+                )
+            )
+        }
+
+        try save(items)
+        return loadItems()
+    }
+
     nonisolated private static func extractAndStoreCoverIfNeeded(
         for fileURL: URL,
         itemID: UUID,
@@ -218,5 +256,33 @@ enum EbookLibraryService {
         let cleaned = source.components(separatedBy: invalid).joined(separator: "-")
         let trimmed = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? "ebook" : trimmed
+    }
+
+    nonisolated private static func resolveSourceFormat(for remoteURL: URL, response: URLResponse) -> EbookSourceFormat? {
+        if let suggestedFilename = response.suggestedFilename,
+           let format = EbookSourceFormat.resolve(from: URL(fileURLWithPath: suggestedFilename)) {
+            return format
+        }
+
+        if let mimeType = response.mimeType,
+           let utType = UTType(mimeType: mimeType),
+           let fileExtension = utType.preferredFilenameExtension,
+           let format = EbookSourceFormat.allCases.first(where: { $0.fileExtension == fileExtension.lowercased() }) {
+            return format
+        }
+
+        return EbookSourceFormat.resolve(from: remoteURL)
+    }
+
+    nonisolated private static func suggestedFilename(for remoteURL: URL, response: URLResponse, sourceFormat: EbookSourceFormat) -> String {
+        let responseName = response.suggestedFilename?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fallbackName = remoteURL.deletingPathExtension().lastPathComponent.isEmpty
+            ? "ebook"
+            : remoteURL.deletingPathExtension().lastPathComponent
+        let baseName = responseName.flatMap { name in
+            let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? nil : URL(fileURLWithPath: trimmed).deletingPathExtension().lastPathComponent
+        } ?? fallbackName
+        return "\(baseName).\(sourceFormat.fileExtension)"
     }
 }

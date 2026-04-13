@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import Combine
 
 struct EbookLibraryView: View {
     @State private var items: [EbookLibraryItem] = []
@@ -66,11 +67,12 @@ struct EbookLibraryView: View {
         ) { result in
             importBooks(from: result)
         }
-        .sheet(isPresented: $isDownloadSheetPresented) {
-            EbookDownloadSheet()
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-                .presentationBackground(AppColors.background)
+        .fullScreenCover(isPresented: $isDownloadSheetPresented) {
+            EbookDownloadSheet { importedItems in
+                items = importedItems
+                isDownloadSheetPresented = false
+            }
+            .presentationBackground(AppColors.background)
         }
         .navigationDestination(item: $selectedEPUBReaderItem) { item in
             EPUBReadiumReaderView(item: item)
@@ -383,47 +385,624 @@ private struct EbookShelfCard: View {
 }
 
 private struct EbookDownloadSheet: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @StateObject private var viewModel: EbookDownloadViewModel
+
+    init(onImported: @escaping ([EbookLibraryItem]) -> Void) {
+        _viewModel = StateObject(wrappedValue: EbookDownloadViewModel(onImported: onImported))
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Capsule()
-                .fill(.white.opacity(0.12))
-                .frame(width: 42, height: 5)
-                .frame(maxWidth: .infinity)
-                .padding(.top, 10)
+        ZStack {
+            AppShellBackground()
+                .ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text(AppLocalizer.localized("下载电子书"))
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(.white)
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 18) {
+                    HStack {
+                        Spacer()
 
-                Text(AppLocalizer.localized("从合法公版站点获取 EPUB 资源，再导入到书架中。"))
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(AppColors.textSecondary)
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white.opacity(0.9))
+                                .frame(width: 36, height: 36)
+                                .background(Color.white.opacity(0.06))
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(AppLocalizer.localized("下载电子书"))
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(.white)
+
+                        Text(AppLocalizer.localized("输入可直接访问的 EPUB 或 TXT 文件链接，下载后会自动导入到书架。"))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(AppColors.textSecondary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(AppLocalizer.localized("下载链接"))
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.82))
+
+                        TextEditor(text: $viewModel.link)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .foregroundColor(.white)
+                            .scrollContentBackground(.hidden)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 10)
+                            .frame(minHeight: 108)
+                            .background(AppColors.cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                            )
+
+                        if let errorMessage = viewModel.errorMessage, !errorMessage.isEmpty {
+                            Text(errorMessage)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(AppColors.accentRed)
+                        }
+
+                        Button {
+                            viewModel.startOrResume()
+                        } label: {
+                            HStack(spacing: 8) {
+                                if viewModel.state == .downloading || viewModel.state == .importing {
+                                    ProgressView()
+                                        .tint(.white)
+                                        .scaleEffect(0.9)
+                                } else {
+                                    Image(systemName: "arrow.down.circle.fill")
+                                        .font(.system(size: 15, weight: .bold))
+                                }
+
+                                Text(viewModel.primaryButtonTitle)
+                                    .font(.system(size: 15, weight: .bold))
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 48)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .fill(AppColors.accentGreen.opacity(viewModel.canStart ? 0.96 : 0.42))
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!viewModel.canStart)
+
+                        if viewModel.showsProgress {
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack {
+                                    Text(viewModel.statusTitle)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(.white.opacity(0.86))
+
+                                    if !viewModel.speedLabel.isEmpty {
+                                        Text(viewModel.speedLabel)
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundColor(AppColors.accentBlue.opacity(0.92))
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(
+                                                Capsule(style: .continuous)
+                                                    .fill(AppColors.accentBlue.opacity(0.12))
+                                            )
+                                    }
+
+                                    Spacer(minLength: 0)
+
+                                    Text(viewModel.progressLabel)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(AppColors.textSecondary)
+                                }
+
+                                ProgressView(value: viewModel.progress)
+                                    .tint(AppColors.accentBlue)
+
+                                HStack(spacing: 10) {
+                                    if viewModel.state == .downloading {
+                                        downloadActionButton(
+                                            title: AppLocalizer.localized("暂停下载"),
+                                            icon: "pause.fill",
+                                            accent: AppColors.accentBlue,
+                                            action: viewModel.pause
+                                        )
+                                    }
+
+                                    if viewModel.state == .paused || viewModel.state == .downloading {
+                                        downloadActionButton(
+                                            title: AppLocalizer.localized("取消下载"),
+                                            icon: "xmark",
+                                            accent: AppColors.accentRed,
+                                            action: viewModel.cancel
+                                        )
+                                    }
+                                }
+                            }
+                            .padding(14)
+                            .background(AppColors.cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                            )
+                        }
+                    }
+
+                    VStack(spacing: 12) {
+                        DownloadSourceRow(
+                            title: "Project Gutenberg",
+                            detail: AppLocalizer.localized("免费公版书资源，适合下载 EPUB 测试样本。"),
+                            action: { openURL(URL(string: "https://www.gutenberg.org/")!) }
+                        )
+                        DownloadSourceRow(
+                            title: "Standard Ebooks",
+                            detail: AppLocalizer.localized("排版更精致的公版 EPUB 资源。"),
+                            action: { openURL(URL(string: "https://standardebooks.org/ebooks")!) }
+                        )
+                        DownloadSourceRow(
+                            title: "Open Library",
+                            detail: AppLocalizer.localized("可浏览和借阅部分公开电子书资源。"),
+                            action: { openURL(URL(string: "https://openlibrary.org/")!) }
+                        )
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+                .padding(.bottom, 36)
             }
-            .padding(.horizontal, 20)
+        }
+        .alert(AppLocalizer.localized("下载电子书"), isPresented: Binding(
+            get: { viewModel.errorMessage != nil && !viewModel.errorMessage!.isEmpty },
+            set: { if !$0 { viewModel.errorMessage = nil } }
+        )) {
+            Button(AppLocalizer.localized("确定"), role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
+    }
 
-            VStack(spacing: 12) {
-                DownloadSourceRow(
-                    title: "Project Gutenberg",
-                    detail: AppLocalizer.localized("免费公版书资源，适合下载 EPUB 测试样本。"),
-                    action: { openURL(URL(string: "https://www.gutenberg.org/")!) }
-                )
-                DownloadSourceRow(
-                    title: "Standard Ebooks",
-                    detail: AppLocalizer.localized("排版更精致的公版 EPUB 资源。"),
-                    action: { openURL(URL(string: "https://standardebooks.org/ebooks")!) }
-                )
-                DownloadSourceRow(
-                    title: "Open Library",
-                    detail: AppLocalizer.localized("可浏览和借阅部分公开电子书资源。"),
-                    action: { openURL(URL(string: "https://openlibrary.org/")!) }
-                )
+    @ViewBuilder
+    private func downloadActionButton(title: String, icon: String, accent: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 13, weight: .bold))
+                Text(title)
+                    .font(.system(size: 13, weight: .bold))
             }
-            .padding(.horizontal, 20)
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 40)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(accent.opacity(0.92))
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
 
-            Spacer(minLength: 10)
+private final class EbookDownloadViewModel: NSObject, ObservableObject {
+    enum State {
+        case idle
+        case downloading
+        case paused
+        case importing
+    }
+
+    @Published var link = ""
+    @Published var state: State = .idle
+    @Published var progress: Double = 0
+    @Published var errorMessage: String?
+    @Published private var bytesPerSecond: Double = 0
+    @Published private var bytesReceived: Int64 = 0
+    @Published private var expectedBytes: Int64 = 0
+
+    private let onImported: ([EbookLibraryItem]) -> Void
+    private var session: URLSession?
+    private var task: URLSessionDownloadTask?
+    private var sizeProbeTask: URLSessionDataTask?
+    private var resumeData: Data?
+    private var currentRemoteURL: URL?
+    private var lastSpeedSampleDate: Date?
+    private var lastSpeedSampleBytes: Int64 = 0
+
+    init(onImported: @escaping ([EbookLibraryItem]) -> Void) {
+        self.onImported = onImported
+    }
+
+    var canStart: Bool {
+        switch state {
+        case .downloading, .importing:
+            return false
+        case .idle, .paused:
+            return !link.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+    }
+
+    var showsProgress: Bool {
+        state != .idle
+    }
+
+    var primaryButtonTitle: String {
+        switch state {
+        case .paused:
+            return AppLocalizer.localized("继续下载")
+        case .importing:
+            return AppLocalizer.localized("正在导入电子书...")
+        default:
+            return AppLocalizer.localized("下载并导入")
+        }
+    }
+
+    var statusTitle: String {
+        switch state {
+        case .downloading:
+            return AppLocalizer.localized("下载中")
+        case .paused:
+            return AppLocalizer.localized("已暂停")
+        case .importing:
+            return AppLocalizer.localized("正在导入电子书...")
+        case .idle:
+            return ""
+        }
+    }
+
+    var progressLabel: String {
+        if expectedBytes > 0 {
+            let boundedProgress = min(max(progress, 0), 1)
+            return "\(Int((boundedProgress * 100).rounded()))%"
+        }
+
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useKB, .useMB]
+        formatter.countStyle = .file
+        formatter.includesUnit = true
+        formatter.isAdaptive = true
+        return formatter.string(fromByteCount: bytesReceived)
+    }
+
+    var speedLabel: String {
+        guard state == .downloading, bytesPerSecond > 0 else { return "" }
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useKB, .useMB]
+        formatter.countStyle = .file
+        formatter.includesUnit = true
+        formatter.isAdaptive = true
+        return "\(formatter.string(fromByteCount: Int64(bytesPerSecond)))/s"
+    }
+
+    var transferSizeLabel: String {
+        guard bytesReceived > 0 || expectedBytes > 0 else { return "" }
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useKB, .useMB]
+        formatter.countStyle = .file
+        formatter.includesUnit = true
+        formatter.isAdaptive = true
+
+        let receivedText = formatter.string(fromByteCount: bytesReceived)
+        if expectedBytes > 0 {
+            let expectedText = formatter.string(fromByteCount: expectedBytes)
+            return "\(receivedText)/\(expectedText)"
+        }
+
+        return receivedText
+    }
+
+    func startOrResume() {
+        guard state != .downloading, state != .importing else { return }
+        errorMessage = nil
+
+        if let resumeData {
+            let task = makeSession().downloadTask(withResumeData: resumeData)
+            self.resumeData = nil
+            self.task = task
+            resetSpeedTracking(keepingTransferSize: true)
+            if expectedBytes <= 0, let currentRemoteURL {
+                prefetchExpectedBytes(for: currentRemoteURL)
+            }
+            state = .downloading
+            task.resume()
+            return
+        }
+
+        let trimmed = link.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard
+            let remoteURL = URL(string: trimmed),
+            let scheme = remoteURL.scheme?.lowercased(),
+            scheme == "https" || scheme == "http"
+        else {
+            errorMessage = AppLocalizer.localized("请输入有效的下载链接")
+            return
+        }
+
+        currentRemoteURL = remoteURL
+        progress = 0
+        resetSpeedTracking()
+        prefetchExpectedBytes(for: remoteURL)
+        let request = URLRequest(url: remoteURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 90)
+        let task = makeSession().downloadTask(with: request)
+        self.task = task
+        state = .downloading
+        task.resume()
+    }
+
+    func pause() {
+        guard state == .downloading, let task else { return }
+        task.cancel(byProducingResumeData: { [weak self] data in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.resumeData = data
+                self.task = nil
+                self.bytesPerSecond = 0
+                self.lastSpeedSampleDate = nil
+                self.lastSpeedSampleBytes = 0
+                self.state = data == nil ? .idle : .paused
+            }
+        })
+    }
+
+    func cancel() {
+        task?.cancel()
+        sizeProbeTask?.cancel()
+        task = nil
+        sizeProbeTask = nil
+        resumeData = nil
+        currentRemoteURL = nil
+        progress = 0
+        bytesPerSecond = 0
+        bytesReceived = 0
+        expectedBytes = 0
+        lastSpeedSampleDate = nil
+        lastSpeedSampleBytes = 0
+        state = .idle
+        errorMessage = nil
+    }
+
+    private func makeSession() -> URLSession {
+        if let session {
+            return session
+        }
+        let configuration = URLSessionConfiguration.default
+        configuration.waitsForConnectivity = true
+        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        self.session = session
+        return session
+    }
+
+    private func resetSpeedTracking(keepingTransferSize: Bool = false) {
+        bytesPerSecond = 0
+        if !keepingTransferSize {
+            bytesReceived = 0
+            expectedBytes = 0
+        }
+        lastSpeedSampleDate = Date()
+        lastSpeedSampleBytes = 0
+    }
+
+    private func prefetchExpectedBytes(for remoteURL: URL) {
+        sizeProbeTask?.cancel()
+
+        var request = URLRequest(url: remoteURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
+        request.httpMethod = "HEAD"
+
+        let task = URLSession.shared.dataTask(with: request) { [weak self] _, response, _ in
+            guard let self else { return }
+            let resolvedExpectedBytes: Int64 = {
+                if let responseExpected = response?.expectedContentLength, responseExpected > 0 {
+                    return responseExpected
+                }
+                if let httpResponse = response as? HTTPURLResponse,
+                   let contentLengthHeader = httpResponse.value(forHTTPHeaderField: "Content-Length"),
+                   let contentLength = Int64(contentLengthHeader),
+                   contentLength > 0 {
+                    return contentLength
+                }
+                return 0
+            }()
+
+            if resolvedExpectedBytes > 0 {
+                DispatchQueue.main.async {
+                    self.expectedBytes = max(self.expectedBytes, resolvedExpectedBytes)
+                    if self.expectedBytes > 0, self.bytesReceived > 0 {
+                        self.progress = Double(self.bytesReceived) / Double(self.expectedBytes)
+                    }
+                }
+                return
+            }
+
+            self.prefetchExpectedBytesUsingRangeProbe(for: remoteURL)
+        }
+        sizeProbeTask = task
+        task.resume()
+    }
+
+    private func prefetchExpectedBytesUsingRangeProbe(for remoteURL: URL) {
+        sizeProbeTask?.cancel()
+
+        var request = URLRequest(url: remoteURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
+        request.httpMethod = "GET"
+        request.setValue("bytes=0-0", forHTTPHeaderField: "Range")
+
+        let task = URLSession.shared.dataTask(with: request) { [weak self] _, response, _ in
+            guard let self else { return }
+            guard let httpResponse = response as? HTTPURLResponse else { return }
+
+            let resolvedExpectedBytes: Int64 = {
+                if let contentRange = httpResponse.value(forHTTPHeaderField: "Content-Range"),
+                   let slashIndex = contentRange.lastIndex(of: "/") {
+                    let suffix = contentRange[contentRange.index(after: slashIndex)...]
+                    if let totalBytes = Int64(suffix), totalBytes > 0 {
+                        return totalBytes
+                    }
+                }
+
+                if let contentLengthHeader = httpResponse.value(forHTTPHeaderField: "Content-Length"),
+                   let contentLength = Int64(contentLengthHeader),
+                   contentLength > 0,
+                   httpResponse.statusCode == 200 {
+                    return contentLength
+                }
+
+                if response?.expectedContentLength ?? 0 > 0 {
+                    return response?.expectedContentLength ?? 0
+                }
+
+                return 0
+            }()
+
+            guard resolvedExpectedBytes > 0 else { return }
+            DispatchQueue.main.async {
+                self.expectedBytes = max(self.expectedBytes, resolvedExpectedBytes)
+                if self.expectedBytes > 0, self.bytesReceived > 0 {
+                    self.progress = Double(self.bytesReceived) / Double(self.expectedBytes)
+                }
+            }
+        }
+        sizeProbeTask = task
+        task.resume()
+    }
+}
+
+extension EbookDownloadViewModel: URLSessionDownloadDelegate {
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        DispatchQueue.main.async {
+            let inferredExpectedBytes: Int64 = {
+                if totalBytesExpectedToWrite > 0 { return totalBytesExpectedToWrite }
+                if let responseExpected = downloadTask.response?.expectedContentLength, responseExpected > 0 { return responseExpected }
+                let taskExpected = downloadTask.countOfBytesExpectedToReceive
+                return taskExpected > 0 ? taskExpected : 0
+            }()
+
+            self.bytesReceived = totalBytesWritten
+            if inferredExpectedBytes > 0 {
+                self.expectedBytes = max(self.expectedBytes, inferredExpectedBytes)
+            }
+            if self.expectedBytes > 0 {
+                self.progress = Double(totalBytesWritten) / Double(self.expectedBytes)
+            } else {
+                self.progress = 0
+            }
+
+            let now = Date()
+            if self.lastSpeedSampleDate == nil {
+                self.lastSpeedSampleDate = now
+                self.lastSpeedSampleBytes = totalBytesWritten
+                self.bytesPerSecond = max(Double(bytesWritten), 0)
+                return
+            }
+
+            let elapsed = now.timeIntervalSince(self.lastSpeedSampleDate ?? now)
+            if elapsed >= 0.2 {
+                let deltaBytes = totalBytesWritten - self.lastSpeedSampleBytes
+                let rawBytesPerSecond = elapsed > 0 ? Double(deltaBytes) / elapsed : 0
+                if self.bytesPerSecond == 0 {
+                    self.bytesPerSecond = rawBytesPerSecond
+                } else {
+                    self.bytesPerSecond = (self.bytesPerSecond * 0.45) + (rawBytesPerSecond * 0.55)
+                }
+                self.lastSpeedSampleDate = now
+                self.lastSpeedSampleBytes = totalBytesWritten
+            }
+        }
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        guard let remoteURL = currentRemoteURL, let response = downloadTask.response else { return }
+
+        do {
+            let fileInfo = try EbookLibraryService.resolvedDownloadFileInfo(for: remoteURL, response: response)
+            let tempDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+            try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+            let localURL = tempDirectory.appendingPathComponent(fileInfo.filename)
+            try FileManager.default.moveItem(at: location, to: localURL)
+
+            DispatchQueue.main.async {
+                self.state = .importing
+                self.progress = 1
+                self.bytesPerSecond = 0
+                self.bytesReceived = self.expectedBytes > 0 ? self.expectedBytes : self.bytesReceived
+            }
+
+            Task.detached(priority: .userInitiated) {
+                defer {
+                    try? FileManager.default.removeItem(at: localURL)
+                    try? FileManager.default.removeItem(at: tempDirectory)
+                }
+
+                do {
+                    let importedItems = try EbookLibraryService.importDownloadedFile(at: localURL)
+                    await MainActor.run {
+                        self.task = nil
+                        self.sizeProbeTask = nil
+                        self.resumeData = nil
+                        self.currentRemoteURL = nil
+                        self.state = .idle
+                        self.progress = 0
+                        self.bytesPerSecond = 0
+                        self.bytesReceived = 0
+                        self.expectedBytes = 0
+                        self.onImported(importedItems)
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.task = nil
+                        self.sizeProbeTask = nil
+                        self.resumeData = nil
+                        self.currentRemoteURL = nil
+                        self.state = .idle
+                        self.progress = 0
+                        self.bytesPerSecond = 0
+                        self.bytesReceived = 0
+                        self.expectedBytes = 0
+                        self.errorMessage = error.localizedDescription
+                    }
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.task = nil
+                self.sizeProbeTask = nil
+                self.resumeData = nil
+                self.currentRemoteURL = nil
+                self.state = .idle
+                self.progress = 0
+                self.bytesPerSecond = 0
+                self.bytesReceived = 0
+                self.expectedBytes = 0
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
+        guard let error else { return }
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled {
+            return
+        }
+
+        DispatchQueue.main.async {
+            self.task = nil
+            self.sizeProbeTask = nil
+            self.resumeData = nil
+            self.currentRemoteURL = nil
+            self.state = .idle
+            self.progress = 0
+            self.bytesPerSecond = 0
+            self.bytesReceived = 0
+            self.expectedBytes = 0
+            self.errorMessage = error.localizedDescription
         }
     }
 }
@@ -474,46 +1053,159 @@ private struct DownloadSourceRow: View {
     }
 }
 
-private struct TXTBookContent {
+nonisolated private struct TXTBookContent {
     let title: String
-    let chapters: [TXTBookChapter]
-    let renderedText: String
-    let chapterLayouts: [TXTBookChapterLayout]
+    var chapters: [TXTBookChapter]
+    var isParsingComplete: Bool
 }
 
-private struct TXTBookChapter: Identifiable, Hashable {
+nonisolated private struct TXTBookChapter: Codable, Identifiable, Hashable {
     let id: Int
     let title: String
     let text: String
 }
 
-private struct TXTBookChapterLayout: Hashable {
-    let chapterIndex: Int
+nonisolated private struct CachedTXTBookChapterSummary: Codable, Hashable {
+    let id: Int
     let title: String
-    let range: NSRange
+}
+
+nonisolated private struct TXTBookParsingState {
+    let text: String
+    let contentRange: NSRange
+    var nextLocation: Int
+    var pendingHeading: TXTBookPendingHeading?
+    var didHandleLeadingContent: Bool
+}
+
+nonisolated private struct TXTBookPendingHeading: Codable {
+    let title: String
+    let start: Int
+}
+
+nonisolated private struct CachedTXTBookSnapshot: Codable {
+    let title: String
+    let chapters: [CachedTXTBookChapterSummary]
+    let isParsingComplete: Bool
+    let parsingState: CachedTXTBookParsingState?
+    let sourceFileSize: Int64
+    let sourceModificationTime: TimeInterval
+}
+
+nonisolated private struct CachedTXTBookParsingState: Codable {
+    let contentLocation: Int
+    let contentLength: Int
+    let nextLocation: Int
+    let pendingHeading: TXTBookPendingHeading?
+    let didHandleLeadingContent: Bool
 }
 
 private enum TXTReaderService {
-    nonisolated static func loadBook(from url: URL, fallbackTitle: String) throws -> TXTBookContent {
-        let rawText = try readText(from: url)
-        let normalized = normalize(rawText)
-        let trimmed = normalized.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
+    nonisolated private static let parsingChunkChapterCount = 24
+    nonisolated private static let libraryFolderName = "EbookLibrary"
+    nonisolated private static let cacheFolderName = "TXTReaderCache"
+    nonisolated private static let memoryCacheLock = NSLock()
+    nonisolated(unsafe) private static var memoryCacheEntries: [String: TXTBookContent] = [:]
+    nonisolated(unsafe) private static var signatureCacheEntries: [String: String] = [:]
+
+    nonisolated static func loadBook(
+        from url: URL,
+        item: EbookLibraryItem,
+        preferredChapterIndex: Int = 0,
+        preloadRadius: Int = 3
+    ) throws -> TXTBookContent {
+        if let cachedBook = loadCachedBookIfAvailable(
+            from: url,
+            item: item,
+            preferredChapterIndex: preferredChapterIndex,
+            preloadRadius: preloadRadius
+        ) {
+            return cachedBook
+        }
+
+        let sourceSignature = try sourceSignature(for: url)
+        if let snapshot = loadCachedSnapshot(for: item, signature: sourceSignature), !snapshot.isParsingComplete {
+            let payload = try readTextPayload(from: url)
+            let normalized = normalize(payload.text)
+            let partialBook = makeBook(from: snapshot, item: item, loadChapterTexts: true)
+            var state = makeParsingState(from: snapshot, normalizedText: normalized)
+            let resumedBook = try parseEntireBook(
+                title: item.title,
+                initialBook: partialBook,
+                state: &state,
+                item: item,
+                signature: sourceSignature
+            )
+            persistCache(for: item, book: resumedBook, signature: sourceSignature, parsingState: nil)
+            storeInMemoryCache(resumedBook, for: item, signature: sourceSignature)
+            return resumedBook
+        }
+
+        let payload = try readTextPayload(from: url)
+        let normalized = normalize(payload.text)
+        let contentRange = trimmedContentRange(in: normalized)
+        guard contentRange.length > 0 else {
             throw TXTReaderError.emptyContent
         }
 
-        let chapters = makeChapters(from: trimmed)
-        let renderedBook = makeRenderedBook(from: chapters)
-        return TXTBookContent(
-            title: fallbackTitle,
-            chapters: chapters,
-            renderedText: renderedBook.text,
-            chapterLayouts: renderedBook.layouts
+        var state = TXTBookParsingState(
+            text: normalized,
+            contentRange: contentRange,
+            nextLocation: contentRange.location,
+            pendingHeading: nil,
+            didHandleLeadingContent: false
         )
+        let book = try parseEntireBook(
+            title: item.title,
+            initialBook: TXTBookContent(
+                title: item.title,
+                chapters: [],
+                isParsingComplete: false
+            ),
+            state: &state,
+            item: item,
+            signature: sourceSignature
+        )
+        persistCache(for: item, book: book, signature: sourceSignature, parsingState: nil)
+        storeInMemoryCache(book, for: item, signature: sourceSignature)
+        return book
     }
 
-    nonisolated private static func readText(from url: URL) throws -> String {
-        let data = try Data(contentsOf: url)
+    nonisolated static func loadCachedBookIfAvailable(
+        from url: URL,
+        item: EbookLibraryItem,
+        preferredChapterIndex: Int,
+        preloadRadius: Int
+    ) -> TXTBookContent? {
+        guard let signature = try? sourceSignature(for: url) else {
+            return nil
+        }
+        if let memoryCached = loadMemoryCachedBook(for: item, signature: signature) {
+            let hydrated = hydrateChapterWindow(
+                in: memoryCached,
+                for: item,
+                centerIndex: preferredChapterIndex,
+                radius: preloadRadius
+            )
+            storeInMemoryCache(hydrated, for: item, signature: signature)
+            return hydrated
+        }
+        guard let snapshot = loadCachedSnapshot(for: item, signature: signature), snapshot.isParsingComplete else {
+            return nil
+        }
+
+        let book = hydrateChapterWindow(
+            in: makeBook(from: snapshot, item: item, loadChapterTexts: false),
+            for: item,
+            centerIndex: preferredChapterIndex,
+            radius: preloadRadius
+        )
+        storeInMemoryCache(book, for: item, signature: signature)
+        return book
+    }
+
+    nonisolated private static func readTextPayload(from url: URL) throws -> (text: String, byteCount: Int) {
+        let data = try Data(contentsOf: url, options: [.mappedIfSafe])
         let encodings: [String.Encoding] = [
             .utf8,
             .unicode,
@@ -528,7 +1220,7 @@ private enum TXTReaderService {
 
         for encoding in encodings {
             if let text = String(data: data, encoding: encoding) {
-                return text
+                return (text, data.count)
             }
         }
 
@@ -536,77 +1228,421 @@ private enum TXTReaderService {
     }
 
     nonisolated private static func normalize(_ text: String) -> String {
-        text
+        guard text.contains("\r") || text.contains("\u{feff}") else {
+            return text
+        }
+
+        return text
             .replacingOccurrences(of: "\r\n", with: "\n")
             .replacingOccurrences(of: "\r", with: "\n")
             .replacingOccurrences(of: "\u{feff}", with: "")
     }
 
-    nonisolated private static func makeChapters(from text: String) -> [TXTBookChapter] {
-        let lines = text.components(separatedBy: "\n")
-        var headings: [(index: Int, title: String)] = []
-        for (index, line) in lines.enumerated() {
-            let heading = normalizedHeading(from: line)
-            if isChapterHeading(heading) {
-                headings.append((index, heading))
+    nonisolated private static func trimmedContentRange(in text: String) -> NSRange {
+        let source = text as NSString
+        var start = 0
+        var end = source.length
+        let whitespace = CharacterSet.whitespacesAndNewlines
+
+        while start < end {
+            let scalar = source.character(at: start)
+            guard let unicodeScalar = UnicodeScalar(scalar), whitespace.contains(unicodeScalar) else {
+                break
+            }
+            start += 1
+        }
+
+        while end > start {
+            let scalar = source.character(at: end - 1)
+            guard let unicodeScalar = UnicodeScalar(scalar), whitespace.contains(unicodeScalar) else {
+                break
+            }
+            end -= 1
+        }
+
+        return NSRange(location: start, length: max(end - start, 0))
+    }
+
+    nonisolated private static func sourceSignature(for url: URL) throws -> (fileSize: Int64, modificationTime: TimeInterval) {
+        let values = try url.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
+        return (
+            Int64(values.fileSize ?? 0),
+            values.contentModificationDate?.timeIntervalSince1970 ?? 0
+        )
+    }
+
+    nonisolated private static func persistCache(
+        for item: EbookLibraryItem,
+        book: TXTBookContent,
+        signature: (fileSize: Int64, modificationTime: TimeInterval),
+        parsingState: TXTBookParsingState?,
+        updatedChapters: [TXTBookChapter]? = nil
+    ) {
+        let snapshot = CachedTXTBookSnapshot(
+            title: book.title,
+            chapters: book.chapters.map { CachedTXTBookChapterSummary(id: $0.id, title: $0.title) },
+            isParsingComplete: book.isParsingComplete,
+            parsingState: makeCachedParsingState(from: parsingState),
+            sourceFileSize: signature.fileSize,
+            sourceModificationTime: signature.modificationTime
+        )
+
+        do {
+            _ = try metadataDirectory()
+            let encoder = PropertyListEncoder()
+            encoder.outputFormat = .binary
+            let data = try encoder.encode(snapshot)
+            try data.write(to: metadataURL(for: item), options: .atomic)
+            try writeChapterShards(updatedChapters ?? book.chapters, for: item)
+        } catch {
+            #if DEBUG
+            print("Failed to cache TXT book:", error.localizedDescription)
+            #endif
+        }
+    }
+
+    nonisolated private static func loadCachedSnapshot(
+        for item: EbookLibraryItem,
+        signature: (fileSize: Int64, modificationTime: TimeInterval)
+    ) -> CachedTXTBookSnapshot? {
+        guard
+            let data = try? Data(contentsOf: metadataURL(for: item))
+        else {
+            return nil
+        }
+
+        let snapshot =
+            (try? PropertyListDecoder().decode(CachedTXTBookSnapshot.self, from: data))
+            ?? (try? JSONDecoder().decode(CachedTXTBookSnapshot.self, from: data))
+
+        guard
+            let snapshot,
+            snapshot.sourceFileSize == signature.fileSize,
+            abs(snapshot.sourceModificationTime - signature.modificationTime) < 0.5
+        else {
+            return nil
+        }
+
+        return snapshot
+    }
+
+    nonisolated private static func isParsingComplete(_ state: TXTBookParsingState) -> Bool {
+        state.nextLocation >= NSMaxRange(state.contentRange) && state.pendingHeading == nil
+    }
+
+    nonisolated private static func parseEntireBook(
+        title: String,
+        initialBook: TXTBookContent,
+        state: inout TXTBookParsingState,
+        item: EbookLibraryItem,
+        signature: (fileSize: Int64, modificationTime: TimeInterval)
+    ) throws -> TXTBookContent {
+        var book = initialBook
+
+        while true {
+            let wasComplete = isParsingComplete(state)
+            if wasComplete {
+                book.isParsingComplete = true
+                break
+            }
+
+            let targetCount = max(book.chapters.count + parsingChunkChapterCount, parsingChunkChapterCount)
+            let chunk = scanChapters(into: &state, existingCount: book.chapters.count, targetCount: targetCount)
+            if !chunk.isEmpty {
+                book.chapters.append(contentsOf: chunk)
+            }
+
+            book.isParsingComplete = isParsingComplete(state)
+            persistCache(
+                for: item,
+                book: book,
+                signature: signature,
+                parsingState: book.isParsingComplete ? nil : state,
+                updatedChapters: chunk
+            )
+
+            if book.isParsingComplete {
+                break
+            }
+
+            try Task.checkCancellation()
+
+            if chunk.isEmpty {
+                break
             }
         }
 
-        if headings.isEmpty {
-            return [TXTBookChapter(id: 0, title: AppLocalizer.localized("正文"), text: text)]
+        guard book.isParsingComplete else {
+            persistCache(for: item, book: book, signature: signature, parsingState: state)
+            throw TXTReaderError.incompleteParsing
         }
 
+        return TXTBookContent(
+            title: title,
+            chapters: book.chapters,
+            isParsingComplete: true
+        )
+    }
+
+    nonisolated private static func makeBook(
+        from snapshot: CachedTXTBookSnapshot,
+        item: EbookLibraryItem,
+        loadChapterTexts: Bool
+    ) -> TXTBookContent {
+        TXTBookContent(
+            title: snapshot.title,
+            chapters: snapshot.chapters.map { summary in
+                TXTBookChapter(
+                    id: summary.id,
+                    title: summary.title,
+                    text: loadChapterTexts ? (loadChapterText(for: item, chapterID: summary.id) ?? "") : ""
+                )
+            },
+            isParsingComplete: snapshot.isParsingComplete
+        )
+    }
+
+    nonisolated private static func makeParsingState(from snapshot: CachedTXTBookSnapshot, normalizedText: String) -> TXTBookParsingState {
+        if let cachedParsingState = snapshot.parsingState {
+            return TXTBookParsingState(
+                text: normalizedText,
+                contentRange: NSRange(location: cachedParsingState.contentLocation, length: cachedParsingState.contentLength),
+                nextLocation: cachedParsingState.nextLocation,
+                pendingHeading: cachedParsingState.pendingHeading,
+                didHandleLeadingContent: cachedParsingState.didHandleLeadingContent
+            )
+        }
+
+        let contentRange = trimmedContentRange(in: normalizedText)
+        return TXTBookParsingState(
+            text: normalizedText,
+            contentRange: contentRange,
+            nextLocation: contentRange.location,
+            pendingHeading: nil,
+            didHandleLeadingContent: false
+        )
+    }
+
+    nonisolated private static func makeCachedParsingState(from parsingState: TXTBookParsingState?) -> CachedTXTBookParsingState? {
+        guard let parsingState else { return nil }
+        return CachedTXTBookParsingState(
+            contentLocation: parsingState.contentRange.location,
+            contentLength: parsingState.contentRange.length,
+            nextLocation: parsingState.nextLocation,
+            pendingHeading: parsingState.pendingHeading,
+            didHandleLeadingContent: parsingState.didHandleLeadingContent
+        )
+    }
+
+    nonisolated private static func memoryCacheKey(for item: EbookLibraryItem) -> String {
+        item.id.uuidString.lowercased()
+    }
+
+    nonisolated private static func signatureString(for signature: (fileSize: Int64, modificationTime: TimeInterval)) -> String {
+        "\(signature.fileSize)-\(signature.modificationTime)"
+    }
+
+    nonisolated private static func loadMemoryCachedBook(
+        for item: EbookLibraryItem,
+        signature: (fileSize: Int64, modificationTime: TimeInterval)
+    ) -> TXTBookContent? {
+        let key = memoryCacheKey(for: item)
+        let signatureValue = signatureString(for: signature)
+
+        memoryCacheLock.lock()
+        defer { memoryCacheLock.unlock() }
+
+        guard let cachedSignature = signatureCacheEntries[key] else {
+            return nil
+        }
+        guard cachedSignature == signatureValue else {
+            memoryCacheEntries.removeValue(forKey: key)
+            signatureCacheEntries.removeValue(forKey: key)
+            return nil
+        }
+        return memoryCacheEntries[key]
+    }
+
+    nonisolated private static func storeInMemoryCache(
+        _ book: TXTBookContent,
+        for item: EbookLibraryItem,
+        signature: (fileSize: Int64, modificationTime: TimeInterval)
+    ) {
+        let key = memoryCacheKey(for: item)
+        memoryCacheLock.lock()
+        memoryCacheEntries[key] = book
+        signatureCacheEntries[key] = signatureString(for: signature)
+        if memoryCacheEntries.count > 8, let staleKey = memoryCacheEntries.keys.first(where: { $0 != key }) {
+            memoryCacheEntries.removeValue(forKey: staleKey)
+            signatureCacheEntries.removeValue(forKey: staleKey)
+        }
+        memoryCacheLock.unlock()
+    }
+
+    nonisolated static func hydrateChapterWindow(
+        in book: TXTBookContent,
+        for item: EbookLibraryItem,
+        centerIndex: Int,
+        radius: Int
+    ) -> TXTBookContent {
+        guard !book.chapters.isEmpty else { return book }
+
+        let lowerBound = max(centerIndex - radius, 0)
+        let upperBound = min(centerIndex + radius, book.chapters.count - 1)
+        var hydratedBook = book
+        var mutated = false
+
+        for index in lowerBound...upperBound {
+            guard hydratedBook.chapters[index].text.isEmpty else { continue }
+            guard let text = loadChapterText(for: item, chapterID: hydratedBook.chapters[index].id) else { continue }
+            hydratedBook.chapters[index] = TXTBookChapter(
+                id: hydratedBook.chapters[index].id,
+                title: hydratedBook.chapters[index].title,
+                text: text
+            )
+            mutated = true
+        }
+
+        return mutated ? hydratedBook : book
+    }
+
+    nonisolated private static func metadataDirectory() throws -> URL {
+        let root = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let directory = root
+            .appendingPathComponent(libraryFolderName, isDirectory: true)
+            .appendingPathComponent(cacheFolderName, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+
+    nonisolated private static func chaptersDirectory(for item: EbookLibraryItem) throws -> URL {
+        let directory = try metadataDirectory()
+            .appendingPathComponent(item.id.uuidString.lowercased(), isDirectory: true)
+            .appendingPathComponent("chapters", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+
+    nonisolated private static func metadataURL(for item: EbookLibraryItem) -> URL {
+        (try? metadataDirectory().appendingPathComponent("\(item.id.uuidString.lowercased()).plist"))
+        ?? URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(item.id.uuidString.lowercased()).plist")
+    }
+
+    nonisolated private static func chapterURL(for item: EbookLibraryItem, chapterID: Int) -> URL {
+        (try? chaptersDirectory(for: item).appendingPathComponent("\(chapterID).txt"))
+        ?? URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(item.id.uuidString.lowercased())-\(chapterID).txt")
+    }
+
+    nonisolated private static func writeChapterShards(_ chapters: [TXTBookChapter], for item: EbookLibraryItem) throws {
+        guard !chapters.isEmpty else { return }
+        for chapter in chapters {
+            let url = chapterURL(for: item, chapterID: chapter.id)
+            if let data = chapter.text.data(using: .utf8) {
+                try data.write(to: url, options: .atomic)
+            } else {
+                try chapter.text.write(to: url, atomically: true, encoding: .utf8)
+            }
+        }
+    }
+
+    nonisolated private static func loadChapterText(for item: EbookLibraryItem, chapterID: Int) -> String? {
+        let url = chapterURL(for: item, chapterID: chapterID)
+        guard let data = try? Data(contentsOf: url, options: [.mappedIfSafe]) else {
+            return nil
+        }
+        return String(data: data, encoding: .utf8)
+    }
+
+    nonisolated private static func scanChapters(
+        into state: inout TXTBookParsingState,
+        existingCount: Int,
+        targetCount: Int
+    ) -> [TXTBookChapter] {
+        let source = state.text as NSString
+        let contentRange = state.contentRange
+        let contentEnd = NSMaxRange(contentRange)
         var chapters: [TXTBookChapter] = []
-        if let firstHeading = headings.first, firstHeading.index > 0 {
-            let leadingSlice = lines[..<firstHeading.index]
-                .joined(separator: "\n")
+        var nextLocation = state.nextLocation
+        var pendingHeading = state.pendingHeading
+        var didHandleLeadingContent = state.didHandleLeadingContent
+
+        func appendChapter(title: String, start: Int, end: Int) {
+            guard end > start else { return }
+            let slice = source.substring(with: NSRange(location: start, length: end - start))
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-            if shouldKeepLeadingContent(leadingSlice) {
+            guard !slice.isEmpty else { return }
+            chapters.append(
+                TXTBookChapter(
+                    id: existingCount + chapters.count,
+                    title: title,
+                    text: slice
+                )
+            )
+        }
+
+        let remainingRange = NSRange(location: nextLocation, length: max(contentEnd - nextLocation, 0))
+        if remainingRange.length > 0 {
+            source.enumerateSubstrings(in: remainingRange, options: [.byLines, .substringNotRequired]) { _, substringRange, enclosingRange, stop in
+                let line = source.substring(with: substringRange)
+                let heading = normalizedHeading(from: line)
+
+                if isChapterHeading(heading) {
+                    if let pending = pendingHeading {
+                        appendChapter(title: pending.title, start: pending.start, end: substringRange.location)
+                        if existingCount + chapters.count >= targetCount {
+                            pendingHeading = TXTBookPendingHeading(title: heading, start: substringRange.location)
+                            didHandleLeadingContent = true
+                            nextLocation = NSMaxRange(enclosingRange)
+                            stop.pointee = true
+                            return
+                        }
+                    } else if !didHandleLeadingContent && substringRange.location > contentRange.location {
+                        let leadingText = source.substring(with: NSRange(location: contentRange.location, length: substringRange.location - contentRange.location))
+                            .trimmingCharacters(in: .whitespacesAndNewlines)
+                        if shouldKeepLeadingContent(leadingText) {
+                            chapters.append(
+                                TXTBookChapter(
+                                    id: existingCount + chapters.count,
+                                    title: AppLocalizer.localized("正文"),
+                                    text: leadingText
+                                )
+                            )
+                        }
+                    }
+
+                    didHandleLeadingContent = true
+                    pendingHeading = TXTBookPendingHeading(title: heading, start: substringRange.location)
+                }
+
+                nextLocation = NSMaxRange(enclosingRange)
+            }
+        }
+
+        if nextLocation >= contentEnd {
+            if let pending = pendingHeading {
+                appendChapter(title: pending.title, start: pending.start, end: contentEnd)
+                pendingHeading = nil
+            } else if existingCount + chapters.count == 0 && !didHandleLeadingContent {
                 chapters.append(
                     TXTBookChapter(
-                        id: chapters.count,
+                        id: existingCount,
                         title: AppLocalizer.localized("正文"),
-                        text: leadingSlice
+                        text: source.substring(with: contentRange)
                     )
                 )
             }
         }
 
-        for (position, heading) in headings.enumerated() {
-            let start = heading.index
-            let end = position + 1 < headings.count ? headings[position + 1].index : lines.count
-            let slice = lines[start..<end].joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !slice.isEmpty else { continue }
-            chapters.append(TXTBookChapter(id: chapters.count, title: heading.title, text: slice))
-        }
+        state.nextLocation = nextLocation
+        state.pendingHeading = pendingHeading
+        state.didHandleLeadingContent = didHandleLeadingContent
 
-        return chapters.isEmpty ? [TXTBookChapter(id: 0, title: AppLocalizer.localized("正文"), text: text)] : chapters
-    }
-
-    nonisolated private static func makeRenderedBook(from chapters: [TXTBookChapter]) -> (text: String, layouts: [TXTBookChapterLayout]) {
-        var renderedText = ""
-        var layouts: [TXTBookChapterLayout] = []
-
-        for chapter in chapters {
-            if !renderedText.isEmpty {
-                renderedText.append("\n\n")
-            }
-
-            let start = renderedText.utf16.count
-            let chapterText = chapter.text.trimmingCharacters(in: .whitespacesAndNewlines)
-            renderedText.append(chapterText)
-            let end = renderedText.utf16.count
-
-            layouts.append(
-                TXTBookChapterLayout(
-                    chapterIndex: chapter.id,
-                    title: chapter.title,
-                    range: NSRange(location: start, length: max(end - start, 0))
-                )
-            )
-        }
-
-        return (renderedText, layouts)
+        return chapters
     }
 
     nonisolated private static func normalizedHeading(from line: String) -> String {
@@ -677,6 +1713,7 @@ private enum TXTReaderService {
 private enum TXTReaderError: LocalizedError {
     case unreadableFile
     case emptyContent
+    case incompleteParsing
 
     var errorDescription: String? {
         switch self {
@@ -684,6 +1721,8 @@ private enum TXTReaderError: LocalizedError {
             return AppLocalizer.localized("无法读取该 TXT 文件")
         case .emptyContent:
             return AppLocalizer.localized("当前 TXT 文件内容为空")
+        case .incompleteParsing:
+            return AppLocalizer.localized("电子书解析未完成，请重试")
         }
     }
 }
@@ -691,6 +1730,67 @@ private enum TXTReaderError: LocalizedError {
 private enum TXTReaderOverlayPanel {
     case tableOfContents
     case appearance
+}
+
+private enum TXTChapterBoundaryDirection {
+    case previous
+    case next
+}
+
+private struct TXTReaderWindow: Equatable {
+    let startChapterIndex: Int
+    let chapters: [TXTBookChapter]
+    let chapterRanges: [TXTReaderWindowChapterRange]
+
+    var endChapterIndex: Int {
+        startChapterIndex + chapters.count - 1
+    }
+
+    func contains(chapterIndex: Int) -> Bool {
+        chapterIndex >= startChapterIndex && chapterIndex <= endChapterIndex
+    }
+}
+
+private struct TXTReaderWindowChapterRange: Equatable {
+    let chapterIndex: Int
+    let chapterID: Int
+    let title: String
+    let displayRange: NSRange
+    let bodyRange: NSRange
+}
+
+private func normalizedTXTChapterHeading(_ text: String) -> String {
+    text
+        .replacingOccurrences(of: "\u{3000}", with: " ")
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
+private func deduplicatedTXTChapterBody(text: String, title: String) -> String {
+    let normalizedTitle = normalizedTXTChapterHeading(title)
+    guard !normalizedTitle.isEmpty else { return text }
+
+    let normalizedBody = text.replacingOccurrences(of: "\r\n", with: "\n")
+    let lines = normalizedBody.components(separatedBy: "\n")
+    guard let firstNonEmptyLine = lines.first(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) else {
+        return text
+    }
+
+    guard normalizedTXTChapterHeading(firstNonEmptyLine) == normalizedTitle else {
+        return text
+    }
+
+    var didRemoveHeading = false
+    let filteredLines = lines.filter { line in
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !didRemoveHeading, !trimmed.isEmpty, normalizedTXTChapterHeading(line) == normalizedTitle {
+            didRemoveHeading = true
+            return false
+        }
+        return true
+    }
+
+    let stripped = filteredLines.joined(separator: "\n").trimmingCharacters(in: .newlines)
+    return stripped.isEmpty ? text : stripped
 }
 
 private enum TXTReaderThemeOption: String, CaseIterable, Identifiable {
@@ -752,6 +1852,32 @@ private enum TXTReaderThemeOption: String, CaseIterable, Identifiable {
             return Color(hex: "#E9D9B6")
         }
     }
+
+    var loadingTextColor: UIColor {
+        switch self {
+        case .dark:
+            return UIColor(hex: "#F5F7FA").withAlphaComponent(0.9)
+        case .light:
+            return UIColor(hex: "#1F2937").withAlphaComponent(0.82)
+        case .mint:
+            return UIColor(hex: "#23352B").withAlphaComponent(0.82)
+        case .cream:
+            return UIColor(hex: "#4A4032").withAlphaComponent(0.82)
+        }
+    }
+
+    var loadingIndicatorColor: UIColor {
+        switch self {
+        case .dark:
+            return UIColor(hex: "#F5F7FA").withAlphaComponent(0.88)
+        case .light:
+            return UIColor(hex: "#4B5563")
+        case .mint:
+            return UIColor(hex: "#2F6B4F")
+        case .cream:
+            return UIColor(hex: "#7A5B2E")
+        }
+    }
 }
 
 struct TXTEbookReaderView: View {
@@ -768,6 +1894,9 @@ struct TXTEbookReaderView: View {
     @State private var chapterScrollProgress = 0.0
     @State private var scrollRequest: TXTReaderScrollRequest?
     @State private var lastSavedProgress = TXTReaderProgress(chapterIndex: 0, chapterProgress: 0)
+    @State private var loadTask: Task<Void, Never>?
+    @State private var prewarmTask: Task<Void, Never>?
+    @State private var readerWindow: TXTReaderWindow?
 
     var body: some View {
         GeometryReader { proxy in
@@ -776,17 +1905,7 @@ struct TXTEbookReaderView: View {
 
                 Group {
                     if let book {
-                        TXTReaderTextView(
-                            text: book.renderedText,
-                            chapterLayouts: book.chapterLayouts,
-                            styleSettings: styleSettings,
-                            theme: readerTheme,
-                            scrollRequest: scrollRequest,
-                            onTap: toggleChrome,
-                            onReadingPositionChange: handleReadingPositionChange
-                        )
-                        .id("txt-\(item.id.uuidString)")
-                        .ignoresSafeArea()
+                        readerContent(for: book)
                     } else if let loadError {
                         TXTEbookErrorView(message: loadError, onRetry: loadBook)
                     } else {
@@ -824,6 +1943,10 @@ struct TXTEbookReaderView: View {
             loadBook()
         }
         .onDisappear {
+            loadTask?.cancel()
+            prewarmTask?.cancel()
+            loadTask = nil
+            prewarmTask = nil
             saveProgress(force: true)
         }
     }
@@ -832,11 +1955,27 @@ struct TXTEbookReaderView: View {
         VStack(spacing: 14) {
             ProgressView()
                 .scaleEffect(1.2)
-                .tint(.white)
+                .tint(Color(uiColor: readerTheme.loadingIndicatorColor))
 
             Text(AppLocalizer.localized("正在处理电子书..."))
                 .font(.system(size: 15, weight: .medium))
-                .foregroundColor(.white.opacity(0.92))
+                .foregroundColor(Color(uiColor: readerTheme.loadingTextColor))
+
+            Button {
+                cancelLoadingAndDismiss()
+            } label: {
+                Text(AppLocalizer.localized("取消"))
+                    .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(Color(uiColor: readerTheme.loadingTextColor))
+                .padding(.horizontal, 14)
+                .frame(height: 38)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color(uiColor: readerTheme.textColor).opacity(readerTheme == .dark ? 0.12 : 0.08))
+                )
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 2)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -853,6 +1992,23 @@ struct TXTEbookReaderView: View {
     private var compactChapterTitle: String {
         guard let book else { return item.title }
         return currentChapter(in: book).title
+    }
+
+    @ViewBuilder
+    private func readerContent(for book: TXTBookContent) -> some View {
+        let window = readerWindow ?? makeReaderWindow(from: book, centerIndex: currentChapterIndex)
+        TXTReaderTextView(
+            cacheKey: "\(item.id.uuidString.lowercased())-window-\(window.startChapterIndex)-\(window.endChapterIndex)",
+            window: window,
+            styleSettings: styleSettings,
+            theme: readerTheme,
+            scrollRequest: scrollRequest,
+            onTap: toggleChrome,
+            onReadingPositionChange: handleReadingPositionChange,
+            onBoundaryCross: handleChapterBoundaryCross
+        )
+        .id("txt-\(item.id.uuidString)-\(window.startChapterIndex)-\(window.endChapterIndex)")
+        .ignoresSafeArea()
     }
 
     private func topChrome(topInset: CGFloat) -> some View {
@@ -994,24 +2150,25 @@ struct TXTEbookReaderView: View {
     }
 
     private var tocPanel: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    Text(AppLocalizer.localized("目录"))
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Text(AppLocalizer.localized("目录"))
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
 
-                    Spacer(minLength: 0)
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                .padding(.bottom, 10)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                    .padding(.bottom, 10)
 
-                if let book, !book.chapters.isEmpty {
-                    ForEach(Array(book.chapters.enumerated()), id: \.element.id) { index, chapter in
-                        Button {
-                            jumpToChapter(index)
-                        } label: {
+                    if let book, !book.chapters.isEmpty {
+                        ForEach(Array(book.chapters.enumerated()), id: \.element.id) { index, chapter in
+                            Button {
+                                jumpToChapter(index)
+                            } label: {
                             HStack(spacing: 12) {
                                 Text(chapter.title)
                                     .font(.system(size: 14, weight: index == currentChapterIndex ? .bold : .medium))
@@ -1025,24 +2182,36 @@ struct TXTEbookReaderView: View {
                             .padding(.vertical, 12)
                             .contentShape(Rectangle())
                         }
-                        .buttonStyle(.plain)
+                            .buttonStyle(.plain)
+                            .id(chapter.id)
 
-                        if index != book.chapters.count - 1 {
-                            Divider()
-                                .overlay(Color.white.opacity(0.06))
-                                .padding(.leading, 16)
+                            if index != book.chapters.count - 1 {
+                                Divider()
+                                    .overlay(Color.white.opacity(0.06))
+                                    .padding(.leading, 16)
+                            }
                         }
+                    } else {
+                        Text(AppLocalizer.localized("当前电子书暂时没有可用目录"))
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(AppColors.textSecondary)
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 18)
                     }
-                } else {
-                    Text(AppLocalizer.localized("当前电子书暂时没有可用目录"))
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(AppColors.textSecondary)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 18)
                 }
             }
+            .onAppear {
+                scrollTOCToCurrentChapter(with: proxy)
+            }
+            .onChange(of: currentChapterIndex) { _, _ in
+                scrollTOCToCurrentChapter(with: proxy)
+                scheduleNearbyChapterPrewarm()
+            }
+            .onChange(of: styleSettings) { _, _ in
+                scheduleNearbyChapterPrewarm()
+            }
         }
-        .frame(maxHeight: 300)
+        .frame(maxHeight: 360)
         .background(Color(hex: "#10161F"))
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .overlay(
@@ -1226,40 +2395,63 @@ struct TXTEbookReaderView: View {
     }
 
     private func loadBook() {
-        isLoading = true
+        loadTask?.cancel()
         loadError = nil
-        book = nil
         activePanel = nil
 
         let fileURL = EbookLibraryService.fileURL(for: item)
+        let savedProgress = EbookReaderPreferencesStore.loadTXTProgress(for: item.id) ?? TXTReaderProgress(chapterIndex: 0, chapterProgress: 0)
+        let requestedChapter = max(savedProgress.chapterIndex, 0)
+        let safeProgress = min(max(savedProgress.chapterProgress, 0), 1)
 
-        Task {
+        isLoading = true
+        book = nil
+
+        loadTask = Task {
             do {
                 let loadedBook = try await Task.detached(priority: .userInitiated) {
-                    try TXTReaderService.loadBook(from: fileURL, fallbackTitle: item.title)
+                    try TXTReaderService.loadBook(
+                        from: fileURL,
+                        item: item,
+                        preferredChapterIndex: requestedChapter,
+                        preloadRadius: 3
+                    )
                 }.value
-
-                let savedProgress = EbookReaderPreferencesStore.loadTXTProgress(for: item.id) ?? TXTReaderProgress(chapterIndex: 0, chapterProgress: 0)
-                let safeChapter = min(max(savedProgress.chapterIndex, 0), max(loadedBook.chapters.count - 1, 0))
-                let safeProgress = min(max(savedProgress.chapterProgress, 0), 1)
+                guard !Task.isCancelled else { return }
+                let safeChapter = min(requestedChapter, max(loadedBook.chapters.count - 1, 0))
 
                 await MainActor.run {
                     book = loadedBook
                     currentChapterIndex = safeChapter
                     chapterScrollProgress = safeProgress
+                    readerWindow = makeReaderWindow(from: loadedBook, centerIndex: safeChapter)
                     scrollRequest = TXTReaderScrollRequest(chapterIndex: safeChapter, chapterProgress: safeProgress)
                     lastSavedProgress = TXTReaderProgress(chapterIndex: safeChapter, chapterProgress: safeProgress)
                     isLoading = false
                     chromeVisible = false
+                    loadTask = nil
+                    scheduleNearbyChapterPrewarm()
+                }
+            } catch is CancellationError {
+                await MainActor.run {
+                    loadTask = nil
                 }
             } catch {
+                guard !Task.isCancelled else { return }
                 await MainActor.run {
                     loadError = error.localizedDescription
                     isLoading = false
                     chromeVisible = true
+                    loadTask = nil
                 }
             }
         }
+    }
+
+    private func cancelLoadingAndDismiss() {
+        loadTask?.cancel()
+        loadTask = nil
+        dismiss()
     }
 
     private func toggleChrome() {
@@ -1280,18 +2472,110 @@ struct TXTEbookReaderView: View {
     }
 
     private func handleReadingPositionChange(_ position: TXTVisibleReadingPosition) {
-        currentChapterIndex = position.chapterIndex
+        if currentChapterIndex != position.chapterIndex {
+            currentChapterIndex = position.chapterIndex
+            if
+                let currentBook = book,
+                shouldShiftReaderWindow(
+                    currentWindow: readerWindow,
+                    toKeepVisibleChapterIndex: position.chapterIndex
+                )
+            {
+                let shiftedWindow = makeReaderWindow(from: currentBook, centerIndex: position.chapterIndex)
+                if readerWindow != shiftedWindow {
+                    readerWindow = shiftedWindow
+                    scrollRequest = TXTReaderScrollRequest(
+                        chapterIndex: position.chapterIndex,
+                        chapterProgress: position.chapterProgress
+                    )
+                }
+            }
+            scheduleNearbyChapterPrewarm()
+        }
         chapterScrollProgress = min(max(position.chapterProgress, 0), 1)
         saveProgress(force: false)
     }
 
+    private func handleChapterBoundaryCross(_ direction: TXTChapterBoundaryDirection) {
+        _ = direction
+    }
+
     private func jumpToChapter(_ index: Int) {
-        currentChapterIndex = index
-        chapterScrollProgress = 0
-        scrollRequest = TXTReaderScrollRequest(chapterIndex: index, chapterProgress: 0)
-        activePanel = nil
-        chromeVisible = false
-        saveProgress(force: true)
+        transitionToChapter(index, progress: 0, hideChrome: true)
+    }
+
+    private func transitionToChapter(_ index: Int, progress: Double, hideChrome: Bool) {
+        guard let currentBook = book, currentBook.chapters.indices.contains(index) else { return }
+
+        let normalizedProgress = min(max(progress, 0), 1)
+        let targetChapter = currentBook.chapters[index]
+        let cacheKey = "\(item.id.uuidString.lowercased())-\(targetChapter.id)"
+        let targetReady =
+            !targetChapter.text.isEmpty &&
+            TXTAttributedTextCache.shared.hasValue(
+                for: cacheKey,
+                textLength: targetChapter.text.utf16.count,
+                styleSettings: styleSettings,
+                theme: readerTheme
+            )
+
+        if targetReady {
+            currentChapterIndex = index
+            chapterScrollProgress = normalizedProgress
+            readerWindow = makeReaderWindow(from: currentBook, centerIndex: index)
+            scrollRequest = TXTReaderScrollRequest(chapterIndex: index, chapterProgress: normalizedProgress)
+            if hideChrome {
+                activePanel = nil
+                chromeVisible = false
+            }
+            saveProgress(force: true)
+            scheduleNearbyChapterPrewarm()
+            return
+        }
+
+        prewarmTask?.cancel()
+        let currentBookSnapshot = currentBook
+        let targetIndex = index
+        let targetTheme = readerTheme
+        let targetStyle = styleSettings
+        let shouldHideChrome = hideChrome
+
+        prewarmTask = Task {
+            let hydratedBook = await Task.detached(priority: .userInitiated) {
+                TXTReaderService.hydrateChapterWindow(
+                    in: currentBookSnapshot,
+                    for: item,
+                    centerIndex: targetIndex,
+                    radius: 3
+                )
+            }.value
+            guard !Task.isCancelled else { return }
+
+            let lowerBound = max(targetIndex - 3, 0)
+            let upperBound = min(targetIndex + 3, hydratedBook.chapters.count - 1)
+            let chapters = Array(hydratedBook.chapters[lowerBound...upperBound]).filter { !$0.text.isEmpty }
+            let baseCacheKey = item.id.uuidString.lowercased()
+            TXTAttributedTextCache.shared.prewarm(
+                chapters: chapters,
+                baseCacheKey: baseCacheKey,
+                styleSettings: targetStyle,
+                theme: targetTheme
+            )
+            guard !Task.isCancelled else { return }
+
+            await MainActor.run {
+                book = hydratedBook
+                currentChapterIndex = targetIndex
+                chapterScrollProgress = normalizedProgress
+                readerWindow = makeReaderWindow(from: hydratedBook, centerIndex: targetIndex)
+                scrollRequest = TXTReaderScrollRequest(chapterIndex: targetIndex, chapterProgress: normalizedProgress)
+                if shouldHideChrome {
+                    activePanel = nil
+                    chromeVisible = false
+                }
+                saveProgress(force: true)
+            }
+        }
     }
 
     private func saveProgress(force: Bool) {
@@ -1303,6 +2587,57 @@ struct TXTEbookReaderView: View {
         guard shouldSave else { return }
         EbookReaderPreferencesStore.saveTXTProgress(progress, for: item.id)
         lastSavedProgress = progress
+    }
+
+    private func scrollTOCToCurrentChapter(with proxy: ScrollViewProxy) {
+        guard let book, book.chapters.indices.contains(currentChapterIndex) else { return }
+        let chapterID = book.chapters[currentChapterIndex].id
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.18)) {
+                proxy.scrollTo(chapterID, anchor: .center)
+            }
+        }
+    }
+
+    private func scheduleNearbyChapterPrewarm() {
+        guard let currentBook = book, !currentBook.chapters.isEmpty else { return }
+        let centerIndex = currentChapterIndex
+        let baseCacheKey = item.id.uuidString.lowercased()
+        let style = styleSettings
+        let theme = readerTheme
+
+        prewarmTask?.cancel()
+        prewarmTask = Task {
+            let hydratedBook = await Task.detached(priority: .utility) {
+                TXTReaderService.hydrateChapterWindow(
+                    in: currentBook,
+                    for: item,
+                    centerIndex: centerIndex,
+                    radius: 3
+                )
+            }.value
+            guard !Task.isCancelled else { return }
+
+            await MainActor.run {
+                if
+                    currentChapterIndex == centerIndex,
+                    book?.title == hydratedBook.title,
+                    book?.chapters.count == hydratedBook.chapters.count
+                {
+                    book = hydratedBook
+                }
+            }
+
+            let lowerBound = max(centerIndex - 3, 0)
+            let upperBound = min(centerIndex + 3, hydratedBook.chapters.count - 1)
+            let chapters = Array(hydratedBook.chapters[lowerBound...upperBound]).filter { !$0.text.isEmpty }
+            TXTAttributedTextCache.shared.prewarm(
+                chapters: chapters,
+                baseCacheKey: baseCacheKey,
+                styleSettings: style,
+                theme: theme
+            )
+        }
     }
 
     private func updateFontSize(by delta: Double) {
@@ -1360,6 +2695,67 @@ struct TXTEbookReaderView: View {
     private func compactOverlayTimeString(for date: Date) -> String {
         date.formatted(.dateTime.hour().minute())
     }
+
+    private func shouldShiftReaderWindow(
+        currentWindow: TXTReaderWindow?,
+        toKeepVisibleChapterIndex chapterIndex: Int
+    ) -> Bool {
+        guard let currentWindow, !currentWindow.chapters.isEmpty else {
+            return true
+        }
+
+        guard currentWindow.contains(chapterIndex: chapterIndex) else {
+            return true
+        }
+
+        let localIndex = chapterIndex - currentWindow.startChapterIndex
+        let lastVisibleIndex = currentWindow.chapters.count - 1
+        return localIndex <= 1 || localIndex >= max(lastVisibleIndex - 1, 0)
+    }
+
+    private func makeReaderWindow(from book: TXTBookContent, centerIndex: Int) -> TXTReaderWindow {
+        guard !book.chapters.isEmpty else {
+            return TXTReaderWindow(startChapterIndex: 0, chapters: [], chapterRanges: [])
+        }
+
+        let lowerBound = max(centerIndex - 5, 0)
+        let upperBound = min(centerIndex + 5, book.chapters.count - 1)
+        var chapters = Array(book.chapters[lowerBound...upperBound]).filter { !$0.text.isEmpty }
+        if chapters.isEmpty, book.chapters.indices.contains(centerIndex) {
+            chapters = [book.chapters[centerIndex]]
+        }
+
+        var location = 0
+        var ranges: [TXTReaderWindowChapterRange] = []
+
+        for (offset, chapter) in chapters.enumerated() {
+            let heading = chapter.title + "\n\n"
+            let separator = offset == chapters.count - 1 ? "" : "\n\n\n"
+            let headingLength = (heading as NSString).length
+            let displayBody = deduplicatedTXTChapterBody(text: chapter.text, title: chapter.title)
+            let bodyLength = (displayBody as NSString).length
+            let separatorLength = (separator as NSString).length
+            let displayLength = headingLength + bodyLength + separatorLength
+
+            ranges.append(
+                TXTReaderWindowChapterRange(
+                    chapterIndex: book.chapters.firstIndex(where: { $0.id == chapter.id }) ?? (lowerBound + offset),
+                    chapterID: chapter.id,
+                    title: chapter.title,
+                    displayRange: NSRange(location: location, length: displayLength),
+                    bodyRange: NSRange(location: location + headingLength, length: bodyLength)
+                )
+            )
+
+            location += displayLength
+        }
+
+        return TXTReaderWindow(
+            startChapterIndex: lowerBound,
+            chapters: chapters,
+            chapterRanges: ranges
+        )
+    }
 }
 
 private struct TXTEbookErrorView: View {
@@ -1398,13 +2794,14 @@ private struct TXTEbookErrorView: View {
 }
 
 private struct TXTReaderTextView: UIViewRepresentable {
-    let text: String
-    let chapterLayouts: [TXTBookChapterLayout]
+    let cacheKey: String
+    let window: TXTReaderWindow
     let styleSettings: ReaderStyleSettings
     let theme: TXTReaderThemeOption
     let scrollRequest: TXTReaderScrollRequest?
     let onTap: () -> Void
     let onReadingPositionChange: (TXTVisibleReadingPosition) -> Void
+    let onBoundaryCross: (TXTChapterBoundaryDirection) -> Void
 
     func makeUIView(context: Context) -> UITextView {
         let textView = UITextView(usingTextLayoutManager: false)
@@ -1427,10 +2824,11 @@ private struct TXTReaderTextView: UIViewRepresentable {
 
         context.coordinator.onTap = onTap
         context.coordinator.onReadingPositionChange = onReadingPositionChange
+        context.coordinator.onBoundaryCross = onBoundaryCross
         context.coordinator.configure(
             textView,
-            text: text,
-            chapterLayouts: chapterLayouts,
+            cacheKey: cacheKey,
+            window: window,
             styleSettings: styleSettings,
             theme: theme,
             scrollRequest: scrollRequest
@@ -1441,10 +2839,11 @@ private struct TXTReaderTextView: UIViewRepresentable {
     func updateUIView(_ uiView: UITextView, context: Context) {
         context.coordinator.onTap = onTap
         context.coordinator.onReadingPositionChange = onReadingPositionChange
+        context.coordinator.onBoundaryCross = onBoundaryCross
         context.coordinator.configure(
             uiView,
-            text: text,
-            chapterLayouts: chapterLayouts,
+            cacheKey: cacheKey,
+            window: window,
             styleSettings: styleSettings,
             theme: theme,
             scrollRequest: scrollRequest
@@ -1454,57 +2853,155 @@ private struct TXTReaderTextView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(
             onTap: onTap,
-            onReadingPositionChange: onReadingPositionChange
+            onReadingPositionChange: onReadingPositionChange,
+            onBoundaryCross: onBoundaryCross
         )
     }
 
     final class Coordinator: NSObject, UITextViewDelegate, UIGestureRecognizerDelegate {
         var onTap: () -> Void
         var onReadingPositionChange: (TXTVisibleReadingPosition) -> Void
-        private var lastText = ""
+        var onBoundaryCross: (TXTChapterBoundaryDirection) -> Void
+        private var lastWindow: TXTReaderWindow?
         private var lastStyle = ReaderStyleSettings.default
         private var lastTheme: TXTReaderThemeOption = .dark
-        private var lastChapterLayouts: [TXTBookChapterLayout] = []
         private var appliedScrollRequest: TXTReaderScrollRequest?
+        private var isApplyingProgrammaticScroll = false
 
         init(
             onTap: @escaping () -> Void,
-            onReadingPositionChange: @escaping (TXTVisibleReadingPosition) -> Void
+            onReadingPositionChange: @escaping (TXTVisibleReadingPosition) -> Void,
+            onBoundaryCross: @escaping (TXTChapterBoundaryDirection) -> Void
         ) {
             self.onTap = onTap
             self.onReadingPositionChange = onReadingPositionChange
+            self.onBoundaryCross = onBoundaryCross
         }
 
         func configure(
             _ textView: UITextView,
-            text: String,
-            chapterLayouts: [TXTBookChapterLayout],
+            cacheKey: String,
+            window: TXTReaderWindow,
             styleSettings: ReaderStyleSettings,
             theme: TXTReaderThemeOption,
             scrollRequest: TXTReaderScrollRequest?
         ) {
-            let textChanged = lastText != text
+            let textChanged = lastWindow != window
             let styleChanged = lastStyle != styleSettings || lastTheme != theme
-            let layoutChanged = lastChapterLayouts != chapterLayouts
-            lastChapterLayouts = chapterLayouts
 
-            if textChanged || styleChanged || layoutChanged {
-                textView.attributedText = attributedText(for: text, styleSettings: styleSettings, theme: theme)
+            if textChanged || styleChanged {
+                textView.attributedText = attributedText(
+                    for: window,
+                    cacheKey: cacheKey,
+                    styleSettings: styleSettings,
+                    theme: theme
+                )
                 textView.backgroundColor = theme.backgroundColor
                 textView.tintColor = UIColor(AppColors.accentBlue)
-                lastText = text
+                lastWindow = window
                 lastStyle = styleSettings
                 lastTheme = theme
                 appliedScrollRequest = nil
 
-                let initialRequest = scrollRequest ?? TXTReaderScrollRequest(chapterIndex: 0, chapterProgress: 0)
-                apply(scrollRequest: initialRequest, to: textView)
+                if let scrollRequest {
+                    apply(scrollRequest: scrollRequest, to: textView)
+                }
             } else if let scrollRequest, appliedScrollRequest != scrollRequest {
                 apply(scrollRequest: scrollRequest, to: textView)
             }
         }
 
-        private func attributedText(for text: String, styleSettings: ReaderStyleSettings, theme: TXTReaderThemeOption) -> NSAttributedString {
+        private func applyReadingPositionIfNeeded(_ textView: UITextView) {
+            let position = readingPosition(for: textView)
+            DispatchQueue.main.async {
+                self.onReadingPositionChange(position)
+            }
+        }
+
+        private func attributedText(
+            for window: TXTReaderWindow,
+            cacheKey: String,
+            styleSettings: ReaderStyleSettings,
+            theme: TXTReaderThemeOption
+        ) -> NSAttributedString {
+            let windowTextLength = window.chapterRanges.last.map { NSMaxRange($0.displayRange) } ?? 0
+            if let cached = TXTAttributedTextCache.shared.value(
+                for: cacheKey,
+                textLength: windowTextLength,
+                styleSettings: styleSettings,
+                theme: theme
+            ) {
+                return cached
+            }
+
+            let attributed = NSMutableAttributedString()
+            let titleFontSize = 20 * styleSettings.fontSize
+
+            for (offset, chapter) in window.chapters.enumerated() {
+                let titleParagraph = NSMutableParagraphStyle()
+                titleParagraph.lineBreakMode = .byWordWrapping
+                titleParagraph.alignment = .natural
+                titleParagraph.lineSpacing = max(0, (titleFontSize * styleSettings.lineHeight) - titleFontSize)
+
+                attributed.append(
+                    NSAttributedString(
+                        string: chapter.title + "\n\n",
+                        attributes: [
+                            .font: UIFont.systemFont(ofSize: titleFontSize, weight: .semibold),
+                            .foregroundColor: theme.textColor,
+                            .kern: styleSettings.letterSpacing * 4,
+                            .paragraphStyle: titleParagraph
+                        ]
+                    )
+                )
+
+                let chapterCacheKey = "\(cacheKey)-chapter-\(chapter.id)"
+                let displayBody = deduplicatedTXTChapterBody(text: chapter.text, title: chapter.title)
+                let bodyLength = displayBody.utf16.count
+                let chapterAttributed =
+                    TXTAttributedTextCache.shared.value(
+                        for: chapterCacheKey,
+                        textLength: bodyLength,
+                        styleSettings: styleSettings,
+                        theme: theme
+                    ) ?? {
+                        let generated = makeChapterAttributedText(
+                            for: displayBody,
+                            styleSettings: styleSettings,
+                            theme: theme
+                        )
+                        TXTAttributedTextCache.shared.store(
+                            generated,
+                            for: chapterCacheKey,
+                            textLength: bodyLength,
+                            styleSettings: styleSettings,
+                            theme: theme
+                        )
+                        return generated
+                    }()
+
+                attributed.append(chapterAttributed)
+
+                if offset != window.chapters.count - 1 {
+                    attributed.append(NSAttributedString(string: "\n\n\n"))
+                }
+            }
+
+            TXTAttributedTextCache.shared.store(
+                attributed,
+                for: cacheKey,
+                textLength: windowTextLength,
+                styleSettings: styleSettings,
+                theme: theme
+            )
+            return attributed
+        }
+
+        private func makeChapterAttributedText(
+            for text: String,
+            styleSettings: ReaderStyleSettings,
+            theme: TXTReaderThemeOption
+        ) -> NSAttributedString {
             let fontSize = 21 * styleSettings.fontSize
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.lineBreakMode = .byWordWrapping
@@ -1530,12 +3027,11 @@ private struct TXTReaderTextView: UIViewRepresentable {
         }
 
         private func scroll(_ textView: UITextView, to request: TXTReaderScrollRequest) {
-            guard !lastChapterLayouts.isEmpty else { return }
-            let safeIndex = min(max(request.chapterIndex, 0), lastChapterLayouts.count - 1)
-            let layout = lastChapterLayouts[safeIndex]
+            guard let window = lastWindow else { return }
+            guard let range = window.chapterRanges.first(where: { $0.chapterIndex == request.chapterIndex }) else { return }
             let progress = min(max(request.chapterProgress, 0), 1)
-            let targetCharacter = layout.range.location + Int((Double(max(layout.range.length - 1, 0)) * progress).rounded())
-            let boundedCharacter = min(max(targetCharacter, 0), max(textView.attributedText.length - 1, 0))
+            let bodyLength = max(range.bodyRange.length - 1, 0)
+            let boundedCharacter = range.bodyRange.location + min(max(Int((Double(bodyLength) * progress).rounded()), 0), bodyLength)
 
             textView.layoutManager.ensureLayout(for: textView.textContainer)
             let glyphIndex = textView.layoutManager.glyphIndexForCharacter(at: boundedCharacter)
@@ -1551,11 +3047,16 @@ private struct TXTReaderTextView: UIViewRepresentable {
                 max(glyphRect.minY - textView.textContainerInset.top - 12, minOffsetY),
                 maxOffsetY
             )
+            isApplyingProgrammaticScroll = true
             textView.setContentOffset(CGPoint(x: 0, y: targetOffsetY), animated: false)
+            DispatchQueue.main.async {
+                self.isApplyingProgrammaticScroll = false
+                self.onReadingPositionChange(self.readingPosition(for: textView))
+            }
         }
 
         private func readingPosition(for textView: UITextView) -> TXTVisibleReadingPosition {
-            guard !lastChapterLayouts.isEmpty, textView.attributedText.length > 0 else {
+            guard textView.attributedText.length > 0, let window = lastWindow else {
                 return TXTVisibleReadingPosition(chapterIndex: 0, chapterProgress: 0)
             }
 
@@ -1575,26 +3076,24 @@ private struct TXTReaderTextView: UIViewRepresentable {
                 max(textView.attributedText.length - 1, 0)
             )
 
-            let chapterIndex = currentChapterIndex(for: characterIndex)
-            let layout = lastChapterLayouts[chapterIndex]
-            let progress = layout.range.length > 0
-                ? min(max(Double(characterIndex - layout.range.location) / Double(layout.range.length), 0), 1)
+            guard let currentRange = window.chapterRanges.first(where: { NSLocationInRange(characterIndex, $0.displayRange) }) ?? window.chapterRanges.last else {
+                return TXTVisibleReadingPosition(chapterIndex: 0, chapterProgress: 0)
+            }
+
+            let relative = characterIndex - currentRange.bodyRange.location
+            let progress = currentRange.bodyRange.length > 1
+                ? min(max(Double(relative) / Double(max(currentRange.bodyRange.length - 1, 1)), 0), 1)
                 : 0
 
-            return TXTVisibleReadingPosition(chapterIndex: chapterIndex, chapterProgress: progress)
-        }
-
-        private func currentChapterIndex(for characterIndex: Int) -> Int {
-            for (index, layout) in lastChapterLayouts.enumerated().reversed() {
-                if characterIndex >= layout.range.location {
-                    return index
-                }
-            }
-            return 0
+            return TXTVisibleReadingPosition(
+                chapterIndex: currentRange.chapterIndex,
+                chapterProgress: progress
+            )
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             guard let textView = scrollView as? UITextView else { return }
+            guard !isApplyingProgrammaticScroll else { return }
             let position = readingPosition(for: textView)
             DispatchQueue.main.async {
                 self.onReadingPositionChange(position)
@@ -1611,6 +3110,106 @@ private struct TXTReaderTextView: UIViewRepresentable {
         func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
             true
         }
+    }
+}
+
+private final class TXTAttributedTextCache {
+    static let shared = TXTAttributedTextCache()
+
+    private let cache = NSCache<NSString, NSAttributedString>()
+
+    private init() {
+        cache.countLimit = 12
+    }
+
+    func value(
+        for cacheKey: String,
+        textLength: Int,
+        styleSettings: ReaderStyleSettings,
+        theme: TXTReaderThemeOption
+    ) -> NSAttributedString? {
+        cache.object(forKey: key(for: cacheKey, textLength: textLength, styleSettings: styleSettings, theme: theme))
+    }
+
+    func hasValue(
+        for cacheKey: String,
+        textLength: Int,
+        styleSettings: ReaderStyleSettings,
+        theme: TXTReaderThemeOption
+    ) -> Bool {
+        value(for: cacheKey, textLength: textLength, styleSettings: styleSettings, theme: theme) != nil
+    }
+
+    func store(
+        _ attributedText: NSAttributedString,
+        for cacheKey: String,
+        textLength: Int,
+        styleSettings: ReaderStyleSettings,
+        theme: TXTReaderThemeOption
+    ) {
+        cache.setObject(
+            attributedText,
+            forKey: key(for: cacheKey, textLength: textLength, styleSettings: styleSettings, theme: theme)
+        )
+    }
+
+    func prewarm(
+        chapters: [TXTBookChapter],
+        baseCacheKey: String,
+        styleSettings: ReaderStyleSettings,
+        theme: TXTReaderThemeOption
+    ) {
+        for chapter in chapters {
+            let cacheKey = "\(baseCacheKey)-\(chapter.id)"
+            let displayBody = deduplicatedTXTChapterBody(text: chapter.text, title: chapter.title)
+            let textLength = displayBody.utf16.count
+            if value(for: cacheKey, textLength: textLength, styleSettings: styleSettings, theme: theme) != nil {
+                continue
+            }
+            let attributedText = makeAttributedText(
+                for: displayBody,
+                styleSettings: styleSettings,
+                theme: theme
+            )
+            store(
+                attributedText,
+                for: cacheKey,
+                textLength: textLength,
+                styleSettings: styleSettings,
+                theme: theme
+            )
+        }
+    }
+
+    private func key(
+        for cacheKey: String,
+        textLength: Int,
+        styleSettings: ReaderStyleSettings,
+        theme: TXTReaderThemeOption
+    ) -> NSString {
+        "\(cacheKey)|\(textLength)|\(styleSettings.fontSize)|\(styleSettings.letterSpacing)|\(styleSettings.lineHeight)|\(styleSettings.themeRawValue)|\(theme.rawValue)" as NSString
+    }
+
+    private func makeAttributedText(
+        for text: String,
+        styleSettings: ReaderStyleSettings,
+        theme: TXTReaderThemeOption
+    ) -> NSAttributedString {
+        let fontSize = 21 * styleSettings.fontSize
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineBreakMode = .byWordWrapping
+        paragraphStyle.alignment = .natural
+        paragraphStyle.lineSpacing = max(0, (fontSize * styleSettings.lineHeight) - fontSize)
+
+        return NSAttributedString(
+            string: text,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: fontSize, weight: .regular),
+                .foregroundColor: theme.textColor,
+                .kern: styleSettings.letterSpacing * 8,
+                .paragraphStyle: paragraphStyle
+            ]
+        )
     }
 }
 
