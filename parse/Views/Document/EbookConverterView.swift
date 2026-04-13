@@ -178,7 +178,7 @@ struct EbookConverterView: View {
                                     .font(.system(size: 28, weight: .heavy))
                                     .foregroundColor(AppColors.textPrimary)
 
-                                Text(AppLocalizer.localized("支持 EPUB 与 TXT 的格式转换和阅读。"))
+                                Text(AppLocalizer.localized("支持 EPUB 与 TXT 的格式转换和阅读"))
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
                                     .fixedSize(horizontal: false, vertical: true)

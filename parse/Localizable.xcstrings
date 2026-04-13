@@ -3135,6 +3135,501 @@
         }
       }
     },
+    "电子书" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-books"
+          }
+        }
+      }
+    },
+    "EPUB 与 TXT 本地互转和阅读" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert and read EPUB and TXT locally"
+          }
+        }
+      }
+    },
+    "支持 EPUB 与 TXT 的格式转换和阅读" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supports EPUB and TXT conversion and reading"
+          }
+        }
+      }
+    },
+    "导入" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import"
+          }
+        }
+      }
+    },
+    "格式转换" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert"
+          }
+        }
+      }
+    },
+    "下载" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download"
+          }
+        }
+      }
+    },
+    "删除电子书" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete E-book"
+          }
+        }
+      }
+    },
+    "正在处理电子书..." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing e-book..."
+          }
+        }
+      }
+    },
+    "在一个页面里管理已导入电子书，快速阅读或进入格式转换。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage imported e-books in one place, read them quickly, or jump into conversion."
+          }
+        }
+      }
+    },
+    "书架还是空的" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your bookshelf is still empty"
+          }
+        }
+      }
+    },
+    "先导入 EPUB 或 TXT 文件，就可以在这里统一管理和阅读。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import EPUB or TXT files first, then manage and read them all here."
+          }
+        }
+      }
+    },
+    "阅读" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read"
+          }
+        }
+      }
+    },
+    "下载电子书" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download E-book"
+          }
+        }
+      }
+    },
+    "免费公版书资源，适合下载 EPUB 测试样本。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free public-domain titles that are great for downloading EPUB test samples."
+          }
+        }
+      }
+    },
+    "排版更精致的公版 EPUB 资源。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public-domain EPUB titles with more polished typography."
+          }
+        }
+      }
+    },
+    "可浏览和借阅部分公开电子书资源。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse and borrow selected publicly available e-book resources."
+          }
+        }
+      }
+    },
+    "正在导入电子书..." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing e-book..."
+          }
+        }
+      }
+    },
+    "电子书解析未完成，请重试" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-book parsing isn't finished yet. Please try again."
+          }
+        }
+      }
+    },
+    "目录" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contents"
+          }
+        }
+      }
+    },
+    "样式" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style"
+          }
+        }
+      }
+    },
+    "阅读中" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading"
+          }
+        }
+      }
+    },
+    "当前电子书暂时没有可用目录" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This e-book doesn't have an available table of contents right now."
+          }
+        }
+      }
+    },
+    "阅读样式" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading Style"
+          }
+        }
+      }
+    },
+    "字号" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font Size"
+          }
+        }
+      }
+    },
+    "主题" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theme"
+          }
+        }
+      }
+    },
+    "电子书打开失败" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to Open E-book"
+          }
+        }
+      }
+    },
+    "重试" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Again"
+          }
+        }
+      }
+    },
+    "电子书处理中" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing E-book"
+          }
+        }
+      }
+    },
+    "电子书格式转换" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-book Conversion"
+          }
+        }
+      }
+    },
+    "双向互转" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert Both Ways"
+          }
+        }
+      }
+    },
+    "支持从 iCloud Drive 或本地目录选择 EPUB、TXT 文件" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose EPUB or TXT files from iCloud Drive or local folders."
+          }
+        }
+      }
+    },
+    "选择导出文件" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Files to Export"
+          }
+        }
+      }
+    },
+    "先勾选要导出的电子书结果，再选择保存到文件夹或传输。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the e-book results you want to export, then save them to a folder or transfer them."
+          }
+        }
+      }
+    },
+    "当前版本暂不支持打开该电子书格式" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This version can't open that e-book format yet."
+          }
+        }
+      }
+    },
+    "无法读取该 EPUB 文件" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to read this EPUB file."
+          }
+        }
+      }
+    },
+    "当前 EPUB 文件暂时无法打开" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This EPUB file can't be opened right now."
+          }
+        }
+      }
+    },
+    "将图片整理为可导出的文档内容" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn images into document content you can export"
+          }
+        }
+      }
+    },
+    "EPUB 文件结构无效" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The EPUB file structure is invalid."
+          }
+        }
+      }
+    },
+    "未找到 EPUB 内容清单" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The EPUB manifest couldn't be found."
+          }
+        }
+      }
+    },
+    "未找到 EPUB 包信息" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The EPUB package information couldn't be found."
+          }
+        }
+      }
+    },
+    "未找到 EPUB 阅读顺序" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The EPUB reading order couldn't be found."
+          }
+        }
+      }
+    },
+    "电子书内容为空或暂不支持解析" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The e-book is empty or can't be parsed yet."
+          }
+        }
+      }
+    },
+    "EPUB 文件读取失败" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to read the EPUB file."
+          }
+        }
+      }
+    },
+    "当前版本暂不支持解析该电子书格式" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This version doesn't support parsing that e-book format yet."
+          }
+        }
+      }
+    },
+    "当前版本暂不支持导出为该电子书格式" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This version doesn't support exporting to that e-book format yet."
+          }
+        }
+      }
+    },
     "目标格式" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4395,6 +4890,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel Download"
+          }
+        }
+      }
+    },
+    "确认从书架移除 %@？" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %1$@ from your bookshelf?"
           }
         }
       }
