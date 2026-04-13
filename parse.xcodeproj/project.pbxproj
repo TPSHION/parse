@@ -391,7 +391,6 @@
 				DEVELOPMENT_TEAM = 4B7HL75P84;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ParseLab;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
@@ -444,7 +443,6 @@
 				DEVELOPMENT_TEAM = 4B7HL75P84;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ParseLab;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;

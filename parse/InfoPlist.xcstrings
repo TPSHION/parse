@@ -1,0 +1,57 @@
+{
+  "sourceLanguage" : "zh-Hans",
+  "strings" : {
+    "NSLocalNetworkUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local network access lets ParseLab start local transfer so other devices on your Wi-Fi can open shared files."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要访问本地网络，才能开启局域网传输并让其他设备访问共享文件。"
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryAddUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo Library Add access lets ParseLab save converted images, videos, and GIFs to Photos. This action doesn't read your existing library."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要“添加到照片”权限，才能将转换后的图片、视频或 GIF 保存到系统相册中。我们不会主动读取您现有的照片或视频。"
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo Library access lets ParseLab show your photos and videos during local transfer and let paired devices download the originals."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要读取照片库内容，才能在局域网网页中展示图片和视频列表，并支持从手机相册下载原文件。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

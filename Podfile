@@ -70,7 +70,6 @@ post_install do |installer|
   project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
       config.build_settings['SWIFT_ENABLE_EXPLICIT_MODULES'] = 'NO'
     end
   end
