@@ -5,7 +5,8 @@ platform :ios, '18.6'
 target 'parse' do
   use_frameworks!
 
-  pod 'ffmpeg-kit-ios-full', :podspec => 'https://raw.githubusercontent.com/luthviar/ffmpeg-kit-ios-full/main/ffmpeg-kit-ios-full.podspec'
+  # Pinned to an LGPL-licensed community-maintained podspec to avoid GPL-enabled forks.
+  pod 'ffmpeg-kit-ios-full', :podspec => 'Vendor/ffmpeg-kit-ios-full-lgpl.podspec.json'
   pod 'GCDWebServer/WebUploader', '~> 3.0'
   pod 'ZIPFoundation', '~> 0.9.20'
 end

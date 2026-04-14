@@ -123,6 +123,7 @@
 		009715B36234790114B815EF2FB0BF36 /* GCDWebServer-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "GCDWebServer-dummy.m"; sourceTree = "<group>"; };
 		02B856259CCF030B87B6340D22D2E8BD /* ZIPFoundation.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = ZIPFoundation.debug.xcconfig; sourceTree = "<group>"; };
 		02C4405450A0B17CCCA59DC91AA09BA9 /* FileManager+ZIP.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "FileManager+ZIP.swift"; path = "Sources/ZIPFoundation/FileManager+ZIP.swift"; sourceTree = "<group>"; };
+		03249348B7E904FA3EFB6F81625258D8 /* libavfilter.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = libavfilter.xcframework; sourceTree = "<group>"; };
 		08E8339251335CFC2D0070994E3ACC5E /* Archive.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Archive.swift; path = Sources/ZIPFoundation/Archive.swift; sourceTree = "<group>"; };
 		0BB8D4D173E426D96D8122990B9567D2 /* GCDWebServerPrivate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerPrivate.h; path = GCDWebServer/Core/GCDWebServerPrivate.h; sourceTree = "<group>"; };
 		0D3BA434B2232A429FEE4EDA21B09280 /* Pods-parse-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-parse-Info.plist"; sourceTree = "<group>"; };
@@ -143,7 +144,6 @@
 		2E79987E577B44366B568C70621B0327 /* GCDWebServer-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "GCDWebServer-umbrella.h"; sourceTree = "<group>"; };
 		31E0BB0A2D3A0AD10ACFC5577988BEF4 /* Archive+ZIP64.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Archive+ZIP64.swift"; path = "Sources/ZIPFoundation/Archive+ZIP64.swift"; sourceTree = "<group>"; };
 		32E3DD2A255F836EE1DF34B1877041F5 /* GCDWebServerDataResponse.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerDataResponse.h; path = GCDWebServer/Responses/GCDWebServerDataResponse.h; sourceTree = "<group>"; };
-		34D309447C7E26FFBFCB9100892AED5A /* libavcodec.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = libavcodec.xcframework; path = "ffmpeg-kit-ios-full/libavcodec.xcframework"; sourceTree = "<group>"; };
 		3679D98BBB760E886C57C15E1328C531 /* Archive+Helpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Archive+Helpers.swift"; path = "Sources/ZIPFoundation/Archive+Helpers.swift"; sourceTree = "<group>"; };
 		385E48C63D025336F5075907E284D8D9 /* GCDWebServerErrorResponse.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerErrorResponse.m; path = GCDWebServer/Responses/GCDWebServerErrorResponse.m; sourceTree = "<group>"; };
 		38D35C32172EDFA35C010E339C99DC4E /* Pods-parse-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-parse-umbrella.h"; sourceTree = "<group>"; };
@@ -156,62 +156,62 @@
 		4E399C01C0BEAE23CC6F67DAC312690E /* GCDWebServerRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerRequest.m; path = GCDWebServer/Core/GCDWebServerRequest.m; sourceTree = "<group>"; };
 		4F27CC54AEDFEF7EE8389A91F6E7FA13 /* GCDWebServerResponse.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerResponse.m; path = GCDWebServer/Core/GCDWebServerResponse.m; sourceTree = "<group>"; };
 		50C3C7D7A2ED64AB0B9572012F6C4709 /* Entry+ZIP64.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Entry+ZIP64.swift"; path = "Sources/ZIPFoundation/Entry+ZIP64.swift"; sourceTree = "<group>"; };
+		533E6324B4FC5E0AEE87082D0F04A87F /* libswresample.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = libswresample.xcframework; sourceTree = "<group>"; };
 		5A81F479A3342289728B2BA1195B3A05 /* GCDWebServer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServer.m; path = GCDWebServer/Core/GCDWebServer.m; sourceTree = "<group>"; };
 		5F29CB00E73BABD6B8A388D4D0356438 /* ffmpeg-kit-ios-full-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "ffmpeg-kit-ios-full-xcframeworks.sh"; sourceTree = "<group>"; };
 		61DD209F085A5EDF24FD1AA1C46DD382 /* GCDWebServerDataResponse.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerDataResponse.m; path = GCDWebServer/Responses/GCDWebServerDataResponse.m; sourceTree = "<group>"; };
 		63B9E5D8F53F1163EA4BCF58D68080C3 /* ZIPFoundation-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "ZIPFoundation-prefix.pch"; sourceTree = "<group>"; };
 		66E810BC94CB50438DC6E1F19126E1F9 /* GCDWebServerMultiPartFormRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerMultiPartFormRequest.h; path = GCDWebServer/Requests/GCDWebServerMultiPartFormRequest.h; sourceTree = "<group>"; };
 		6A18F705B8C25021F83B5F7097D07A1A /* ZIPFoundation-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ZIPFoundation-Info.plist"; sourceTree = "<group>"; };
-		6DC6E136A525E1A962CB99D586F21079 /* libswscale.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = libswscale.xcframework; path = "ffmpeg-kit-ios-full/libswscale.xcframework"; sourceTree = "<group>"; };
 		7315172DF143AF5527455D4CC5D09768 /* Archive+MemoryFile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Archive+MemoryFile.swift"; path = "Sources/ZIPFoundation/Archive+MemoryFile.swift"; sourceTree = "<group>"; };
 		74CDB8703ABEB1189AF0235635183A58 /* GCDWebServerFunctions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerFunctions.m; path = GCDWebServer/Core/GCDWebServerFunctions.m; sourceTree = "<group>"; };
 		787F3D0773D066BC625A0E914BFC0556 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
 		793F43E33517E8E6D1DC33AC4D304628 /* GCDWebServerErrorResponse.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerErrorResponse.h; path = GCDWebServer/Responses/GCDWebServerErrorResponse.h; sourceTree = "<group>"; };
 		79ECCEB977B2E3C4B382E1C56C3CE596 /* GCDWebServerFunctions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerFunctions.h; path = GCDWebServer/Core/GCDWebServerFunctions.h; sourceTree = "<group>"; };
 		7E8FBE6B7A553E1C843EC2253E9E391C /* Archive+Deprecated.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Archive+Deprecated.swift"; path = "Sources/ZIPFoundation/Archive+Deprecated.swift"; sourceTree = "<group>"; };
+		88D26C06854DDC22183E965199175D72 /* ffmpegkit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = ffmpegkit.xcframework; sourceTree = "<group>"; };
 		8B8BFCD16DCC86CA9146351007C6AD87 /* Entry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Entry.swift; path = Sources/ZIPFoundation/Entry.swift; sourceTree = "<group>"; };
 		910C86363F0270975D79AA08DAF89D81 /* GCDWebUploader.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = GCDWebUploader.bundle; path = GCDWebUploader/GCDWebUploader.bundle; sourceTree = "<group>"; };
 		91A6BD665F4D6F7B881BC50A25AC35CA /* Data+Serialization.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Data+Serialization.swift"; path = "Sources/ZIPFoundation/Data+Serialization.swift"; sourceTree = "<group>"; };
 		91B174EB933C18CA20026F93239B0B85 /* Archive+Writing.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Archive+Writing.swift"; path = "Sources/ZIPFoundation/Archive+Writing.swift"; sourceTree = "<group>"; };
 		9A37FC82139DEAD67C7074688018DFB6 /* GCDWebServerStreamedResponse.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerStreamedResponse.h; path = GCDWebServer/Responses/GCDWebServerStreamedResponse.h; sourceTree = "<group>"; };
 		9A424A08162284EB03C1629E49C1E134 /* GCDWebUploader.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebUploader.m; path = GCDWebUploader/GCDWebUploader.m; sourceTree = "<group>"; };
+		9D39A147CC04C0300708391FA753AC1A /* libavcodec.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = libavcodec.xcframework; sourceTree = "<group>"; };
 		9D59ED349B38B02B917C2DFA09A1FEEE /* Pods-parse.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-parse.modulemap"; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9E82735A0DBA1110A573E78ACBE8D332 /* GCDWebServerResponse.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerResponse.h; path = GCDWebServer/Core/GCDWebServerResponse.h; sourceTree = "<group>"; };
+		A4D01249EFFCAD039D6776DBD5EF5B18 /* libavformat.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = libavformat.xcframework; sourceTree = "<group>"; };
 		A5C42FC84F9BABB3F9663B6E7B39ECEC /* GCDWebServer.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = GCDWebServer.modulemap; sourceTree = "<group>"; };
 		A7274EFCD43E7E3F3E5134710D60497F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Sources/ZIPFoundation/Resources/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		A7D3828FB7B6F91394DC8509FD0C7218 /* libavformat.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = libavformat.xcframework; path = "ffmpeg-kit-ios-full/libavformat.xcframework"; sourceTree = "<group>"; };
 		A7FAC84D85923234D6AD35944E3DF84D /* GCDWebServer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GCDWebServer.debug.xcconfig; sourceTree = "<group>"; };
 		A8AC142787269B4D7DB0FC2568750B0E /* GCDWebServerRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerRequest.h; path = GCDWebServer/Core/GCDWebServerRequest.h; sourceTree = "<group>"; };
-		A9EA948B410A7B49D380ED698F8EB80F /* libavfilter.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = libavfilter.xcframework; path = "ffmpeg-kit-ios-full/libavfilter.xcframework"; sourceTree = "<group>"; };
 		AC45E7524341B651F7B00597C13164BD /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/CFNetwork.framework; sourceTree = DEVELOPER_DIR; };
 		AC4896DE3B1B2B8F5BAC8479FF5122FF /* Pods-parse-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-parse-acknowledgements.plist"; sourceTree = "<group>"; };
+		B19A6F25B5F83B76178A125DB468F3FB /* libavutil.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = libavutil.xcframework; sourceTree = "<group>"; };
 		B40CE84176DA856F541D85CDF388FC38 /* URL+ZIP.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "URL+ZIP.swift"; path = "Sources/ZIPFoundation/URL+ZIP.swift"; sourceTree = "<group>"; };
 		B68C1052A3B51DBCF7D960F898AAFA95 /* GCDWebServer */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = GCDWebServer; path = GCDWebServer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6C09C628069058879E73B6F9F6A425B /* Date+ZIP.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Date+ZIP.swift"; path = "Sources/ZIPFoundation/Date+ZIP.swift"; sourceTree = "<group>"; };
 		B96590621FFEE2E36DEAAEBD363B5EF6 /* ZIPFoundation.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = ZIPFoundation.modulemap; sourceTree = "<group>"; };
-		BD9ABB9A3069C644DE2E1D474729A857 /* libswresample.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = libswresample.xcframework; path = "ffmpeg-kit-ios-full/libswresample.xcframework"; sourceTree = "<group>"; };
 		BE600BF3A9006548A678BA55CD2B374D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		BE7DE6086B26CD33410435EF4910C111 /* GCDWebServerFileResponse.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerFileResponse.h; path = GCDWebServer/Responses/GCDWebServerFileResponse.h; sourceTree = "<group>"; };
 		BEFE170CE31D0FAAE0471FF91D12513B /* GCDWebServerFileRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerFileRequest.h; path = GCDWebServer/Requests/GCDWebServerFileRequest.h; sourceTree = "<group>"; };
 		C1F6B74D87DC1CDAFE4D136D00E195CB /* ffmpeg-kit-ios-full.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "ffmpeg-kit-ios-full.release.xcconfig"; sourceTree = "<group>"; };
-		C521C05BF67EA6E45D15DB48FB528675 /* libavdevice.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = libavdevice.xcframework; path = "ffmpeg-kit-ios-full/libavdevice.xcframework"; sourceTree = "<group>"; };
+		C329CAF8B297F8A054A67E2D8EF1FBD9 /* libavdevice.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = libavdevice.xcframework; sourceTree = "<group>"; };
 		C62DC389CB9A819F44EA2DA2B9493551 /* GCDWebServerMultiPartFormRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerMultiPartFormRequest.m; path = GCDWebServer/Requests/GCDWebServerMultiPartFormRequest.m; sourceTree = "<group>"; };
 		C99BDE67764F77355BF99A5240055939 /* Archive+BackingConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Archive+BackingConfiguration.swift"; path = "Sources/ZIPFoundation/Archive+BackingConfiguration.swift"; sourceTree = "<group>"; };
 		CA4A114775B98CEA4A566C18123B145F /* ZIPFoundation-ZIPFoundation_Privacy */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "ZIPFoundation-ZIPFoundation_Privacy"; path = ZIPFoundation_Privacy.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0EE95A8024CE7DE6926E353C175A814 /* Pods-parse-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-parse-acknowledgements.markdown"; sourceTree = "<group>"; };
 		D3225305AC0F3C7A4C3982EE5888A8D1 /* GCDWebServerFileRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerFileRequest.m; path = GCDWebServer/Requests/GCDWebServerFileRequest.m; sourceTree = "<group>"; };
+		D507A863D2BCF8FCB9E56A0ADD485F5F /* libswscale.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = libswscale.xcframework; sourceTree = "<group>"; };
 		DC9D95D3F3A2BF6B7424ECE7456B9B6A /* GCDWebServerURLEncodedFormRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerURLEncodedFormRequest.m; path = GCDWebServer/Requests/GCDWebServerURLEncodedFormRequest.m; sourceTree = "<group>"; };
 		DF5201A5533F5240439BDB4A9A047A3A /* GCDWebServer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServer.h; path = GCDWebServer/Core/GCDWebServer.h; sourceTree = "<group>"; };
 		E939801D4215E80E9AB27CBF00B4D4FE /* ZIPFoundation-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "ZIPFoundation-umbrella.h"; sourceTree = "<group>"; };
 		E96B6306DB89082C6F4B1B05D6599D66 /* Pods-parse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-parse.debug.xcconfig"; sourceTree = "<group>"; };
 		EB5EC1AFF0DCA131B9B542BAFC613A66 /* GCDWebServerConnection.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerConnection.h; path = GCDWebServer/Core/GCDWebServerConnection.h; sourceTree = "<group>"; };
-		EB9FD221761F740D3BA85921D42B37E2 /* libavutil.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = libavutil.xcframework; path = "ffmpeg-kit-ios-full/libavutil.xcframework"; sourceTree = "<group>"; };
 		EE19EB9AED30187A514CE077CD2BC2BE /* GCDWebServerURLEncodedFormRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDWebServerURLEncodedFormRequest.h; path = GCDWebServer/Requests/GCDWebServerURLEncodedFormRequest.h; sourceTree = "<group>"; };
 		F1387C04A7D99F91A176D4A26FEDEDA7 /* ZIPFoundation.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = ZIPFoundation.release.xcconfig; sourceTree = "<group>"; };
 		F24C43E1BECCB595D6972D738156C585 /* GCDWebServerStreamedResponse.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerStreamedResponse.m; path = GCDWebServer/Responses/GCDWebServerStreamedResponse.m; sourceTree = "<group>"; };
 		F46E581552A15ACDBE45D6347BB98702 /* Archive+WritingDeprecated.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Archive+WritingDeprecated.swift"; path = "Sources/ZIPFoundation/Archive+WritingDeprecated.swift"; sourceTree = "<group>"; };
-		F49C8C0466B9F09A9183CCCDEB2E90DE /* ffmpegkit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = ffmpegkit.xcframework; path = "ffmpeg-kit-ios-full/ffmpegkit.xcframework"; sourceTree = "<group>"; };
 		F95815F496CB21A2F779B7448DA70FC1 /* Pods-parse */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-parse"; path = Pods_parse.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD2CC399DB6317A7C80A57C6627EE543 /* GCDWebServer-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "GCDWebServer-prefix.pch"; sourceTree = "<group>"; };
 		FF2BC74293001B0D2EDB138D84276816 /* GCDWebServerFileResponse.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerFileResponse.m; path = GCDWebServer/Responses/GCDWebServerFileResponse.m; sourceTree = "<group>"; };
@@ -296,7 +296,7 @@
 		166CBEF9F9587F767850531EC0CF03FF /* ffmpeg-kit-ios-full */ = {
 			isa = PBXGroup;
 			children = (
-				D0EB034C174351C1EEEF9D7312A73076 /* Frameworks */,
+				ADA6C1791B1393032E957DF7A015D421 /* Frameworks */,
 				7DE5635900D558213222201BC611A106 /* Support Files */,
 			);
 			name = "ffmpeg-kit-ios-full";
@@ -421,6 +421,21 @@
 			name = Core;
 			sourceTree = "<group>";
 		};
+		ADA6C1791B1393032E957DF7A015D421 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				88D26C06854DDC22183E965199175D72 /* ffmpegkit.xcframework */,
+				9D39A147CC04C0300708391FA753AC1A /* libavcodec.xcframework */,
+				C329CAF8B297F8A054A67E2D8EF1FBD9 /* libavdevice.xcframework */,
+				03249348B7E904FA3EFB6F81625258D8 /* libavfilter.xcframework */,
+				A4D01249EFFCAD039D6776DBD5EF5B18 /* libavformat.xcframework */,
+				B19A6F25B5F83B76178A125DB468F3FB /* libavutil.xcframework */,
+				533E6324B4FC5E0AEE87082D0F04A87F /* libswresample.xcframework */,
+				D507A863D2BCF8FCB9E56A0ADD485F5F /* libswscale.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B0AEE18C3A0457D1688C2111E12FB613 /* GCDWebServer */ = {
 			isa = PBXGroup;
 			children = (
@@ -466,21 +481,6 @@
 				5D778905D41D04AC252BF064F5A1BE8E /* Products */,
 				94EAF9471A2B99F016CEF62DAFF252D8 /* Targets Support Files */,
 			);
-			sourceTree = "<group>";
-		};
-		D0EB034C174351C1EEEF9D7312A73076 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				F49C8C0466B9F09A9183CCCDEB2E90DE /* ffmpegkit.xcframework */,
-				34D309447C7E26FFBFCB9100892AED5A /* libavcodec.xcframework */,
-				C521C05BF67EA6E45D15DB48FB528675 /* libavdevice.xcframework */,
-				A9EA948B410A7B49D380ED698F8EB80F /* libavfilter.xcframework */,
-				A7D3828FB7B6F91394DC8509FD0C7218 /* libavformat.xcframework */,
-				EB9FD221761F740D3BA85921D42B37E2 /* libavutil.xcframework */,
-				BD9ABB9A3069C644DE2E1D474729A857 /* libswresample.xcframework */,
-				6DC6E136A525E1A962CB99D586F21079 /* libswscale.xcframework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		D3FBFDC2F998AB5FF9D3B4D28E4EC9C6 /* Support Files */ = {
@@ -883,24 +883,6 @@
 			};
 			name = Debug;
 		};
-		5A898E3782C283491E318FF0826672EA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4E06E9E4DCE212E9ABA2A649943E45B5 /* ffmpeg-kit-ios-full.debug.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
 		759134B47A5B0DFD765EF7B8456937A1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E96B6306DB89082C6F4B1B05D6599D66 /* Pods-parse.debug.xcconfig */;
@@ -958,6 +940,25 @@
 			};
 			name = Debug;
 		};
+		8514640CC85D67638A6966692E92B5F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C1F6B74D87DC1CDAFE4D136D00E195CB /* ffmpeg-kit-ios-full.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		94A897A21114C51546BF7E0685FAFAD0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F1387C04A7D99F91A176D4A26FEDEDA7 /* ZIPFoundation.release.xcconfig */;
@@ -976,9 +977,9 @@
 			};
 			name = Release;
 		};
-		A8FC7CD52F0E3A06919C9D7DC65735DB /* Release */ = {
+		B98E98EB80C534EF6BA2C203E3827BD0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C1F6B74D87DC1CDAFE4D136D00E195CB /* ffmpeg-kit-ios-full.release.xcconfig */;
+			baseConfigurationReference = 4E06E9E4DCE212E9ABA2A649943E45B5 /* ffmpeg-kit-ios-full.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -991,9 +992,8 @@
 				);
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
 			};
-			name = Release;
+			name = Debug;
 		};
 		BC5A9E366622BBEC241FA7FF31E0F8B7 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -1291,8 +1291,8 @@
 		DC4CE20616D7E3EDCD792A0C679CB3F2 /* Build configuration list for PBXAggregateTarget "ffmpeg-kit-ios-full" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5A898E3782C283491E318FF0826672EA /* Debug */,
-				A8FC7CD52F0E3A06919C9D7DC65735DB /* Release */,
+				B98E98EB80C534EF6BA2C203E3827BD0 /* Debug */,
+				8514640CC85D67638A6966692E92B5F2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

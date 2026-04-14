@@ -6,7 +6,7 @@ PODS:
   - ZIPFoundation (0.9.20)
 
 DEPENDENCIES:
-  - ffmpeg-kit-ios-full (from `https://raw.githubusercontent.com/luthviar/ffmpeg-kit-ios-full/main/ffmpeg-kit-ios-full.podspec`)
+  - ffmpeg-kit-ios-full (from `Vendor/ffmpeg-kit-ios-full-lgpl.podspec.json`)
   - GCDWebServer/WebUploader (~> 3.0)
   - ZIPFoundation (~> 0.9.20)
 
@@ -17,13 +17,13 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   ffmpeg-kit-ios-full:
-    :podspec: https://raw.githubusercontent.com/luthviar/ffmpeg-kit-ios-full/main/ffmpeg-kit-ios-full.podspec
+    :podspec: Vendor/ffmpeg-kit-ios-full-lgpl.podspec.json
 
 SPEC CHECKSUMS:
-  ffmpeg-kit-ios-full: 2da77324b0e9fb007195ab6661f64be4cf31dc12
+  ffmpeg-kit-ios-full: 7d20651683c9c1e4e183e69af1984d785983ca51
   GCDWebServer: 2c156a56c8226e2d5c0c3f208a3621ccffbe3ce4
   ZIPFoundation: dfd3d681c4053ff7e2f7350bc4e53b5dba3f5351
 
-PODFILE CHECKSUM: fa1ff99419ed95918187c71a0ab42c8e359f1da3
+PODFILE CHECKSUM: 9b971b3690c5c20db2a190e5d9b10516b25a62f8
 
 COCOAPODS: 1.16.2

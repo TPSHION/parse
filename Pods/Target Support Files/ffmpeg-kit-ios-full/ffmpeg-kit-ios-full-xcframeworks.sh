@@ -249,12 +249,12 @@ install_xcframework() {
   echo "Copied $source to $destination"
 }
 
-install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/ffmpeg-kit-ios-full/ffmpegkit.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
-install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/ffmpeg-kit-ios-full/libavcodec.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
-install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/ffmpeg-kit-ios-full/libavdevice.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
-install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/ffmpeg-kit-ios-full/libavfilter.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
-install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/ffmpeg-kit-ios-full/libavformat.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
-install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/ffmpeg-kit-ios-full/libavutil.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
-install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/ffmpeg-kit-ios-full/libswresample.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
-install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/ffmpeg-kit-ios-full/libswscale.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/ffmpegkit.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/libavcodec.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/libavdevice.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/libavfilter.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/libavformat.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/libavutil.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/libswresample.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
+install_xcframework "${PODS_ROOT}/ffmpeg-kit-ios-full/libswscale.xcframework" "ffmpeg-kit-ios-full" "framework" "ios-arm64" "ios-arm64_x86_64-maccatalyst" "ios-arm64_x86_64-simulator"
 
