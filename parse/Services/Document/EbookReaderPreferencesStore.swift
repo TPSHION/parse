@@ -1,5 +1,4 @@
 import Foundation
-import ReadiumShared
 
 struct TXTReaderProgress: Codable, Equatable {
     var chapterIndex: Int
@@ -23,7 +22,6 @@ struct ReaderStyleSettings: Equatable {
 }
 
 enum EbookReaderPreferencesStore {
-    private static let locatorPrefix = "ebook.reader.locator."
     private static let txtProgressPrefix = "ebook.reader.txtProgress."
     private static let fontSizeKey = "ebook.reader.fontSize"
     private static let letterSpacingKey = "ebook.reader.letterSpacing"
@@ -48,17 +46,6 @@ enum EbookReaderPreferencesStore {
         defaults.set(settings.lineHeight, forKey: lineHeightKey)
         defaults.set(settings.isScrollEnabled, forKey: scrollModeKey)
         defaults.set(settings.themeRawValue, forKey: themeKey)
-    }
-
-    static func loadLocator(for itemID: UUID) -> Locator? {
-        guard let jsonString = UserDefaults.standard.string(forKey: locatorPrefix + itemID.uuidString) else {
-            return nil
-        }
-        return try? Locator(jsonString: jsonString)
-    }
-
-    static func saveLocator(_ locator: Locator, for itemID: UUID) {
-        UserDefaults.standard.set(locator.jsonString, forKey: locatorPrefix + itemID.uuidString)
     }
 
     static func loadTXTProgress(for itemID: UUID) -> TXTReaderProgress? {

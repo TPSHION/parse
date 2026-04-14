@@ -1,6 +1,0 @@
-framework module ReadiumFuzi {
-  umbrella header "ReadiumFuzi-umbrella.h"
-
-  export *
-  module * { export * }
-}

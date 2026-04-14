@@ -1,6 +1,0 @@
-framework module ReadiumInternal {
-  umbrella header "ReadiumInternal-umbrella.h"
-
-  export *
-  module * { export * }
-}

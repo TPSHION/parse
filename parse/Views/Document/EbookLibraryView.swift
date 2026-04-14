@@ -8,8 +8,7 @@ struct EbookLibraryView: View {
     @State private var isDownloadSheetPresented = false
     @State private var isImportPickerPresented = false
     @State private var isFormatConversionPresented = false
-    @State private var selectedEPUBReaderItem: EbookLibraryItem?
-    @State private var selectedTXTReaderItem: EbookLibraryItem?
+    @State private var selectedReaderItem: EbookLibraryItem?
     @State private var pendingDeletion: EbookLibraryItem?
     @State private var showAlert = false
     @State private var alertMessage: String?
@@ -74,10 +73,7 @@ struct EbookLibraryView: View {
             }
             .presentationBackground(AppColors.background)
         }
-        .navigationDestination(item: $selectedEPUBReaderItem) { item in
-            EPUBReadiumReaderView(item: item)
-        }
-        .navigationDestination(item: $selectedTXTReaderItem) { item in
+        .navigationDestination(item: $selectedReaderItem) { item in
             TXTEbookReaderView(item: item)
         }
         .navigationDestination(isPresented: $isFormatConversionPresented) {
@@ -181,12 +177,7 @@ struct EbookLibraryView: View {
     }
 
     private func openReader(for item: EbookLibraryItem) {
-        switch item.sourceFormat {
-        case .epub:
-            selectedEPUBReaderItem = item
-        case .txt:
-            selectedTXTReaderItem = item
-        }
+        selectedReaderItem = item
     }
 }
 
@@ -1100,6 +1091,11 @@ nonisolated private struct CachedTXTBookParsingState: Codable {
     let didHandleLeadingContent: Bool
 }
 
+nonisolated private struct TXTReaderPayload {
+    let title: String
+    let text: String
+}
+
 private enum TXTReaderService {
     nonisolated private static let parsingChunkChapterCount = 24
     nonisolated private static let libraryFolderName = "EbookLibrary"
@@ -1125,12 +1121,12 @@ private enum TXTReaderService {
 
         let sourceSignature = try sourceSignature(for: url)
         if let snapshot = loadCachedSnapshot(for: item, signature: sourceSignature), !snapshot.isParsingComplete {
-            let payload = try readTextPayload(from: url)
+            let payload = try readTextPayload(from: url, item: item)
             let normalized = normalize(payload.text)
             let partialBook = makeBook(from: snapshot, item: item, loadChapterTexts: true)
             var state = makeParsingState(from: snapshot, normalizedText: normalized)
             let resumedBook = try parseEntireBook(
-                title: item.title,
+                title: payload.title,
                 initialBook: partialBook,
                 state: &state,
                 item: item,
@@ -1141,7 +1137,7 @@ private enum TXTReaderService {
             return resumedBook
         }
 
-        let payload = try readTextPayload(from: url)
+        let payload = try readTextPayload(from: url, item: item)
         let normalized = normalize(payload.text)
         let contentRange = trimmedContentRange(in: normalized)
         guard contentRange.length > 0 else {
@@ -1156,9 +1152,9 @@ private enum TXTReaderService {
             didHandleLeadingContent: false
         )
         let book = try parseEntireBook(
-            title: item.title,
+            title: payload.title,
             initialBook: TXTBookContent(
-                title: item.title,
+                title: payload.title,
                 chapters: [],
                 isParsingComplete: false
             ),
@@ -1204,27 +1200,36 @@ private enum TXTReaderService {
         return book
     }
 
-    nonisolated private static func readTextPayload(from url: URL) throws -> (text: String, byteCount: Int) {
-        let data = try Data(contentsOf: url, options: [.mappedIfSafe])
-        let encodings: [String.Encoding] = [
-            .utf8,
-            .unicode,
-            .utf16,
-            .utf16LittleEndian,
-            .utf16BigEndian,
-            .utf32,
-            .ascii,
-            .init(rawValue: CFStringConvertEncodingToNSStringEncoding(CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue))),
-            .init(rawValue: CFStringConvertEncodingToNSStringEncoding(CFStringEncoding(CFStringEncodings.GB_2312_80.rawValue)))
-        ]
+    nonisolated private static func readTextPayload(from url: URL, item: EbookLibraryItem) throws -> TXTReaderPayload {
+        switch item.sourceFormat {
+        case .epub:
+            let content = try EPUBConversionService.extractContent(from: url)
+            let title = content.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? item.title
+                : content.title
+            return TXTReaderPayload(title: title, text: content.plainText)
+        case .txt:
+            let data = try Data(contentsOf: url, options: [.mappedIfSafe])
+            let encodings: [String.Encoding] = [
+                .utf8,
+                .unicode,
+                .utf16,
+                .utf16LittleEndian,
+                .utf16BigEndian,
+                .utf32,
+                .ascii,
+                .init(rawValue: CFStringConvertEncodingToNSStringEncoding(CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue))),
+                .init(rawValue: CFStringConvertEncodingToNSStringEncoding(CFStringEncoding(CFStringEncodings.GB_2312_80.rawValue)))
+            ]
 
-        for encoding in encodings {
-            if let text = String(data: data, encoding: encoding) {
-                return (text, data.count)
+            for encoding in encodings {
+                if let text = String(data: data, encoding: encoding) {
+                    return TXTReaderPayload(title: item.title, text: text)
+                }
             }
-        }
 
-        throw TXTReaderError.unreadableFile
+            throw TXTReaderError.unreadableFile
+        }
     }
 
     nonisolated private static func normalize(_ text: String) -> String {

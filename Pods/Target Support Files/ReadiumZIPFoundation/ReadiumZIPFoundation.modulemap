@@ -1,6 +1,0 @@
-framework module ReadiumZIPFoundation {
-  umbrella header "ReadiumZIPFoundation-umbrella.h"
-
-  export *
-  module * { export * }
-}
