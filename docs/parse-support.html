@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ParseLab Support</title>
+  <meta name="description" content="ParseLab product support page with bilingual language switching, product overview, and support links.">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fa;
+      --surface: rgba(255, 255, 255, 0.86);
+      --surface-strong: rgba(255, 255, 255, 0.94);
+      --text: #122033;
+      --muted: #66758a;
+      --line: rgba(18, 32, 51, 0.1);
+      --accent: #1565ff;
+      --accent-soft: rgba(21, 101, 255, 0.1);
+      --accent-2: #11b492;
+      --dark: #0a1522;
+      --shadow: 0 18px 50px rgba(8, 19, 31, 0.08);
+      --shadow-soft: 0 12px 28px rgba(8, 19, 31, 0.06);
+      --max-width: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(21, 101, 255, 0.14), transparent 22%),
+        radial-gradient(circle at top right, rgba(17, 180, 146, 0.1), transparent 18%),
+        linear-gradient(180deg, #f9fbff 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page-shell {
+      padding: 16px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(21, 101, 255, 0.18), transparent 24%),
+        radial-gradient(circle at 82% 18%, rgba(17, 180, 146, 0.14), transparent 22%),
+        linear-gradient(135deg, #091421 0%, #10233b 48%, #173d63 100%);
+      color: #f7faff;
+      box-shadow: 0 24px 80px rgba(8, 19, 31, 0.12);
+    }
+
+    .hero-inner,
+    .main,
+    .footer {
+      width: min(var(--max-width), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero-inner {
+      position: relative;
+      padding: 24px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 54px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.06)),
+        linear-gradient(135deg, #1565ff, #11b492);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      position: relative;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+    }
+
+    .brand-name {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      display: block;
+      color: rgba(247, 250, 255, 0.72);
+      font-size: 13px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .lang-switcher {
+      display: inline-flex;
+      gap: 6px;
+      padding: 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+    }
+
+    .lang-button {
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(247, 250, 255, 0.72);
+      padding: 8px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .lang-button.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .hero-copy {
+      max-width: 760px;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(247, 250, 255, 0.86);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-label::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      box-shadow: 0 0 18px rgba(17, 180, 146, 0.8);
+    }
+
+    h1 {
+      margin: 18px 0 16px;
+      font-size: clamp(54px, 8vw, 92px);
+      line-height: 0.92;
+      letter-spacing: -0.07em;
+      font-weight: 900;
+    }
+
+    .hero-subtitle {
+      max-width: 620px;
+      margin: 0;
+      color: rgba(247, 250, 255, 0.78);
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.58;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 26px 0 22px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(247, 250, 255, 0.84);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 20px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 800;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button-primary {
+      background: #ffffff;
+      color: #0b1521;
+      box-shadow: 0 16px 30px rgba(255, 255, 255, 0.12);
+    }
+
+    .button-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+    }
+
+    .main {
+      padding: 54px 0 20px;
+    }
+
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .section-head {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 22px;
+      max-width: 720px;
+    }
+
+    .section-kicker {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 56px);
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+    }
+
+    .section-summary {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card,
+    .support-panel {
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+      box-shadow: var(--shadow);
+    }
+
+    .feature-card {
+      padding: 24px;
+    }
+
+    .feature-card strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .privacy-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      padding: 22px;
+      border-radius: 30px;
+      background:
+        radial-gradient(circle at top right, rgba(21, 101, 255, 0.12), transparent 22%),
+        linear-gradient(145deg, #0a1522 0%, #102339 100%);
+      color: #f7faff;
+      box-shadow: 0 22px 70px rgba(8, 19, 31, 0.12);
+    }
+
+    .privacy-item {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .privacy-item strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 17px;
+    }
+
+    .privacy-item p {
+      margin: 0;
+      color: rgba(247, 250, 255, 0.72);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .support-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(280px, 0.78fr);
+      gap: 24px;
+      padding: 28px;
+    }
+
+    .support-copy p {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.72;
+      max-width: 460px;
+    }
+
+    .support-links {
+      display: grid;
+      gap: 12px;
+    }
+
+    .support-link {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 16px 18px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .support-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(21, 101, 255, 0.2);
+    }
+
+    .support-link strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+
+    .support-link span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .support-link em {
+      font-style: normal;
+      color: var(--accent);
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0 40px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    [data-copy] {
+      display: none;
+    }
+
+    html[data-lang="zh"] [data-lang="zh"] {
+      display: block;
+    }
+
+    html[data-lang="en"] [data-lang="en"] {
+      display: block;
+    }
+
+    html[data-lang="zh"] span[data-lang="zh"],
+    html[data-lang="en"] span[data-lang="en"],
+    html[data-lang="zh"] a[data-lang="zh"],
+    html[data-lang="en"] a[data-lang="en"] {
+      display: inline;
+    }
+
+    html[data-lang="zh"] .button span[data-lang="zh"],
+    html[data-lang="en"] .button span[data-lang="en"],
+    html[data-lang="zh"] .nav-link span[data-lang="zh"],
+    html[data-lang="en"] .nav-link span[data-lang="en"],
+    html[data-lang="zh"] .hero-tag span[data-lang="zh"],
+    html[data-lang="en"] .hero-tag span[data-lang="en"] {
+      display: inline;
+    }
+
+    html[data-lang="zh"] .brand-sub span[data-lang="zh"],
+    html[data-lang="en"] .brand-sub span[data-lang="en"],
+    html[data-lang="zh"] .support-link span[data-lang="zh"],
+    html[data-lang="en"] .support-link span[data-lang="en"] {
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .feature-grid,
+      .privacy-strip,
+      .support-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page-shell {
+        padding: 10px;
+      }
+
+      .hero {
+        border-radius: 24px;
+      }
+
+      .hero-inner,
+      .main,
+      .footer {
+        width: min(var(--max-width), calc(100% - 24px));
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 40px;
+      }
+
+      .topbar-actions,
+      .hero-actions {
+        width: 100%;
+      }
+
+      .nav-link,
+      .button {
+        width: 100%;
+      }
+
+      .footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <section class="hero">
+      <div class="hero-inner">
+        <header class="topbar">
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true"></div>
+            <div>
+              <span class="brand-name">ParseLab</span>
+              <span class="brand-sub">
+                <span data-copy data-lang="zh">本地优先的文件处理工具</span>
+                <span data-copy data-lang="en">Local-first file workflows</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="topbar-actions">
+            <div class="lang-switcher" aria-label="Language switcher">
+              <button class="lang-button active" type="button" data-switch="zh">中文</button>
+              <button class="lang-button" type="button" data-switch="en">English</button>
+            </div>
+            <a class="nav-link" href="#support">
+              <span data-copy data-lang="zh">支持</span>
+              <span data-copy data-lang="en">Support</span>
+            </a>
+          </div>
+        </header>
+
+        <div class="hero-copy">
+          <div class="hero-label">
+            <span data-copy data-lang="zh">Private · Local-first · Simple</span>
+            <span data-copy data-lang="en">Private · Local-first · Simple</span>
+          </div>
+
+          <h1>
+            <span data-copy data-lang="zh">ParseLab</span>
+            <span data-copy data-lang="en">ParseLab</span>
+          </h1>
+
+          <p class="hero-subtitle">
+            <span data-copy data-lang="zh">一个更轻量的文件工具，用来转换、压缩、OCR、局域网传输，以及阅读 EPUB / TXT。</span>
+            <span data-copy data-lang="en">A lighter file toolkit for conversion, compression, OCR, local transfer, and EPUB / TXT reading.</span>
+          </p>
+
+          <div class="hero-tags">
+            <div class="hero-tag">
+              <span data-copy data-lang="zh">媒体转换</span>
+              <span data-copy data-lang="en">Media conversion</span>
+            </div>
+            <div class="hero-tag">
+              <span data-copy data-lang="zh">OCR</span>
+              <span data-copy data-lang="en">OCR</span>
+            </div>
+            <div class="hero-tag">
+              <span data-copy data-lang="zh">本地传输</span>
+              <span data-copy data-lang="en">Local transfer</span>
+            </div>
+            <div class="hero-tag">
+              <span data-copy data-lang="zh">EPUB / TXT</span>
+              <span data-copy data-lang="en">EPUB / TXT</span>
+            </div>
+          </div>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://github.com/TPSHION/parse" target="_blank" rel="noreferrer">
+              <span data-copy data-lang="zh">查看项目</span>
+              <span data-copy data-lang="en">View Project</span>
+            </a>
+            <a class="button button-secondary" href="https://github.com/TPSHION/parse/issues" target="_blank" rel="noreferrer">
+              <span data-copy data-lang="zh">反馈问题</span>
+              <span data-copy data-lang="en">Report an Issue</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="main">
+      <section class="section">
+        <div class="section-head">
+          <div class="section-kicker">
+            <span data-copy data-lang="zh">Product</span>
+            <span data-copy data-lang="en">Product</span>
+          </div>
+          <h2>
+            <span data-copy data-lang="zh">把常用能力放在一起。</span>
+            <span data-copy data-lang="en">Put common workflows in one place.</span>
+          </h2>
+          <p class="section-summary">
+            <span data-copy data-lang="zh">减少切换，保留重点，只展示真正需要知道的信息。</span>
+            <span data-copy data-lang="en">Less switching, fewer distractions, and only the information people actually need.</span>
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <strong>
+              <span data-copy data-lang="zh">转换与压缩</span>
+              <span data-copy data-lang="en">Convert and compress</span>
+            </strong>
+            <p>
+              <span data-copy data-lang="zh">统一处理图片、视频和音频，不必为不同格式切换工具。</span>
+              <span data-copy data-lang="en">Handle images, video, and audio without switching tools by format.</span>
+            </p>
+          </article>
+          <article class="feature-card">
+            <strong>
+              <span data-copy data-lang="zh">OCR 与文本</span>
+              <span data-copy data-lang="en">OCR and text</span>
+            </strong>
+            <p>
+              <span data-copy data-lang="zh">从图片中提取文字，便于复制、整理和继续使用。</span>
+              <span data-copy data-lang="en">Extract text from images so content stays usable and easy to organize.</span>
+            </p>
+          </article>
+          <article class="feature-card">
+            <strong>
+              <span data-copy data-lang="zh">轻阅读与传输</span>
+              <span data-copy data-lang="en">Reading and transfer</span>
+            </strong>
+            <p>
+              <span data-copy data-lang="zh">支持 EPUB / TXT 阅读，并通过局域网浏览器轻松传文件。</span>
+              <span data-copy data-lang="en">Read EPUB / TXT files and move content across devices with local browser transfer.</span>
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-kicker">
+            <span data-copy data-lang="zh">Privacy</span>
+            <span data-copy data-lang="en">Privacy</span>
+          </div>
+          <h2>
+            <span data-copy data-lang="zh">更注重本地处理。</span>
+            <span data-copy data-lang="en">Built around local processing.</span>
+          </h2>
+          <p class="section-summary">
+            <span data-copy data-lang="zh">产品说明保持简洁，但隐私方向很明确。</span>
+            <span data-copy data-lang="en">The page stays simple, but the privacy position stays clear.</span>
+          </p>
+        </div>
+
+        <div class="privacy-strip">
+          <div class="privacy-item">
+            <strong>
+              <span data-copy data-lang="zh">本地优先</span>
+              <span data-copy data-lang="en">Local-first</span>
+            </strong>
+            <p>
+              <span data-copy data-lang="zh">核心文件处理流程尽量在设备本地完成。</span>
+              <span data-copy data-lang="en">Core file workflows stay on device whenever possible.</span>
+            </p>
+          </div>
+          <div class="privacy-item">
+            <strong>
+              <span data-copy data-lang="zh">权限随功能使用</span>
+              <span data-copy data-lang="en">Permissions follow tasks</span>
+            </strong>
+            <p>
+              <span data-copy data-lang="zh">照片库、本地网络和文件访问只在您主动使用时参与工作。</span>
+              <span data-copy data-lang="en">Photo library, local network, and file access are used only when you start those flows.</span>
+            </p>
+          </div>
+          <div class="privacy-item">
+            <strong>
+              <span data-copy data-lang="zh">说明分开</span>
+              <span data-copy data-lang="en">Clear separation</span>
+            </strong>
+            <p>
+              <span data-copy data-lang="zh">产品介绍和隐私政策分别承载不同信息，阅读负担更轻。</span>
+              <span data-copy data-lang="en">Product messaging and privacy details stay separate for easier reading.</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="support">
+        <div class="support-panel">
+          <div class="support-copy">
+            <div class="section-kicker">
+              <span data-copy data-lang="zh">Support</span>
+              <span data-copy data-lang="en">Support</span>
+            </div>
+            <h2>
+              <span data-copy data-lang="zh">需要帮助时，直接进入正确入口。</span>
+              <span data-copy data-lang="en">Go straight to the right support entry.</span>
+            </h2>
+            <p>
+              <span data-copy data-lang="zh">如果您想了解项目、反馈问题或查看隐私说明，下面的链接已经足够。</span>
+              <span data-copy data-lang="en">If you want project details, need to report an issue, or want privacy information, the links below are enough.</span>
+            </p>
+          </div>
+
+          <div class="support-links">
+            <a class="support-link" href="https://github.com/TPSHION/parse" target="_blank" rel="noreferrer">
+              <div>
+                <strong>
+                  <span data-copy data-lang="zh">项目主页</span>
+                  <span data-copy data-lang="en">Project Page</span>
+                </strong>
+                <span data-copy data-lang="zh">仓库、说明和版本更新。</span>
+                <span data-copy data-lang="en">Repository, docs, and updates.</span>
+              </div>
+              <em aria-hidden="true">↗</em>
+            </a>
+
+            <a class="support-link" href="https://github.com/TPSHION/parse/issues" target="_blank" rel="noreferrer">
+              <div>
+                <strong>
+                  <span data-copy data-lang="zh">问题反馈</span>
+                  <span data-copy data-lang="en">Issue Tracker</span>
+                </strong>
+                <span data-copy data-lang="zh">提交 Bug、建议或使用反馈。</span>
+                <span data-copy data-lang="en">Report bugs, request changes, or share feedback.</span>
+              </div>
+              <em aria-hidden="true">↗</em>
+            </a>
+
+            <a class="support-link" href="./privacy-policy-zh.html">
+              <div>
+                <strong>
+                  <span data-copy data-lang="zh">隐私政策</span>
+                  <span data-copy data-lang="en">Privacy Policy</span>
+                </strong>
+                <span data-copy data-lang="zh">查看权限用途与数据处理说明。</span>
+                <span data-copy data-lang="en">Read more about permissions and data handling.</span>
+              </div>
+              <em aria-hidden="true">↗</em>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>
+        <span data-copy data-lang="zh">最后更新：2026-04-15</span>
+        <span data-copy data-lang="en">Last updated: 2026-04-15</span>
+      </span>
+      <span><a href="https://github.com/TPSHION/parse" target="_blank" rel="noreferrer">GitHub</a></span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var storageKey = "parse-support-language";
+      var root = document.documentElement;
+      var buttons = document.querySelectorAll("[data-switch]");
+      var preferred = "zh";
+
+      try {
+        preferred = localStorage.getItem(storageKey) || preferred;
+      } catch (error) {
+      }
+
+      if (!/^(zh|en)$/.test(preferred)) {
+        preferred = "zh";
+      }
+
+      function applyLanguage(language) {
+        root.setAttribute("data-lang", language);
+        root.setAttribute("lang", language === "zh" ? "zh-CN" : "en");
+
+        buttons.forEach(function (button) {
+          var active = button.getAttribute("data-switch") === language;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+
+        try {
+          localStorage.setItem(storageKey, language);
+        } catch (error) {
+        }
+      }
+
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          applyLanguage(button.getAttribute("data-switch"));
+        });
+      });
+
+      applyLanguage(preferred);
+    })();
+  </script>
+</body>
+</html>
