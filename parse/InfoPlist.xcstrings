@@ -25,6 +25,23 @@
         }
       }
     },
+    "NSCameraUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera access lets ParseLab capture photos or videos when you explicitly choose to import them for conversion, OCR, or related workflows."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要相机权限，才能在您主动拍摄并导入图片或视频时完成转换、OCR 等处理。我们不会在未经您主动操作的情况下访问相机。"
+          }
+        }
+      }
+    },
     "NSLocalNetworkUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {

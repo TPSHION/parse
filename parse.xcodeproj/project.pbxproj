@@ -392,6 +392,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ParseLab;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要相机权限，才能在您主动拍摄并导入图片或视频时完成转换、OCR 等处理。我们不会在未经您主动操作的情况下访问相机。";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要访问本地网络，才能开启局域网传输并让其他设备访问共享文件。";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要“添加到照片”权限，才能将转换后的图片、视频或 GIF 保存到系统相册中。我们不会主动读取您现有的照片或视频。";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要读取照片库内容，才能在局域网网页中展示图片和视频列表，并支持从手机相册下载原文件。";
@@ -444,6 +445,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ParseLab;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要相机权限，才能在您主动拍摄并导入图片或视频时完成转换、OCR 等处理。我们不会在未经您主动操作的情况下访问相机。";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要访问本地网络，才能开启局域网传输并让其他设备访问共享文件。";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要“添加到照片”权限，才能将转换后的图片、视频或 GIF 保存到系统相册中。我们不会主动读取您现有的照片或视频。";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要读取照片库内容，才能在局域网网页中展示图片和视频列表，并支持从手机相册下载原文件。";
