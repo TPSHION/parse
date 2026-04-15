@@ -1,16 +1,638 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=./privacy-policy-zh.html">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ParseLab Privacy Policy</title>
-  <link rel="canonical" href="./privacy-policy-zh.html">
-  <script>
-    window.location.replace("./privacy-policy-zh.html");
-  </script>
+  <meta name="description" content="ParseLab Privacy Policy">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f5f8;
+      --paper: #ffffff;
+      --text: #1b2430;
+      --muted: #697586;
+      --line: #d9e0e7;
+      --accent: #1858d6;
+      --notice: #f6f8fb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.8;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 28px auto 56px;
+      padding: 0 16px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+
+    .lang-switcher {
+      display: inline-flex;
+      gap: 6px;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .lang-button {
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 14px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lang-button.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .document {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    }
+
+    .header {
+      padding: 40px 40px 32px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 34px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .summary {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .meta-item {
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .meta-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .meta-item strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .content {
+      padding: 10px 40px 40px;
+    }
+
+    section {
+      padding-top: 28px;
+      margin-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    section:first-child {
+      border-top: 0;
+      margin-top: 0;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      line-height: 1.35;
+    }
+
+    p {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 8px 0;
+      font-size: 15px;
+    }
+
+    .notice {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-left: 3px solid var(--accent);
+      background: var(--notice);
+      color: var(--muted);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    [data-locale] {
+      display: none;
+    }
+
+    html[data-lang="en"] [data-locale="en"],
+    html[data-lang="zh"] [data-locale="zh"] {
+      display: block;
+    }
+
+    @media (max-width: 760px) {
+      .header,
+      .content {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .meta {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <p>If you are not redirected automatically, <a href="./privacy-policy-zh.html">open the privacy policy</a>.</p>
+  <div class="page">
+    <div class="topbar">
+      <div class="lang-switcher" aria-label="Language switcher">
+        <button class="lang-button active" type="button" data-switch="en">English</button>
+        <button class="lang-button" type="button" data-switch="zh">中文</button>
+      </div>
+    </div>
+
+    <main class="document">
+      <header class="header">
+        <div data-locale="en">
+          <p class="eyebrow">ParseLab Privacy Policy</p>
+          <h1>ParseLab Privacy Policy</h1>
+          <p class="summary">
+            This Privacy Policy explains how the ParseLab iOS app handles information related to you when providing file conversion, compression, OCR, ebook processing, and local network transfer features.
+          </p>
+          <div class="meta">
+            <div class="meta-item">
+              <span>Product</span>
+              <strong>ParseLab iOS App</strong>
+            </div>
+            <div class="meta-item">
+              <span>Last Updated</span>
+              <strong>April 15, 2026</strong>
+            </div>
+            <div class="meta-item">
+              <span>Contact</span>
+              <strong><a href="mailto:tpshion@163.com">tpshion@163.com</a></strong>
+            </div>
+          </div>
+        </div>
+
+        <div data-locale="zh">
+          <p class="eyebrow">ParseLab Privacy Policy</p>
+          <h1>ParseLab 隐私政策</h1>
+          <p class="summary">
+            本隐私政策旨在说明 ParseLab iOS 应用在提供文件转换、压缩、OCR、电子书处理及局域网传输等功能过程中，如何处理与您相关的信息。
+          </p>
+          <div class="meta">
+            <div class="meta-item">
+              <span>适用产品</span>
+              <strong>ParseLab iOS 应用</strong>
+            </div>
+            <div class="meta-item">
+              <span>更新日期</span>
+              <strong>2026 年 4 月 15 日</strong>
+            </div>
+            <div class="meta-item">
+              <span>联系邮箱</span>
+              <strong><a href="mailto:tpshion@163.com">tpshion@163.com</a></strong>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div data-locale="en">
+          <section>
+            <h2>1. Scope</h2>
+            <p>
+              This Privacy Policy applies to the ParseLab iOS app (the "App") and the information handling activities involved when you use it.
+            </p>
+            <p>
+              Unless otherwise stated, the App's core features are primarily designed for local processing and do not depend on an account system, advertising tracking, or developer-hosted cloud storage.
+            </p>
+          </section>
+
+          <section>
+            <h2>2. Whether We Collect Personal Information</h2>
+            <p>
+              By default, we do not collect, sell, or share your personal information for advertising, profiling, or data trading purposes.
+            </p>
+            <p>
+              Based on the App's current implementation, we do not perform cross-app tracking, and we do not upload the contents of files you import, convert, compress, recognize, or read to developer-operated servers by default.
+            </p>
+            <div class="notice">
+              Please note that when you intentionally use network-related features, such as entering a remote image URL, downloading ebook resources, visiting external websites, or using Apple's in-app purchase services, the related network requests interact with the relevant third-party service providers.
+            </div>
+          </section>
+
+          <section>
+            <h2>3. Categories of Information the App May Process</h2>
+            <ul>
+              <li>Files you actively choose or import, such as images, videos, audio, text, ebook files, and OCR recognition results.</li>
+              <li>Data available after you grant permission, such as images and videos in your photo library.</li>
+              <li>Local preference settings, such as language, reading styles, trial status, and local unlock status.</li>
+              <li>Local access addresses, pairing codes, and shared file directory content generated for local network transfer.</li>
+              <li>Remote resource links you actively enter, such as image URLs or ebook download links.</li>
+              <li>Limited transaction status information returned by Apple to confirm whether a purchase is active.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>4. How We Use This Information</h2>
+            <ul>
+              <li>To perform image, video, and audio conversion and compression.</li>
+              <li>To perform optical character recognition (OCR).</li>
+              <li>To import, convert, and read EPUB and TXT files.</li>
+              <li>To read photo library content after your authorization for importing files or for displaying and downloading the photo library items you choose to share through the local web page.</li>
+              <li>To save processed results back to the system photo library after your authorization.</li>
+              <li>To provide browser-based access, upload, download, and playback features to devices on the same network when you enable local network transfer.</li>
+              <li>To store necessary local preferences so you can continue using the App later.</li>
+              <li>To determine whether one-time purchase features have been unlocked based on purchase status returned by Apple.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>5. Permission Usage</h2>
+            <ul>
+              <li>
+                <strong>Local Network Permission:</strong>
+                Used to start local transfer features so other devices on the same Wi-Fi or local network can access the files you choose to share through a browser.
+              </li>
+              <li>
+                <strong>Photo Library Read Permission:</strong>
+                Used to import the photos and videos you choose, or to display photo library content available for download through the local web page.
+              </li>
+              <li>
+                <strong>Add to Photos Permission:</strong>
+                Used to save converted images, videos, or GIF files to the system photo library. This permission does not allow the App to automatically read all of your existing photos.
+              </li>
+              <li>
+                <strong>File Access Permission:</strong>
+                When you actively select files from the Files app or iCloud Drive, the App accesses only the items you selected.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>6. Local Processing and Local Network Transfer</h2>
+            <p>Most of the App's core capabilities are completed on your device. For example:</p>
+            <ul>
+              <li>Media conversion and compression are primarily completed locally.</li>
+              <li>OCR recognition relies primarily on on-device capabilities.</li>
+              <li>Ebook parsing, conversion, and reading are primarily completed locally.</li>
+            </ul>
+            <p>
+              When you actively enable local network transfer, the App starts a local web service on your device and allows devices on the same network to access the shared content through a browser. This process is device-to-device communication on a local network and is not the same as uploading files to developer-operated cloud services.
+            </p>
+            <div class="notice">
+              Please note that any device that has the access address and pairing code, and is connected to the same network, may be able to access the content you have chosen to share. For this reason, we recommend using this feature only on trusted networks and turning it off when you are done.
+            </div>
+          </section>
+
+          <section>
+            <h2>7. Network Features</h2>
+            <p>The App may send network requests in the following situations:</p>
+            <ul>
+              <li>When you actively enter a remote image address and request a download or import.</li>
+              <li>When you actively enter an ebook download link and request a download or import.</li>
+              <li>When you tap to visit external ebook resource websites.</li>
+              <li>When you use Apple's in-app purchase, restore purchase, or transaction status synchronization features.</li>
+            </ul>
+            <p>
+              In these situations, the relevant third-party service providers may process your device information, IP address, request time, and similar data as part of ordinary network communications. Such processing is governed by the applicable third party's own privacy policy and is not fully controlled by the App.
+            </p>
+          </section>
+
+          <section>
+            <h2>8. In-App Purchases</h2>
+            <p>
+              The App offers one-time purchase features supported by the Apple App Store. Payment processing, order handling, billing information, and transaction verification are primarily handled by Apple.
+            </p>
+            <p>
+              The App does not directly obtain your full payment details, such as bank card numbers or payment passwords, but it may receive limited purchase status information returned by Apple to determine whether relevant features are unlocked.
+            </p>
+          </section>
+
+          <section>
+            <h2>9. Storage and Retention</h2>
+            <ul>
+              <li>Files you import or generate are generally stored locally on your device or within the App sandbox directory.</li>
+              <li>Cache files, temporary downloads, and intermediate processing files may be automatically deleted after processing, or removed when you clear cache, delete files, or uninstall the App.</li>
+              <li>Local preference settings remain on your device until you delete the App, reset relevant settings, or the system removes them.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>10. Whether We Share Information with Third Parties</h2>
+            <p>Except in the following situations, we do not proactively sell or share your file contents with third parties:</p>
+            <ul>
+              <li>When you actively use Apple's in-app purchase services, the related transactions are processed by Apple.</li>
+              <li>When you actively access external links or download resources hosted on third-party servers, network communication occurs with the relevant websites or servers.</li>
+              <li>When you actively enable local transfer and share files with other devices on the same network, those devices can access the content you are currently sharing.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>11. Data Security</h2>
+            <p>
+              We seek to reduce privacy risks through local processing, minimum necessary permission access, and limiting unnecessary data transmission. However, no software, device, or network environment can guarantee absolute security.
+            </p>
+            <p>
+              To better protect your data, we recommend using the local transfer feature only on trusted networks and carefully managing your device permissions and local files.
+            </p>
+          </section>
+
+          <section>
+            <h2>12. Protection of Minors</h2>
+            <p>
+              The App is not specifically designed for children. If you are a minor, please use the App under the guidance of a parent or legal guardian and obtain their consent before granting permissions or making purchases.
+            </p>
+          </section>
+
+          <section>
+            <h2>13. Updates to This Privacy Policy</h2>
+            <p>
+              We may update this Privacy Policy based on product changes, legal or regulatory developments, or compliance requirements. The updated version will be presented through revised page content, in-app notices, or other appropriate means.
+            </p>
+          </section>
+
+          <section>
+            <h2>14. Contact Us</h2>
+            <p>If you have any questions about this Privacy Policy or the App's privacy practices, you may contact us at:</p>
+            <p>Email: <a href="mailto:tpshion@163.com">tpshion@163.com</a></p>
+          </section>
+        </div>
+
+        <div data-locale="zh">
+          <section>
+            <h2>1. 适用范围</h2>
+            <p>
+              本隐私政策适用于 ParseLab iOS 应用（以下简称“本应用”）在您使用过程中涉及的信息处理活动。
+            </p>
+            <p>
+              如无特别说明，本应用的核心功能以本地处理为主，不以建立账户体系、广告跟踪或开发者云端存储为前提。
+            </p>
+          </section>
+
+          <section>
+            <h2>2. 我们是否收集您的个人信息</h2>
+            <p>
+              默认情况下，我们不会为了广告、画像或数据交易目的而收集、出售或共享您的个人信息。
+            </p>
+            <p>
+              根据本应用当前实现，我们不进行跨 App 跟踪，也不会默认将您导入、转换、压缩、识别或阅读的文件内容上传至开发者自建服务器。
+            </p>
+            <div class="notice">
+              需要说明的是：当您主动使用联网功能时，例如输入远程图片地址、下载电子书资源、访问外部网站，或使用 Apple 的应用内购买服务时，相关网络请求会与对应的第三方服务提供方发生交互。
+            </div>
+          </section>
+
+          <section>
+            <h2>3. 本应用可能处理的信息类型</h2>
+            <ul>
+              <li>您主动选择或导入的文件，例如图片、视频、音频、文本、电子书文件以及 OCR 识别结果。</li>
+              <li>您主动授予权限后可访问的数据，例如照片库中的图片和视频。</li>
+              <li>本地偏好设置，例如语言、阅读样式、试用状态和本地解锁状态。</li>
+              <li>为完成局域网传输而生成的本地访问地址、配对码和共享文件目录内容。</li>
+              <li>您主动输入的远程资源链接，例如图片链接或电子书下载链接。</li>
+              <li>Apple 为完成应用内购买所返回的有限交易状态信息，例如购买是否生效。</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>4. 我们如何使用这些信息</h2>
+            <ul>
+              <li>执行图片、视频、音频转换与压缩。</li>
+              <li>执行图片文字识别（OCR）。</li>
+              <li>执行 EPUB / TXT 导入、转换与阅读。</li>
+              <li>在您授权后读取照片库内容，用于导入文件或在局域网网页中展示和下载您选择共享的相册内容。</li>
+              <li>在您授权后将处理结果保存到系统照片库。</li>
+              <li>在您启用局域网传输时，向同一网络中的设备提供浏览器访问、上传、下载和在线播放能力。</li>
+              <li>保存必要的本地偏好设置，以便您下次继续使用。</li>
+              <li>根据 Apple 返回的购买状态判断您是否已解锁一次性购买功能。</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>5. 权限使用说明</h2>
+            <ul>
+              <li>
+                <strong>本地网络权限：</strong>
+                用于启动局域网传输功能，让同一 Wi-Fi 或局域网中的其他设备通过浏览器访问您选择共享的文件。
+              </li>
+              <li>
+                <strong>照片库读取权限：</strong>
+                用于导入您选择的照片与视频，或在局域网网页中展示可供下载的相册内容。
+              </li>
+              <li>
+                <strong>添加到照片权限：</strong>
+                用于将转换后的图片、视频或 GIF 保存到系统相册。该权限不会让本应用自动读取您现有的全部照片内容。
+              </li>
+              <li>
+                <strong>文件访问权限：</strong>
+                当您从“文件”或 iCloud Drive 中主动选择文件时，本应用仅访问您选中的项目。
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>6. 本地处理与局域网传输说明</h2>
+            <p>本应用的多数核心能力在您的设备上完成。例如：</p>
+            <ul>
+              <li>媒体转换与压缩主要在本地完成。</li>
+              <li>OCR 识别基于设备侧能力完成。</li>
+              <li>电子书解析、转换与阅读主要在本地完成。</li>
+            </ul>
+            <p>
+              当您主动开启局域网传输后，本应用会在您的设备上启动本地 Web 服务，并允许同一网络中的设备通过浏览器访问共享内容。该过程属于设备与设备之间的本地网络通信，不等同于将文件上传到开发者云端。
+            </p>
+            <div class="notice">
+              请注意：任何获得访问地址和配对码、且处于同一网络环境中的设备，都可能访问您当前选择共享的内容。因此，建议您仅在可信网络环境中开启该功能，并在使用完成后及时关闭。
+            </div>
+          </section>
+
+          <section>
+            <h2>7. 联网功能说明</h2>
+            <p>本应用在以下情况下可能发起网络请求：</p>
+            <ul>
+              <li>您主动输入远程图片地址并要求下载导入时。</li>
+              <li>您主动输入电子书下载链接并要求下载导入时。</li>
+              <li>您点击访问外部电子书资源网站时。</li>
+              <li>您使用 Apple 的应用内购买、恢复购买或交易状态同步功能时。</li>
+            </ul>
+            <p>
+              在这些场景下，相关第三方服务提供方可能会基于网络通信常规处理您的设备信息、IP 地址、请求时间等数据。该等处理受对应第三方自己的隐私政策约束，而不完全由本应用控制。
+            </p>
+          </section>
+
+          <section>
+            <h2>8. 应用内购买说明</h2>
+            <p>
+              本应用提供由 Apple App Store 支持的一次性购买功能。支付、订单处理、账单信息以及交易验证主要由 Apple 负责。
+            </p>
+            <p>
+              本应用不会直接获取您的银行卡号、支付密码等完整支付信息，但可能会接收 Apple 返回的有限购买状态信息，以判断相关功能是否已解锁。
+            </p>
+          </section>
+
+          <section>
+            <h2>9. 信息存储与保存期限</h2>
+            <ul>
+              <li>您导入或生成的文件通常保存在您的设备本地或应用沙盒目录中。</li>
+              <li>缓存、临时下载文件和中间处理文件可能在处理完成后自动删除，也可能在您清除缓存、删除文件或卸载应用时被移除。</li>
+              <li>本地偏好设置会保留在设备上，直到您删除应用、重置相关设置，或系统将其移除。</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>10. 我们是否向第三方共享信息</h2>
+            <p>除以下情况外，我们不会主动向第三方出售或共享您的文件内容：</p>
+            <ul>
+              <li>您主动使用 Apple 的应用内购买服务时，相关交易由 Apple 处理。</li>
+              <li>您主动访问外部链接或下载第三方服务器上的资源时，会与对应网站或服务器发生网络通信。</li>
+              <li>您主动开启局域网传输并向同一网络中的其他设备共享文件时，相关设备可访问您当前共享的内容。</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>11. 数据安全</h2>
+            <p>
+              我们会尽量通过本地处理、最小权限访问和减少不必要的数据外发来降低隐私风险。但任何软件、设备或网络环境都无法保证绝对安全。
+            </p>
+            <p>
+              为更好地保护您的数据，请您在可信网络环境中使用局域网传输功能，并妥善管理设备本身的系统权限和本地文件。
+            </p>
+          </section>
+
+          <section>
+            <h2>12. 未成年人保护</h2>
+            <p>
+              本应用并非专门面向儿童设计。若您是未成年人，请在监护人指导下使用本应用，并在授予权限或进行购买前征得监护人同意。
+            </p>
+          </section>
+
+          <section>
+            <h2>13. 隐私政策更新</h2>
+            <p>
+              我们可能会根据产品功能调整、法律法规变化或合规要求更新本隐私政策。更新后的版本将通过新的页面内容、应用内说明或其他适当方式向您展示。
+            </p>
+          </section>
+
+          <section>
+            <h2>14. 联系我们</h2>
+            <p>如您对本隐私政策或本应用的隐私实践有疑问，可通过以下方式联系我们：</p>
+            <p>电子邮箱：<a href="mailto:tpshion@163.com">tpshion@163.com</a></p>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var storageKey = "parse-privacy-language";
+      var root = document.documentElement;
+      var buttons = document.querySelectorAll("[data-switch]");
+      var preferred = "en";
+
+      try {
+        preferred = localStorage.getItem(storageKey) || preferred;
+      } catch (error) {
+      }
+
+      if (!/^(en|zh)$/.test(preferred)) {
+        preferred = "en";
+      }
+
+      function applyLanguage(language) {
+        root.setAttribute("data-lang", language);
+        root.setAttribute("lang", language === "zh" ? "zh-CN" : "en");
+        document.title = language === "zh" ? "ParseLab 隐私政策" : "ParseLab Privacy Policy";
+
+        buttons.forEach(function (button) {
+          var active = button.getAttribute("data-switch") === language;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+
+        try {
+          localStorage.setItem(storageKey, language);
+        } catch (error) {
+        }
+      }
+
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          applyLanguage(button.getAttribute("data-switch"));
+        });
+      });
+
+      applyLanguage(preferred);
+    })();
+  </script>
 </body>
 </html>
